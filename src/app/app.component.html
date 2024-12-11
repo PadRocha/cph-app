@@ -1,0 +1,21 @@
+<div class="container mt-5">
+  <h1>Prueba de ng-bootstrap</h1>
+  <button type="button" class="btn btn-primary" (click)="open(content)">
+    Abrir Modal
+  </button>
+
+  <ng-template #content let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">¡Hola desde ng-bootstrap!</h4>
+      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+      <p>Si ves este modal, ¡ng-bootstrap está funcionando correctamente!</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Cerrar</button>
+    </div>
+  </ng-template>
+</div>
+
+<router-outlet />
