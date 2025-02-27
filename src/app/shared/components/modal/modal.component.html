@@ -1,0 +1,41 @@
+<div class="modal-backdrop" (click)="onBackdropClick()" *ngIf="isOpen">
+  <div 
+    class="modal-dialog" 
+    [ngClass]="sizeClass" 
+    [@modalState]="isOpen ? 'visible' : 'void'" 
+    (click)="$event.stopPropagation()"
+  >
+    <div class="modal-content">
+      <!-- Header -->
+      <div class="modal-header">
+        <ng-container *ngIf="headerTemplate; else defaultHeader">
+          <ng-container *ngTemplateOutlet="headerTemplate"></ng-container>
+        </ng-container>
+        <ng-template #defaultHeader>
+          <h1 class="modal-title">
+            <ng-content select="[modal-title]"></ng-content>
+          </h1>
+          <button class="btn-close" (click)="hide()" aria-label="Close"></button>
+        </ng-template>
+      </div>
+      <!-- Body -->
+      <div class="modal-body">
+        <ng-container *ngIf="bodyTemplate; else defaultBody">
+          <ng-container *ngTemplateOutlet="bodyTemplate"></ng-container>
+        </ng-container>
+        <ng-template #defaultBody>
+          <ng-content select="[modal-body]"></ng-content>
+        </ng-template>
+      </div>
+      <!-- Footer -->
+      <div class="modal-footer">
+        <ng-container *ngIf="footerTemplate; else defaultFooter">
+          <ng-container *ngTemplateOutlet="footerTemplate"></ng-container>
+        </ng-container>
+        <ng-template #defaultFooter>
+          <ng-content select="[modal-footer]"></ng-content>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

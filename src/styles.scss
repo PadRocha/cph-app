@@ -1,2 +1,20 @@
-@use 'bootstrap';
+@import 'local_variables';
+@import 'local_mixins';
 
+body {
+    background-color: rbg(219, 219, 219);
+    @include scroll;
+}
+
+*:has(> [class^='ico-']) {
+    display: flex;
+    align-items: center !important;
+}
+
+*[copy] {
+    cursor: pointer;
+}
+
+.aside-width {
+    width: 260px !important;
+}

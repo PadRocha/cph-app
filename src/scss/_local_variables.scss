@@ -1,0 +1,118 @@
+// VARIABLES RELEVANTES (para reutilización en otros componentes)
+$z-index-backdrop: 1050; // Backdrop por encima de la página
+$z-index-container: 1055; // Contenedor del modal, mayor que el backdrop
+$z-index-dialog: 1060; // Modal dialog, por encima del contenedor
+$z-index-content: 1065; // Contenido del modal, el más alto
+
+// VARIABLES DE COLORES Y ESTILOS
+$modal-bg: #fff;
+$modal-color: #212529;
+$modal-bg-dark: #2e2e2e;
+$modal-color-dark: #f8f9fa;
+
+// Definir valores de espaciado
+$spacer: 1rem;
+$spacers: (
+  0: 0,
+  1: $spacer * 0.25,
+  2: $spacer * 0.5,
+  3: $spacer,
+  4: $spacer * 1.5,
+  5: $spacer * 3,
+  auto: auto
+);
+
+// Breakpoints de Bootstrap
+$breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px
+);
+
+//*------------------------------------------------------------------*/
+// * Main
+//*------------------------------------------------------------------*/
+$primary: #fff;
+$secundary: #000;
+$lighter: 20%;
+$darker: 20%;
+$icons-size: 1rem;
+$scrollbar-thumb: #545456;
+$scrollbar-track: #060608;
+$option-collection: (
+  #ffffff,
+  #a09f9f,
+  #cd4b4b,
+  #4b4bff,
+  #ae2aae,
+  #00c200,
+);
+//*------------------------------------------------------------------*/
+// * Scroll To Top
+//*------------------------------------------------------------------*/
+$scroll-top-background: #9055a2dc;
+$scroll-top-spacing: 1rem;
+$scroll-top-size: 35px;
+//*------------------------------------------------------------------*/
+// * Aside Lines
+//*------------------------------------------------------------------*/
+$aside-background: #000;
+$aside-error: #ff0000;
+//*------------------------------------------------------------------*/
+// * Item
+//*------------------------------------------------------------------*/
+$item-color: #ffF;
+$item-icon-collection: (
+  warning,
+  settings,
+  camera,
+);
+//*------------------------------------------------------------------*/
+// * Header
+//*------------------------------------------------------------------*/
+$header-min-height: 58px;
+$header-icon-collection: (
+  logout,
+  return,
+);
+//*------------------------------------------------------------------*/
+// * Home
+//*------------------------------------------------------------------*/
+$home-icon-collection: (
+  image,
+  defective,
+  found,
+  photographed,
+  prepared,
+  edited,
+  saved,
+  left-bar,
+);
+//*------------------------------------------------------------------*/
+// * Modal Images
+//*------------------------------------------------------------------*/
+$images-icon-collection: (
+  arrow-left,
+  arrow-right,
+  back,
+);
+//*------------------------------------------------------------------*/
+// * Modal Image Editor
+//*------------------------------------------------------------------*/
+$editor-icon-collection: (
+  undo,
+  redo,
+  left,
+  center,
+  right,
+  justify,
+  transparent,
+  fill,
+  stroke,
+  background,
+  opacity,
+  round,
+);

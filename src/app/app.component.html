@@ -1,21 +1,46 @@
 <div class="container mt-5">
-  <h1>Prueba de ng-bootstrap</h1>
-  <button type="button" class="btn btn-primary" (click)="open(content)">
+  <h1>Prueba de ModalComponent</h1>
+  <button type="button" class="btn btn-primary" (click)="openModal()">
     Abrir Modal
   </button>
+  <label>
+    <input type="checkbox" [(ngModel)]="darkTheme" /> Modo oscuro
+  </label>
 
-  <ng-template #content let-modal>
-    <div class="modal-header">
-      <h4 class="modal-title" id="modal-basic-title">¡Hola desde ng-bootstrap!</h4>
-      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
-    </div>
-    <div class="modal-body">
-      <p>Si ves este modal, ¡ng-bootstrap está funcionando correctamente!</p>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Cerrar</button>
-    </div>
-  </ng-template>
+  <!-- Aquí se incluye el ModalComponent -->
+  <app-modal
+    #demoModal
+    backdrop="static"
+    size="lg"
+    [keyboard]="false"
+    [ngClass]="{ 'theme-dark': darkTheme }"
+    (onShow)="onModalShow($event)"
+    (onShown)="onModalShown()"
+    (onHide)="onModalHide()"
+    (onHidden)="onModalHidden()"
+    (onHidePrevented)="onModalHidePrevented()"
+  >
+    <!-- Encabezado personalizado -->
+    <ng-template #modalHeader>
+      <h4 class="modal-title">¡Hola desde ModalComponent!</h4>
+      <button class="btn-close" (click)="demoModal.hide()" aria-label="Cerrar"></button>
+    </ng-template>
+    <!-- Cuerpo del modal -->
+    <ng-template #modalBody>
+      <p>
+        Este es el <b>contenido del modal</b>. Aquí puedes poner textos, formularios,
+        etc.
+      </p>
+      <p *ngIf="showExtraInfo">
+        Información extra visible según configuración.
+      </p>
+    </ng-template>
+    <!-- Pie del modal -->
+    <ng-template #modalFooter>
+      <button class="btn btn-secondary" (click)="demoModal.hide()">Cerrar</button>
+      <button class="btn btn-primary" (click)="accion()">Acción</button>
+    </ng-template>
+  </app-modal>
 </div>
 
 <router-outlet />
