@@ -1,5 +1,5 @@
-import { CanActivateFn } from '@angular/router';
+import { CanMatchFn } from '@angular/router';
 
-export const editGuard: CanActivateFn = (route, state) => {
+export const editGuard: CanMatchFn = (route, segments) => {
   return true;
 };

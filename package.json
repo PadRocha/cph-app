@@ -2,9 +2,10 @@
   "name": "cph-app",
   "version": "0.1.0",
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve --no-hmr",
-    "build": "ng build",
+    "start": "ng serve --no-hmr --configuration development --port 1420",
+    "start:prod": "ng serve --no-hmr --configuration production --port 1420",
+    "build": "ng build --configuration production",
+    "build:dev": "ng build --configuration development",
     "watch": "ng build --watch --configuration development",
     "tauri": "tauri",
     "dev": "tauri dev"

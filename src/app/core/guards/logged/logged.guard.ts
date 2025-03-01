@@ -1,5 +1,5 @@
-import { CanActivateFn } from '@angular/router';
+import { CanMatchFn } from '@angular/router';
 
-export const loggedGuard: CanActivateFn = (route, state) => {
+export const loggedGuard: CanMatchFn = (route, segments) => {
   return true;
 };

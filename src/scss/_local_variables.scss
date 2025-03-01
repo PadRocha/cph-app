@@ -1,37 +1,6 @@
-// VARIABLES RELEVANTES (para reutilización en otros componentes)
-$z-index-backdrop: 1050; // Backdrop por encima de la página
-$z-index-container: 1055; // Contenedor del modal, mayor que el backdrop
-$z-index-dialog: 1060; // Modal dialog, por encima del contenedor
-$z-index-content: 1065; // Contenido del modal, el más alto
-
-// VARIABLES DE COLORES Y ESTILOS
-$modal-bg: #fff;
-$modal-color: #212529;
-$modal-bg-dark: #2e2e2e;
-$modal-color-dark: #f8f9fa;
-
-// Definir valores de espaciado
-$spacer: 1rem;
-$spacers: (
-  0: 0,
-  1: $spacer * 0.25,
-  2: $spacer * 0.5,
-  3: $spacer,
-  4: $spacer * 1.5,
-  5: $spacer * 3,
-  auto: auto
-);
-
-// Breakpoints de Bootstrap
-$breakpoints: (
-  xs: 0,
-  sm: 576px,
-  md: 768px,
-  lg: 992px,
-  xl: 1200px,
-  xxl: 1400px
-);
-
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins';
 //*------------------------------------------------------------------*/
 // * Main
 //*------------------------------------------------------------------*/

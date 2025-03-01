@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
-import { CanActivateFn } from '@angular/router';
+import { CanMatchFn } from '@angular/router';
 
 import { editGuard } from './edit.guard';
 
 describe('editGuard', () => {
-  const executeGuard: CanActivateFn = (...guardParameters) => 
+  const executeGuard: CanMatchFn = (...guardParameters) => 
       TestBed.runInInjectionContext(() => editGuard(...guardParameters));
 
   beforeEach(() => {
