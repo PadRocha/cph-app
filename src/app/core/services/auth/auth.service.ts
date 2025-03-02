@@ -5,12 +5,13 @@ import { Router } from "@angular/router";
 import { User } from "@core/models";
 import { environment } from "@environment";
 
+type Token = { token: string };
+
 @Injectable({
   providedIn: "root",
 })
 export class AuthService {
   protected url: String;
-  private headersJSON: HttpHeaders;
   private tokenSignal: WritableSignal<string | null>;
 
   constructor(
@@ -19,7 +20,6 @@ export class AuthService {
     @Inject(PLATFORM_ID) protected platformId: InjectionToken<Object>
   ) {
     this.url = environment.httpUrl;
-    this.headersJSON = new HttpHeaders().set("Content-Type","application/json");
     this.tokenSignal = signal<string | null>(null);
 
     if (isPlatformBrowser(this.platformId)) {
@@ -41,10 +41,14 @@ export class AuthService {
     this.tokenSignal.set(value);
   }
 
-  public login(user: User) {
-    const params = JSON.stringify(user);
-    return this.http.post<{ token: string }>(`${this.url}/user/login`, params, {
-      headers: this.headersJSON,
+  public login(user: User){
+    const params = JSON.stringify(user); 
+    // const logged = this.http.post<{ token: string|null }>(`${this.url}/user/login`, params, {
+    //   headers: new HttpHeaders().set("Content-Type", "application/json"),
+    // });
+    // return toSignal(logged , { initialValue: { token: null } });
+    return this.http.post<Token>(`${this.url}/user/login`, params, {
+      headers: new HttpHeaders().set("Content-Type", "application/json"),
     });
   }
 
@@ -54,11 +58,11 @@ export class AuthService {
     this.router.navigate(["/login"]);
   }
 
-  get token(): string | null {
+  public get token(): string | null {
     return this.tokenSignal();
   }
 
-  get loggedIn(): boolean {
+  public get loggedIn(): boolean {
     return !!this.tokenSignal();
   }
 }
