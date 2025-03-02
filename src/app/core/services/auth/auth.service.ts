@@ -1,6 +1,13 @@
 import { isPlatformBrowser } from "@angular/common";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { Inject, Injectable, InjectionToken, PLATFORM_ID, signal, WritableSignal } from "@angular/core";
+import {
+  Inject,
+  Injectable,
+  InjectionToken,
+  PLATFORM_ID,
+  signal,
+  WritableSignal,
+} from "@angular/core";
 import { Router } from "@angular/router";
 import { User } from "@core/models";
 import { environment } from "@environment";
@@ -37,12 +44,13 @@ export class AuthService {
   public setToken(value: string, expiry = true): void {
     const now = new Date();
     const item = { value, expiry: expiry ? now.getTime() + 86_400_000 : false };
-    if (isPlatformBrowser(this.platformId)) sessionStorage.setItem("token", JSON.stringify(item));
+    if (isPlatformBrowser(this.platformId))
+      sessionStorage.setItem("token", JSON.stringify(item));
     this.tokenSignal.set(value);
   }
 
-  public login(user: User){
-    const params = JSON.stringify(user); 
+  public login(user: User) {
+    const params = JSON.stringify(user);
     // const logged = this.http.post<{ token: string|null }>(`${this.url}/user/login`, params, {
     //   headers: new HttpHeaders().set("Content-Type", "application/json"),
     // });
