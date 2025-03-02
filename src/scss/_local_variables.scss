@@ -1,6 +1,7 @@
 @import 'bootstrap/scss/functions';
 @import 'bootstrap/scss/variables';
 @import 'bootstrap/scss/mixins';
+
 //*------------------------------------------------------------------*/
 // * Main
 //*------------------------------------------------------------------*/
@@ -19,6 +20,35 @@ $option-collection: (
   #ae2aae,
   #00c200,
 );
+// Altura del title-bar
+$title-bar-height: 2.313rem;
+
+// Estilos generales del title-bar
+$title-bar-bg: #2d2d2d;
+$title-bar-text: $primary; // Asumimos que $primary es #fff
+
+// Botones de control en el title-bar
+$title-bar-control-button-font-size: 14px;
+$title-bar-control-button-bg: transparent;
+$title-bar-control-button-border: none;
+$title-bar-control-button-color: $title-bar-text;
+$title-bar-control-button-hover-bg: rgba(255, 255, 255, 0.2);
+$title-bar-control-button-close-hover-bg: #e81123;
+
+// Icono del title-bar
+$title-bar-icon-size: 1rem;
+
+// Dropdown de historial
+$title-bar-dropdown-bg: #3a3a3a;
+$title-bar-dropdown-border: #555;
+$title-bar-dropdown-border-radius: 4px;
+$title-bar-dropdown-z-index: 10;
+$title-bar-dropdown-min-width: 200px;
+$title-bar-dropdown-padding-vertical: 0.5rem;
+$title-bar-dropdown-button-padding: 0.5rem 1rem;
+
+// Estado actual (ruta seleccionada)
+$title-bar-current-bg: rgba(255, 255, 255, 0.3);
 //*------------------------------------------------------------------*/
 // * Scroll To Top
 //*------------------------------------------------------------------*/

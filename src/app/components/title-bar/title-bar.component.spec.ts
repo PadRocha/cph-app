@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PageNotFoundComponent } from './page-not-found.component';
+import { TitleBarComponent } from './title-bar.component';
 
-describe('PageNotFoundComponent', () => {
-  let component: PageNotFoundComponent;
-  let fixture: ComponentFixture<PageNotFoundComponent>;
+describe('TitleBarComponent', () => {
+  let component: TitleBarComponent;
+  let fixture: ComponentFixture<TitleBarComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PageNotFoundComponent]
+      imports: [TitleBarComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(PageNotFoundComponent);
+    fixture = TestBed.createComponent(TitleBarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -25,8 +25,17 @@
     "noPropertyAccessFromIndexSignature": true,
     "outDir": "./dist/out-tsc",
     "paths": {
+      "@components": [
+        "src/app/components/index.ts"
+      ],
       "@core/*": [
         "src/app/core/*"
+      ],
+      "@routes": [
+        "src/app/routes/index.ts"
+      ],
+      "@shared/*": [
+        "src/app/shared/*"
       ],
       "@dashboard/*": [
         "src/app/pages/dashboard/*"
@@ -35,17 +44,14 @@
         "src/environments/environment.ts"
       ],
       "@home/*": [
-        "src/app/pages/home/*"
+        "src/app/routes/home/*"
       ],
       "@login/*": [
-        "src/app/pages/login/*"
+        "src/app/routes/login/*"
       ],
       "@pdf/*": [
-        "src/app/pages/pdf/*"
+        "src/app/routes/pdf/*"
       ],
-      "@shared/*": [
-        "src/app/shared/*"
-      ]
     },
     "skipLibCheck": true,
     "sourceMap": true,

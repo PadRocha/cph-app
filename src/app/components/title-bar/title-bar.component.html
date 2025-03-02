@@ -1,0 +1,93 @@
+<div class="d-inline-flex align-items-center me-2">
+  <ng-container *ngIf="canGoBack()">
+    <button
+      class="control-button py-1 px-3"
+      (click)="goBack()"
+      title="Anterior"
+      aria-label="Anterior"
+    >
+      &#x2190;
+    </button>
+  </ng-container>
+  <ng-container *ngIf="canGoForward()">
+    <button
+      class="control-button py-1 px-3"
+      (click)="goForward()"
+      title="Siguiente"
+      aria-label="Siguiente"
+    >
+      &#x2192;
+    </button>
+  </ng-container>
+  <ng-container *ngIf="showDropdown()">
+    <div ngbDropdown class="d-inline-block">
+      <button
+        ngbDropdownToggle
+        type="button"
+        class="control-button dropdown-toggle"
+        (click)="toggleDropdown()"
+        title="Historial"
+        aria-label="Historial"
+      ></button>
+      <div ngbDropdownMenu class="dropdown-menu-flotante">
+        <button
+          ngbDropdownItem
+          *ngFor="let item of partialHistory"
+          [class.current]="isCurrent(item.index)"
+          (click)="navigateTo(item.index)"
+          [title]="item.route"
+          [attr.aria-label]="'Ir a ' + item.route"
+        >
+          {{ item.route }}
+        </button>
+      </div>
+    </div>
+  </ng-container>
+  <button
+    class="control-button py-1 px-3"
+    (click)="onRefresh()"
+    title="Actualizar"
+    aria-label="Actualizar"
+  >
+    &#x21bb;
+  </button>
+</div>
+<div
+  class="drag-handle d-inline-flex align-items-center flex-grow-1"
+  title="Título de la aplicación"
+>
+  <img
+    src="title-icon.png"
+    class="title-icon me-2"
+    alt="Icono de la aplicación"
+    title="Icono"
+  />
+  <span class="title-text" title="Catálogo">Catalogo</span>
+</div>
+<div class="d-inline-flex align-items-center">
+  <button
+    class="control-button py-1 px-3 order-1 rounded-start"
+    (click)="onMinimize()"
+    title="Minimizar"
+    aria-label="Minimizar"
+  >
+    &#x2013;
+  </button>
+  <button
+    class="control-button py-1 px-3 order-2"
+    (click)="onToggleMaximize()"
+    title="Maximizar/restaurar"
+    aria-label="Maximizar o restaurar"
+  >
+    <ng-container *ngIf="!isMaximized(); else restoreIcon">&#9744;</ng-container>
+    <ng-template #restoreIcon>&#9633;</ng-template>
+  </button>
+  <button
+    class="control-button py-1 px-3 order-3 rounded-end close"
+    (click)="onClose()"
+    title="Cerrar"
+    aria-label="Cerrar"
+  >
+    &#10005;
+  </button>
+</div>

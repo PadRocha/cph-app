@@ -1,0 +1,76 @@
+@import "local_variables";
+
+:host {
+  height: $title-bar-height;
+  max-height: $title-bar-height;
+  box-sizing: border-box;
+  background-color: $title-bar-bg;
+  color: $title-bar-text;
+  @supports (-webkit-app-region: no-drag) {
+    -webkit-app-region: no-drag;
+  }
+}
+/* Área de arrastre: Título central */
+.drag-handle {
+  cursor: default;
+}
+
+/* Icono y texto del título */
+.title-icon {
+  width: $title-bar-icon-size;
+  height: $title-bar-icon-size;
+  cursor: pointer;
+}
+
+.title-text {
+  font-size: $title-bar-control-button-font-size;
+  cursor: pointer;
+}
+
+/* Botones generales */
+.control-button {
+  background: $title-bar-control-button-bg;
+  border: $title-bar-control-button-border;
+  color: $title-bar-control-button-color;
+  cursor: pointer;
+  font-size: $title-bar-control-button-font-size;
+
+  &:hover {
+    background-color: $title-bar-control-button-hover-bg;
+  }
+
+  &.close:hover {
+    background-color: $title-bar-control-button-close-hover-bg;
+  }
+}
+
+/* Dropdown flotante para historial */
+.dropdown-menu-flotante {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: $title-bar-dropdown-bg;
+  border: 1px solid $title-bar-dropdown-border;
+  border-radius: $title-bar-dropdown-border-radius;
+  z-index: $title-bar-dropdown-z-index;
+  min-width: $title-bar-dropdown-min-width;
+  padding: $title-bar-dropdown-padding-vertical 0;
+
+  & button[ngbDropdownItem] {
+    width: 100%;
+    background: $title-bar-control-button-bg;
+    border: $title-bar-control-button-border;
+    color: $title-bar-text;
+    text-align: left;
+    padding: $title-bar-dropdown-button-padding;
+
+    &:hover {
+      background-color: $title-bar-control-button-hover-bg;
+    }
+
+    &.current {
+      background-color: $title-bar-current-bg;
+      font-weight: bold;
+    }
+  }
+}

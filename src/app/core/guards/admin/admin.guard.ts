@@ -2,11 +2,11 @@ import { inject } from '@angular/core';
 import { CanMatchFn, Router } from '@angular/router';
 import { UserService } from '@core/services';
 
-export const editGuard: CanMatchFn = () => {
+export const adminGuard: CanMatchFn = (route, segments) => {
   const user = inject(UserService);
   const router = inject(Router);
 
-  if (user.hasRole("EDIT", "GRANT", "ADMIN")) return true;
+  if (user.hasRole("GRANT", "ADMIN")) return true;
 
-  return router.createUrlTree(["/pdf"]);
+  return router.createUrlTree(["/home"]);
 };
