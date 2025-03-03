@@ -1,93 +1,80 @@
 <div class="d-inline-flex align-items-center me-2">
   <ng-container *ngIf="canGoBack()">
-    <button
-      class="control-button py-1 px-3"
-      (click)="goBack()"
-      title="Anterior"
-      aria-label="Anterior"
-    >
+    <button class="control-button py-2 px-3" (click)="goBack()" title="Anterior" aria-label="Anterior">
       &#x2190;
     </button>
   </ng-container>
   <ng-container *ngIf="canGoForward()">
-    <button
-      class="control-button py-1 px-3"
-      (click)="goForward()"
-      title="Siguiente"
-      aria-label="Siguiente"
-    >
+    <button class="control-button py-2 px-3" (click)="goForward()" title="Siguiente" aria-label="Siguiente">
       &#x2192;
     </button>
   </ng-container>
   <ng-container *ngIf="showDropdown()">
     <div ngbDropdown class="d-inline-block">
-      <button
-        ngbDropdownToggle
-        type="button"
-        class="control-button dropdown-toggle"
-        (click)="toggleDropdown()"
-        title="Historial"
-        aria-label="Historial"
-      ></button>
+      <button ngbDropdownToggle type="button" class="control-button py-2 px-3 dropdown-toggle" (click)="toggleDropdown()" title="Historial" aria-label="Historial"></button>
       <div ngbDropdownMenu class="dropdown-menu-flotante">
-        <button
-          ngbDropdownItem
-          *ngFor="let item of partialHistory"
-          [class.current]="isCurrent(item.index)"
-          (click)="navigateTo(item.index)"
-          [title]="item.route"
-          [attr.aria-label]="'Ir a ' + item.route"
-        >
-          {{ item.route }}
-        </button>
+        <ng-container *ngFor="let item of partialHistory">
+          <button ngbDropdownItem [class.current]="isCurrent(item.index)" (click)="navigateTo(item.index)" [title]="item.route" [attr.aria-label]="'Ir a ' + item.route">
+            {{ item.route }}
+          </button>
+        </ng-container>
       </div>
     </div>
   </ng-container>
-  <button
-    class="control-button py-1 px-3"
-    (click)="onRefresh()"
-    title="Actualizar"
-    aria-label="Actualizar"
-  >
+  <button class="control-button py-2 px-3" (click)="onRefresh()" title="Actualizar" aria-label="Actualizar">
     &#x21bb;
   </button>
 </div>
-<div
-  class="drag-handle d-inline-flex align-items-center flex-grow-1"
-  title="Título de la aplicación"
->
-  <img
-    src="title-icon.png"
-    class="title-icon me-2"
-    alt="Icono de la aplicación"
-    title="Icono"
-  />
-  <span class="title-text" title="Catálogo">Catalogo</span>
+<div class="drag-handle d-flex align-items-center justify-content-between flex-grow-1" title="Título de la aplicación">
+  <a class="d-flex align-items-center py-2 text-decoration-none" [routerLink]="['/home']" title="Ir a home">
+    <img src="title-icon.png" class="title-icon me-2" alt="Icono de la aplicación" title="Icono"/>
+    <span class="title-text" title="Catálogo">Catálogo</span>
+  </a>
+  <div class="d-none d-md-flex align-items-center me-3 gap-2">
+    <button class="control-button py-2 px-3" [routerLink]="['/pdf']" routerLinkActive="active">
+      PDF
+    </button>
+    <ng-container *ngIf="isAdmin">
+      <button class="control-button py-2 px-3" [routerLink]="['/dashboard']" routerLinkActive="active">
+        Dashboard
+      </button>
+    </ng-container>
+  </div>
+  <div class="d-md-none me-2" ngbDropdown>
+    <button type="button" class="control-button py-2 px-3 dropdown-toggle" ngbDropdownToggle aria-label="Abrir menú">
+      &#9776;
+    </button>
+    <div ngbDropdownMenu class="dropdown-menu-flotante">
+      <button class="control-button w-100" ngbDropdownItem [routerLink]="['/pdf']">
+        PDF
+      </button>
+      <ng-container *ngIf="isAdmin">
+        <button class="control-button w-100" ngbDropdownItem [routerLink]="['/dashboard']">
+          Dashboard
+        </button>
+      </ng-container>
+    </div>
+  </div>
 </div>
 <div class="d-inline-flex align-items-center">
-  <button
-    class="control-button py-1 px-3 order-1 rounded-start"
-    (click)="onMinimize()"
-    title="Minimizar"
-    aria-label="Minimizar"
-  >
+  <ng-container *ngIf="showLogout">
+    <button class="control-button py-2 px-3 order-0" (click)="onLogout()" title="Cerrar Sesión" aria-label="Cerrar Sesión">
+      Logout
+    </button>
+  </ng-container>
+  <ng-container *ngIf="showLogin">
+    <button class="control-button py-2 px-3 order-0" [routerLink]="['/login']" title="Iniciar Sesión" aria-label="Iniciar Sesión">
+      Login
+    </button>
+  </ng-container>
+  <button class="control-button py-2 px-3 order-1" (click)="onMinimize()" title="Minimizar" aria-label="Minimizar">
     &#x2013;
   </button>
-  <button
-    class="control-button py-1 px-3 order-2"
-    (click)="onToggleMaximize()"
-    title="Maximizar/restaurar"
-    aria-label="Maximizar o restaurar"
-  >
+  <button class="control-button py-2 px-3 order-2" (click)="onToggleMaximize()" title="Maximizar/restaurar" aria-label="Maximizar o restaurar">
     <ng-container *ngIf="!isMaximized(); else restoreIcon">&#9744;</ng-container>
     <ng-template #restoreIcon>&#9633;</ng-template>
   </button>
-  <button
-    class="control-button py-1 px-3 order-3 rounded-end close"
-    (click)="onClose()"
-    title="Cerrar"
-    aria-label="Cerrar"
-  >
+  <button class="control-button py-2 px-3 order-3 close" (click)="onClose()" title="Cerrar" aria-label="Cerrar">
     &#10005;
   </button>
 </div>

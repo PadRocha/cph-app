@@ -24,6 +24,7 @@
 
 .title-text {
   font-size: $title-bar-control-button-font-size;
+  color: $title-bar-control-button-color;
   cursor: pointer;
 }
 
@@ -35,6 +36,7 @@
   cursor: pointer;
   font-size: $title-bar-control-button-font-size;
 
+  &[routerlinkactive],
   &:hover {
     background-color: $title-bar-control-button-hover-bg;
   }
@@ -46,15 +48,15 @@
 
 /* Dropdown flotante para historial */
 .dropdown-menu-flotante {
-  position: absolute;
-  top: 100%;
-  left: 0;
+  // position: absolute;
+  // top: 100%;
+  // left: 0;
   background: $title-bar-dropdown-bg;
-  border: 1px solid $title-bar-dropdown-border;
-  border-radius: $title-bar-dropdown-border-radius;
-  z-index: $title-bar-dropdown-z-index;
-  min-width: $title-bar-dropdown-min-width;
-  padding: $title-bar-dropdown-padding-vertical 0;
+  // border: 1px solid $title-bar-dropdown-border;
+  // border-radius: $title-bar-dropdown-border-radius;1
+  // z-index: $title-bar-dropdown-z-index;
+  // min-width: $title-bar-dropdown-min-width;
+  // padding: $title-bar-dropdown-padding-vertical 0;
 
   & button[ngbDropdownItem] {
     width: 100%;

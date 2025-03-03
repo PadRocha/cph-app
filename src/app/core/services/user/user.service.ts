@@ -6,11 +6,8 @@ import { AuthService } from '../auth/auth.service';
 type authRole = "READ" | "WRITE" | "EDIT" | "GRANT" | "ADMIN";
 
 interface UserIdentity {
-  /** Código de identificador de usuario */
   identifier: string | null;
-  /** Nombre de usuario */
   nickname: string | null;
-  /** Roles que posee el usuario */
   roles: authRole[];
 }
 
@@ -24,7 +21,6 @@ const initialIdentity: UserIdentity = {
   providedIn: "root",
 })
 export class UserService extends AuthService {
-  /** Identidad del usuario */
   private userSignal: WritableSignal<UserIdentity>;
 
   constructor(

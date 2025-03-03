@@ -5,19 +5,22 @@ import {
   HostListener,
   resource,
   ResourceRef,
+  signal,
   Signal,
+  WritableSignal,
 } from "@angular/core";
 import { NgbDropdownModule } from "@ng-bootstrap/ng-bootstrap";
-import { HistoryService } from "@core/services";
+import { HistoryService, UserService } from "@core/services";
 import { getCurrentWindow, Window } from "@tauri-apps/api/window";
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: "app-title-bar",
-  imports: [CommonModule, NgbDropdownModule],
+  imports: [CommonModule, RouterLink, NgbDropdownModule],
   templateUrl: "./title-bar.component.html",
   styleUrl: "./title-bar.component.scss",
   host: {
-    class: "d-flex justify-content-between align-items-center px-2 py-1",
+    class: "d-flex justify-content-between align-items-center",
   },
 })
 export class TitleBarComponent {
@@ -28,8 +31,9 @@ export class TitleBarComponent {
   public canGoBack: Signal<boolean>;
   public canGoForward: Signal<boolean>;
   public showDropdown: Signal<boolean>;
+  public isCollapsed: WritableSignal<boolean>;
 
-  constructor(private history: HistoryService) {
+  constructor(private history: HistoryService, private user: UserService) {
     this.window = getCurrentWindow();
     this.maximizedResource = resource({
       loader: async () => await this.window.isMaximized(),
@@ -41,10 +45,13 @@ export class TitleBarComponent {
       () => this.history.index < this.history.getTrail().length - 1
     );
     this.showDropdown = computed(() => this.history.getTrail().length >= 3);
+    this.isCollapsed = signal(true);
   }
 
   @HostListener("mousedown", ["$event"])
-  async onMouseDown({ target }: MouseEvent & { target: HTMLElement }): Promise<void> {
+  async onMouseDown({
+    target,
+  }: MouseEvent & { target: HTMLElement }): Promise<void> {
     if (target.classList.contains("drag-handle")) {
       await this.window.startDragging();
       setTimeout(() => this.maximizedResource.reload(), 200);
@@ -101,5 +108,28 @@ export class TitleBarComponent {
   public navigateTo(index: number): void {
     this.history.index = index;
     this.dropdownVisible = false;
+  }
+
+  public get showLogin(): boolean {
+    return !this.user.logged && this.history.url === "/pdf";
+  }
+
+  public get showLogout(): boolean {
+    return this.user.logged && this.history.url !== "/login";
+  }
+
+  public get isAdmin(): boolean {
+    return this.user.hasRole("GRANT", "ADMIN");
+  }
+
+  public onLogin() {}
+
+  public onLogout(): void {
+    this.user.destroy();
+    this.user.logout();
+  }
+
+  public toggleNav(): void {
+    this.isCollapsed.update((val) => !val);
   }
 }

@@ -14,7 +14,7 @@ export class HistoryService {
   private suppressNextEvent: boolean;
   private trail: WritableSignal<string[]>;
   private currentIndex: WritableSignal<number>;
-  public currentUrl: Signal<string>;
+  private currentUrl: Signal<string>;
 
   constructor(private router: Router) {
     this.suppressNextEvent = false;
@@ -74,6 +74,10 @@ export class HistoryService {
 
   public get index(): number {
     return this.currentIndex();
+  }
+
+  public get url(): string {
+    return this.currentUrl();
   }
 
   public getTrail(): string[] {
