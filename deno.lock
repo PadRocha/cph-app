@@ -18,6 +18,7 @@
     "npm:@tauri-apps/api@2": "2.1.1",
     "npm:@tauri-apps/api@^2.2.0": "2.2.0",
     "npm:@tauri-apps/cli@^2.2.7": "2.2.7",
+    "npm:@tauri-apps/plugin-global-shortcut@2.2": "2.2.0",
     "npm:@tauri-apps/plugin-shell@2": "2.2.0",
     "npm:@types/jasmine@^5.1.7": "5.1.7",
     "npm:bootstrap@^5.3.3": "5.3.3_@popperjs+core@2.11.8",
@@ -1185,6 +1186,12 @@
         "@tauri-apps/cli-win32-arm64-msvc",
         "@tauri-apps/cli-win32-ia32-msvc",
         "@tauri-apps/cli-win32-x64-msvc"
+      ]
+    },
+    "@tauri-apps/plugin-global-shortcut@2.2.0": {
+      "integrity": "sha512-clI9Bg/BcxWXNDK+ij601o1qC2WxMEy8ovhGgEW5Ai17oPy0KK8uwzmc59KiVnOYKpBWHCUPqBxG+KBNUFXgzw==",
+      "dependencies": [
+        "@tauri-apps/api@2.2.0"
       ]
     },
     "@tauri-apps/plugin-shell@2.2.0": {
@@ -3459,6 +3466,7 @@
         "npm:@popperjs/core@^2.11.8",
         "npm:@tauri-apps/api@^2.2.0",
         "npm:@tauri-apps/cli@^2.2.7",
+        "npm:@tauri-apps/plugin-global-shortcut@2.2",
         "npm:@tauri-apps/plugin-shell@2",
         "npm:@types/jasmine@^5.1.7",
         "npm:bootstrap@^5.3.3",

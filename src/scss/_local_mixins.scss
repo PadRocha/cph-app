@@ -32,9 +32,9 @@
 @mixin icon($url, $size: $icons-size) {
   display: inline-flex !important;
   width: $size;
-  -webkit-mask: url(/assets/icons/#{$url}.svg) 0 0 / contain no-repeat,
+  -webkit-mask: url(/icons/#{$url}.svg) 0 0 / contain no-repeat,
   linear-gradient(#fff 0 0) !important;
-  mask: url(/assets/icons/#{$url}.svg) 0 0 / contain no-repeat,
+  mask: url(/icons/#{$url}.svg) 0 0 / contain no-repeat,
   linear-gradient(#fff 0 0) !important;
   -webkit-mask-composite: destination-in !important;
   mask-composite: intersect !important;

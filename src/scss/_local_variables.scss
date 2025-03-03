@@ -20,8 +20,21 @@ $option-collection: (
   #ae2aae,
   #00c200,
 );
-// Altura del title-bar
+
+
+//*------------------------------------------------------------------*/
+// * Header
+//*------------------------------------------------------------------*/
 $title-bar-height: 2.313rem;
+// $title-bar-min-height: 58px;
+$title-bar-icon-collection: (
+  logout,
+  login,
+  pdf,
+  dashboard,
+  minimize,
+  unmaximize
+);
 
 // Estilos generales del title-bar
 $title-bar-bg: #2d2d2d;
@@ -68,14 +81,6 @@ $item-icon-collection: (
   warning,
   settings,
   camera,
-);
-//*------------------------------------------------------------------*/
-// * Header
-//*------------------------------------------------------------------*/
-$header-min-height: 58px;
-$header-icon-collection: (
-  logout,
-  return,
 );
 //*------------------------------------------------------------------*/
 // * Home

@@ -58,9 +58,14 @@ export class TitleBarComponent {
     }
   }
 
+  @HostListener("window:keydown.Meta")
+  async onMetaKeyboard(): Promise<void> {
+    setTimeout(() => this.maximizedResource.reload(), 300);
+  }
+
   public async onMinimize(): Promise<void> {
     await this.window.minimize();
-    this.maximizedResource.reload();
+    // this.maximizedResource.reload();
   }
 
   public async onToggleMaximize(): Promise<void> {
