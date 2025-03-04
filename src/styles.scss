@@ -45,16 +45,6 @@
 
 // Utilities
 @import "bootstrap/scss/utilities/api";
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-}
-
-body {
-    background-color: rbg(219, 219, 219);
-    @include scroll;
-}
 
 *:has(> [class^='ico-']) {
     display: flex;

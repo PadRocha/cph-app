@@ -1,10 +1,14 @@
-// @import "functions";
 @import "local_variables";
 @import "local_mixins";
 
 @include iconsCollection($title-bar-icon-collection);
 
 :host {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: $title-bar-zindex;
   height: $title-bar-height;
   max-height: $title-bar-height;
   box-sizing: border-box;
@@ -27,7 +31,7 @@
 }
 
 .title-text {
-  font-size: $title-bar-control-button-font-size;
+  font-size: $title-bar-font-size;
   color: $title-bar-control-button-color;
   cursor: pointer;
 }
@@ -38,7 +42,7 @@
   border: $title-bar-control-button-border;
   color: $title-bar-control-button-color;
   cursor: pointer;
-  font-size: $title-bar-control-button-font-size;
+  font-size: $title-bar-font-size;
 
   &[routerlinkactive],
   &:hover {
@@ -50,25 +54,14 @@
   }
 }
 
-/* Dropdown flotante para historial */
 .dropdown-menu-flotante {
-  // position: absolute;
-  // top: 100%;
-  // left: 0;
   background: $title-bar-dropdown-bg;
-  // border: 1px solid $title-bar-dropdown-border;
-  // border-radius: $title-bar-dropdown-border-radius;1
-  // z-index: $title-bar-dropdown-z-index;
-  // min-width: $title-bar-dropdown-min-width;
-  // padding: $title-bar-dropdown-padding-vertical 0;
 
   & button[ngbDropdownItem] {
-    width: 100%;
     background: $title-bar-control-button-bg;
-    border: $title-bar-control-button-border;
     color: $title-bar-text;
+    font-size: $title-bar-font-size;
     text-align: left;
-    padding: $title-bar-dropdown-button-padding;
 
     &:hover {
       background-color: $title-bar-control-button-hover-bg;

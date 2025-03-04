@@ -1,0 +1,17 @@
+@import 'local_variables';
+@import 'local_mixins';
+
+:host {
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+  margin-top: $title-bar-height;
+  flex: 1 1 auto;
+  overflow: auto;
+  background-color: $background-main;
+  @include scroll;
+}
