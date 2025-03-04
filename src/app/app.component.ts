@@ -10,7 +10,4 @@ import { TitleBarComponent } from "@components";
   styleUrls: ["./app.component.scss"],
 })
 export class AppComponent  {
-  // async ngOnInit() {
-  //   await getCurrentWindow().maximize();
-  // }
 }

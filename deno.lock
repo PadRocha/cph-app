@@ -3,7 +3,6 @@
   "specifiers": {
     "npm:@angular/animations@^19.1.6": "19.1.7_@angular+core@19.1.7__rxjs@7.8.1__zone.js@0.15.0_rxjs@7.8.1_zone.js@0.15.0",
     "npm:@angular/build@^19.1.7": "19.1.8_@angular+compiler@19.1.7__@angular+core@19.1.7___rxjs@7.8.1___zone.js@0.15.0__rxjs@7.8.1__zone.js@0.15.0_@angular+compiler-cli@19.1.7__@angular+compiler@19.1.7___@angular+core@19.1.7____rxjs@7.8.1____zone.js@0.15.0___rxjs@7.8.1___zone.js@0.15.0__typescript@5.5.4__@angular+core@19.1.7___rxjs@7.8.1___zone.js@0.15.0__rxjs@7.8.1__zone.js@0.15.0_typescript@5.5.4_@angular+core@19.1.7__rxjs@7.8.1__zone.js@0.15.0_@babel+core@7.26.0_vite@6.0.11__sass@1.83.1_sass@1.83.1_rxjs@7.8.1_zone.js@0.15.0",
-    "npm:@angular/cdk@^19.2.1": "19.2.1_@angular+common@19.1.7__@angular+core@19.1.7___rxjs@7.8.1___zone.js@0.15.0__rxjs@7.8.1__zone.js@0.15.0_@angular+core@19.1.7__rxjs@7.8.1__zone.js@0.15.0_rxjs@7.8.1_zone.js@0.15.0",
     "npm:@angular/cli@^19.1.7": "19.1.8_@inquirer+prompts@7.2.1__@types+node@22.5.4",
     "npm:@angular/common@^19.1.6": "19.1.7_@angular+core@19.1.7__rxjs@7.8.1__zone.js@0.15.0_rxjs@7.8.1_zone.js@0.15.0",
     "npm:@angular/compiler-cli@^19.1.6": "19.1.7_@angular+compiler@19.1.7__@angular+core@19.1.7___rxjs@7.8.1___zone.js@0.15.0__rxjs@7.8.1__zone.js@0.15.0_typescript@5.5.4_@angular+core@19.1.7__rxjs@7.8.1__zone.js@0.15.0_rxjs@7.8.1_zone.js@0.15.0",
@@ -110,16 +109,6 @@
         "typescript",
         "vite",
         "watchpack"
-      ]
-    },
-    "@angular/cdk@19.2.1_@angular+common@19.1.7__@angular+core@19.1.7___rxjs@7.8.1___zone.js@0.15.0__rxjs@7.8.1__zone.js@0.15.0_@angular+core@19.1.7__rxjs@7.8.1__zone.js@0.15.0_rxjs@7.8.1_zone.js@0.15.0": {
-      "integrity": "sha512-j7dg18PJIbyeU4DTko3vIK3M2OuUv3H0ZViNddOaLlGN5X93cq4QCGcNhcGm3x3r5rUr/AaexYu+KHMyN8PwmA==",
-      "dependencies": [
-        "@angular/common@19.1.7_@angular+core@19.1.7__rxjs@7.8.1__zone.js@0.15.0_rxjs@7.8.1_zone.js@0.15.0",
-        "@angular/core@19.1.7_rxjs@7.8.1_zone.js@0.15.0",
-        "parse5",
-        "rxjs@7.8.1",
-        "tslib"
       ]
     },
     "@angular/cli@19.1.8_@inquirer+prompts@7.2.1__@types+node@22.5.4": {
@@ -3452,7 +3441,6 @@
       "dependencies": [
         "npm:@angular/animations@^19.1.6",
         "npm:@angular/build@^19.1.7",
-        "npm:@angular/cdk@^19.2.1",
         "npm:@angular/cli@^19.1.7",
         "npm:@angular/common@^19.1.6",
         "npm:@angular/compiler-cli@^19.1.6",
