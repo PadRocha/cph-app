@@ -1,0 +1,14 @@
+@import 'local_variables';
+
+:host {
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-content {
+  margin-top: $title-bar-height;
+  flex: 1 1 auto;
+  overflow: auto;
+}

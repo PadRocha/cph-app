@@ -45,11 +45,6 @@
 
 // Utilities
 @import "bootstrap/scss/utilities/api";
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-}
 
 body {
     background-color: rbg(219, 219, 219);
@@ -67,4 +62,8 @@ body {
 
 .aside-width {
     width: 260px !important;
+}
+
+.sticky-top {
+  top: $title-bar-height !important; // en tu caso, 2.313rem
 }

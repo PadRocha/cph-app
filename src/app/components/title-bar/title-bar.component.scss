@@ -5,6 +5,11 @@
 @include iconsCollection($title-bar-icon-collection);
 
 :host {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: $title-bar-zindex;
   height: $title-bar-height;
   max-height: $title-bar-height;
   box-sizing: border-box;

@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { RouterModule, RouterOutlet } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { TitleBarComponent } from "@components";
@@ -9,5 +9,5 @@ import { TitleBarComponent } from "@components";
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
 })
-export class AppComponent  {
+export class AppComponent {
 }

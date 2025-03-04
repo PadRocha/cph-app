@@ -21,12 +21,11 @@ $option-collection: (
   #00c200,
 );
 
-
 //*------------------------------------------------------------------*/
 // * Header
 //*------------------------------------------------------------------*/
 $title-bar-height: 2.313rem;
-// $title-bar-min-height: 58px;
+$title-bar-zindex: 1030;
 $title-bar-icon-collection: (
   logout,
   login,
