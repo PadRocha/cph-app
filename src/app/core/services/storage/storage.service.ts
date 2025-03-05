@@ -8,16 +8,18 @@ import {
   WritableSignal,
 } from "@angular/core";
 
+type theme = "dark" | "light" | "auto";
+
 @Injectable({
   providedIn: "root",
 })
 export class StorageService {
   private locationSignal: WritableSignal<string | null>;
-  private themeSignal: WritableSignal<string | null>;
+  private themeSignal: WritableSignal<theme>;
 
   constructor(@Inject(PLATFORM_ID) private platformId: InjectionToken<Object>) {
     this.locationSignal = signal(null);
-    this.themeSignal = signal(null);
+    this.themeSignal = signal("auto");
 
     if (isPlatformBrowser(this.platformId)) {
       const location = localStorage.getItem("location");
@@ -25,19 +27,19 @@ export class StorageService {
         this.locationSignal.set(location);
       }
 
-      const theme = localStorage.getItem("theme");
+      const theme = localStorage.getItem("theme") as theme;
       if (theme) {
         this.themeSignal.set(theme);
       }
 
       if (window.matchMedia) {
         const media = window.matchMedia("(prefers-color-scheme: dark)");
-        if (this.theme == null) {
+        if (this.theme === 'auto') {
           this.theme = media.matches ? "dark" : "light";
         }
 
         media.addEventListener("change", (event: MediaQueryListEvent) => {
-          if (this.theme == null) {
+          if (this.theme === 'auto') {
             this.theme = event.matches ? "dark" : "light";
           }
         });
@@ -60,9 +62,9 @@ export class StorageService {
     return this.locationSignal();
   }
 
-  public set theme(value: string | null) {
+  public set theme(value: theme) {
     if (isPlatformBrowser(this.platformId)) {
-      if (value === null) {
+      if (value === "auto") {
         localStorage.removeItem("theme");
       } else {
         localStorage.setItem("theme", value);
@@ -71,7 +73,7 @@ export class StorageService {
     this.themeSignal.set(value);
   }
 
-  public get theme(): string | null {
+  public get theme(): theme {
     return this.themeSignal();
   }
 }

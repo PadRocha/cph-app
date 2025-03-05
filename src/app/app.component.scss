@@ -13,5 +13,12 @@ main {
   flex: 1 1 auto;
   overflow: auto;
   background-color: $background-main;
+  color: $text-color;
+
   @include scroll;
+
+  &[data-bs-theme=dark] {
+    background-color: $background-main-dark;
+    color: $text-color-dark;
+  }
 }

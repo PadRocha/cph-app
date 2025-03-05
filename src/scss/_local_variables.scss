@@ -5,12 +5,15 @@
 //*------------------------------------------------------------------*/
 // * Main
 //*------------------------------------------------------------------*/
-$color-mode-type: data;
 $primary: #f5f5f5;;
-$secundary: #000;
+$secundary: #2d2d2d;
+$color-percent: 10%;
+$text-color: darken($secundary, $color-percent);
+$text-color-dark: lighten($primary, $color-percent);
+$background-main: darken($primary, $color-percent);
+$background-main-dark: lighten($secundary, $color-percent);
 $lighter: 20%;
 $darker: 20%;
-$background-main: $primary;
 $icons-size: 1rem;
 $scrollbar-thumb: #545456;
 $scrollbar-track: #060608;
@@ -22,14 +25,14 @@ $option-collection: (
   #ae2aae,
   #00c200,
 );
-
-
 //*------------------------------------------------------------------*/
 // * Title bar
 //*------------------------------------------------------------------*/
 $title-bar-height: 2.313rem;
 $title-bar-zindex: 1030;
 $title-bar-icon-size: 1rem;
+$title-bar-bg: $secundary;
+$title-bar-text: $primary; // Asumimos que $primary es #fff
 $title-bar-dropdown-bg: #3a3a3a;
 $title-bar-current-bg: rgba(255, 255, 255, 0.3);
 $title-bar-font-size: 14px;
@@ -41,18 +44,12 @@ $title-bar-icon-collection: (
   minimize,
   unmaximize
 );
-
-// Estilos generales del title-bar
-$title-bar-bg: #2d2d2d;
-$title-bar-text: $primary; // Asumimos que $primary es #fff
-
 // Botones de control en el title-bar
 $title-bar-control-button-bg: transparent;
 $title-bar-control-button-border: none;
 $title-bar-control-button-color: $title-bar-text;
 $title-bar-control-button-hover-bg: rgba(255, 255, 255, 0.2);
 $title-bar-control-button-close-hover-bg: #e81123;
-
 //*------------------------------------------------------------------*/
 // * Scroll To Top
 //*------------------------------------------------------------------*/
