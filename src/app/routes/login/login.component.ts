@@ -9,6 +9,7 @@ import {
 } from "@angular/forms";
 import { Router } from "@angular/router";
 import { UserService } from "@core/services";
+import { ToastService } from "@core/services/toast/toast.service";
 
 interface LoginForm {
   nickname: FormControl<string>;
@@ -24,7 +25,7 @@ interface LoginForm {
 export class LoginComponent {
   public userForm: FormGroup<LoginForm>;
 
-  constructor(private user: UserService, private router: Router) {
+  constructor(private user: UserService, private router: Router, private toast: ToastService) {
     this.userForm = new FormGroup<LoginForm>(
       {
         nickname: new FormControl("", {
@@ -52,9 +53,13 @@ export class LoginComponent {
     const params = this.userForm.getRawValue();
     this.user.login(params).subscribe({
       next: ({ token }) => {
+        this.userForm.reset();
         this.user.setToken(token);
         this.user.update();
         this.router.navigateByUrl('/home');
+      },
+      error: () => {
+        this.toast.show('Login', 'danger')
       }
     })
   }

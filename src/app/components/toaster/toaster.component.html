@@ -1,1 +1,5 @@
-<p>toaster works!</p>
+@for (toast of toasts; track $index) {
+<ngb-toast [class]="className(toast)" [autohide]="true" [delay]="toast.delay" (hidden)="remove(toast)" class="text-light">
+    {{ toast.header }} [{{ toast.type }}]
+</ngb-toast>
+}

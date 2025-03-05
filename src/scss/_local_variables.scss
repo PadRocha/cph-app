@@ -29,7 +29,7 @@ $option-collection: (
 // * Title bar
 //*------------------------------------------------------------------*/
 $title-bar-height: 2.313rem;
-$title-bar-zindex: 1030;
+$title-bar-zindex: 1040;
 $title-bar-icon-size: 1rem;
 $title-bar-bg: $secundary;
 $title-bar-text: $primary;
@@ -57,11 +57,16 @@ $login-color-aside: $primary;
 $login-bg-section: $primary; 
 $login-color-section: $secundary;
 //*------------------------------------------------------------------*/
+// * Toaster
+//*------------------------------------------------------------------*/
+$toaster-zindex: 1030;
+//*------------------------------------------------------------------*/
 // * Scroll To Top
 //*------------------------------------------------------------------*/
 $scroll-top-background: #9055a2dc;
-$scroll-top-spacing: 1rem;
+$scroll-top-spacing: 0.5rem;
 $scroll-top-size: 35px;
+$scroll-top-zindex: 990;
 //*------------------------------------------------------------------*/
 // * Aside Lines
 //*------------------------------------------------------------------*/
