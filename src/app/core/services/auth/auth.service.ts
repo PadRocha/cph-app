@@ -19,6 +19,7 @@ type Token = { token: string };
 })
 export class AuthService {
   protected url: String;
+  private storage!: Storage;
   private tokenSignal: WritableSignal<string | null>;
 
   constructor(
@@ -30,27 +31,23 @@ export class AuthService {
     this.tokenSignal = signal<string | null>(null);
 
     if (isPlatformBrowser(this.platformId)) {
-      const tokenStr = sessionStorage.getItem("token");
+      this.storage = sessionStorage;
+      const tokenStr = this.storage.getItem("token");
       if (tokenStr) {
         const { expiry, value } = JSON.parse(tokenStr);
         const now = new Date().getTime();
-        if (!expiry || now <= expiry) {
-          this.tokenSignal.set(value);
-        }
+        if (!expiry || now <= expiry) this.tokenSignal.set(value);
       }
     }
   }
 
   public setToken(value: string, expiry = true): void {
-    const now = new Date();
-    const item = { value, expiry: expiry ? now.getTime() + 86_400_000 : false };
-    if (isPlatformBrowser(this.platformId))
-      sessionStorage.setItem("token", JSON.stringify(item));
-    console.log("setToken", value);
-    
+    if (isPlatformBrowser(this.platformId)) {
+      const now = new Date();
+      const item = { value, expiry: expiry ? now.getTime() + 86_400_000 : false };
+      this.storage.setItem("token", JSON.stringify(item));
+    }
     this.tokenSignal.set(value);
-    console.log("setToken", this.tokenSignal());
-    
   }
 
   public login(user: User) {
@@ -66,8 +63,6 @@ export class AuthService {
   }
 
   public get token(): string | null {
-    console.log("get token", this.tokenSignal());
-    
     return this.tokenSignal();
   }
 

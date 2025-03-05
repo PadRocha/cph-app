@@ -75,6 +75,10 @@ $btn-outline-dark-hover-bg: $secundary;
         color: $btn-outline-dark-hover-color;
         background-color: $btn-outline-dark-hover-bg;
     }
+
+    &:active {
+      color: $btn-outline-dark-hover-color;
+    }
   }
 }
 

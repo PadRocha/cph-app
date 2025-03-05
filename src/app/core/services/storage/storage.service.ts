@@ -14,6 +14,7 @@ type theme = "dark" | "light" | "auto";
   providedIn: "root",
 })
 export class StorageService {
+  private storage!: Storage;
   private locationSignal: WritableSignal<string | null>;
   private themeSignal: WritableSignal<theme>;
 
@@ -22,12 +23,14 @@ export class StorageService {
     this.themeSignal = signal("auto");
 
     if (isPlatformBrowser(this.platformId)) {
-      const location = localStorage.getItem("location");
+      this.storage = localStorage;
+  
+      const location = this.storage.getItem("location");
       if (location) {
         this.locationSignal.set(location);
       }
 
-      const theme = localStorage.getItem("theme") as theme;
+      const theme = this.storage.getItem("theme") as theme;
       if (theme) {
         this.themeSignal.set(theme);
       }
@@ -50,9 +53,9 @@ export class StorageService {
   public set location(value: string | null) {
     if (isPlatformBrowser(this.platformId)) {
       if (value === null) {
-        localStorage.removeItem("location");
+        this.storage.removeItem("location");
       } else {
-        localStorage.setItem("location", value);
+        this.storage.setItem("location", value);
       }
     }
     this.locationSignal.set(value);
@@ -65,9 +68,9 @@ export class StorageService {
   public set theme(value: theme) {
     if (isPlatformBrowser(this.platformId)) {
       if (value === "auto") {
-        localStorage.removeItem("theme");
+        this.storage.removeItem("theme");
       } else {
-        localStorage.setItem("theme", value);
+        this.storage.setItem("theme", value);
       }
     }
     this.themeSignal.set(value);
