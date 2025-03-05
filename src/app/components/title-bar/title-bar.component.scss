@@ -14,6 +14,7 @@
   box-sizing: border-box;
   background-color: $title-bar-bg;
   color: $title-bar-text;
+
   @supports (-webkit-app-region: no-drag) {
     -webkit-app-region: no-drag;
   }
@@ -39,12 +40,12 @@
 /* Botones generales */
 .control-button {
   background: $title-bar-control-button-bg;
-  border: $title-bar-control-button-border;
+  border: none;
   color: $title-bar-control-button-color;
   cursor: pointer;
   font-size: $title-bar-font-size;
 
-  &[routerlinkactive],
+  &.active,
   &:hover {
     background-color: $title-bar-control-button-hover-bg;
   }

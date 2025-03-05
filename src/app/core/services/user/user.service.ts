@@ -35,8 +35,8 @@ export class UserService extends AuthService {
     }
   }
 
-  private update(): void {
-    this.http.get<UserIdentity>(`${this.url}/user`).subscribe({
+  public update(): void {
+    this.http.get<UserIdentity>(`${this.url}/user/info`).subscribe({
       next: (user) => this.userSignal.set(user),
       error: () => this.destroy(),
     });

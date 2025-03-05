@@ -32,7 +32,7 @@ $title-bar-height: 2.313rem;
 $title-bar-zindex: 1030;
 $title-bar-icon-size: 1rem;
 $title-bar-bg: $secundary;
-$title-bar-text: $primary; // Asumimos que $primary es #fff
+$title-bar-text: $primary;
 $title-bar-dropdown-bg: #3a3a3a;
 $title-bar-current-bg: rgba(255, 255, 255, 0.3);
 $title-bar-font-size: 14px;
@@ -46,10 +46,16 @@ $title-bar-icon-collection: (
 );
 // Botones de control en el title-bar
 $title-bar-control-button-bg: transparent;
-$title-bar-control-button-border: none;
 $title-bar-control-button-color: $title-bar-text;
 $title-bar-control-button-hover-bg: rgba(255, 255, 255, 0.2);
 $title-bar-control-button-close-hover-bg: #e81123;
+//*------------------------------------------------------------------*/
+// * Login
+//*------------------------------------------------------------------*/
+$login-bg-aside: $secundary;
+$login-color-aside: $primary;
+$login-bg-section: $primary; 
+$login-color-section: $secundary;
 //*------------------------------------------------------------------*/
 // * Scroll To Top
 //*------------------------------------------------------------------*/

@@ -13,11 +13,11 @@ import {
 import { NgbDropdownModule } from "@ng-bootstrap/ng-bootstrap";
 import { HistoryService, UserService } from "@core/services";
 import { getCurrentWindow, Window } from "@tauri-apps/api/window";
-import { RouterLink } from "@angular/router";
+import { RouterModule } from "@angular/router";
 
 @Component({
   selector: "app-title-bar",
-  imports: [CommonModule, RouterLink, NgbDropdownModule],
+  imports: [CommonModule, RouterModule, NgbDropdownModule],
   templateUrl: "./title-bar.component.html",
   styleUrl: "./title-bar.component.scss",
   host: {
@@ -121,7 +121,7 @@ export class TitleBarComponent {
   }
 
   public get showLogout(): boolean {
-    return this.user.logged && this.history.url !== "/login";
+    return this.user.logged;
   }
 
   public get isAdmin(): boolean {

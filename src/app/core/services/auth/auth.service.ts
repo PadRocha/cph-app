@@ -46,16 +46,15 @@ export class AuthService {
     const item = { value, expiry: expiry ? now.getTime() + 86_400_000 : false };
     if (isPlatformBrowser(this.platformId))
       sessionStorage.setItem("token", JSON.stringify(item));
+    console.log("setToken", value);
+    
     this.tokenSignal.set(value);
+    console.log("setToken", this.tokenSignal());
+    
   }
 
   public login(user: User) {
-    const params = JSON.stringify(user);
-    // const logged = this.http.post<{ token: string|null }>(`${this.url}/user/login`, params, {
-    //   headers: new HttpHeaders().set("Content-Type", "application/json"),
-    // });
-    // return toSignal(logged , { initialValue: { token: null } });
-    return this.http.post<Token>(`${this.url}/user/login`, params, {
+    return this.http.post<Token>(`${this.url}/user/login`, user, {
       headers: new HttpHeaders().set("Content-Type", "application/json"),
     });
   }
@@ -67,6 +66,8 @@ export class AuthService {
   }
 
   public get token(): string | null {
+    console.log("get token", this.tokenSignal());
+    
     return this.tokenSignal();
   }
 

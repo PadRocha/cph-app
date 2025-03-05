@@ -39,8 +39,8 @@ export class HistoryService {
         const newTrail = [...this.trail(), event.urlAfterRedirects];
         this.trail.set(newTrail);
         this.currentIndex.set(newTrail.length - 1);
-        console.log("Historial:", this.trail());
-        console.log("Índice actual:", this.currentIndex());
+        // console.log("Historial:", this.trail());
+        // console.log("Índice actual:", this.currentIndex());
       }
     });
   }

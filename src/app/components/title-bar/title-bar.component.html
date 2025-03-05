@@ -25,31 +25,31 @@
     &#x21bb;
   </button>
 </div>
-<div class="drag-handle d-flex align-items-center justify-content-between flex-grow-1 px-2" >
-  <a class="d-flex align-items-center py-2 text-decoration-none" [routerLink]="['/home']" title="Ir a home">
+<div  class="drag-handle d-flex align-items-center justify-content-between flex-grow-1 px-2" >
+  <a class="d-flex align-items-center py-2 text-decoration-none" routerLink="/home" title="Ir a home">
     <img src="title-icon.png" class="title-icon me-2" alt="Icono de la aplicación" title="Icono"/>
     <span class="title-text" title="Catálogo">Catálogo</span>
   </a>
   <div class="d-none d-md-flex align-items-center gap-2">
-    <button class="control-button py-2 px-3" [routerLink]="['/pdf']" routerLinkActive="active">
+    <button class="control-button py-2 px-3" routerLink="/pdf" routerLinkActive="active" title="Ir a catalogo PDF" aria-label="Ir a catalogo PDF">
       <span class="ico-pdf me-2"></span> PDF
     </button>
     <ng-container *ngIf="isAdmin">
-      <button class="control-button py-2 px-3" [routerLink]="['/dashboard']" routerLinkActive="active">
-        <span class="ico-dashboard me-2"></span> Dashboard
+      <button class="control-button py-2 px-3" routerLink="/dashboard" routerLinkActive="active" title="Ir a configuración" aria-label="Ir a configuración">
+        <span class="ico-dashboard me-2"></span> Ajustes
       </button>
     </ng-container>
   </div>
   <div class="d-md-none" ngbDropdown>
-    <button type="button" class="control-button py-2 px-3 dropdown-toggle" ngbDropdownToggle aria-label="Abrir menú">
+    <button type="button" class="control-button py-2 px-3 dropdown-toggle" ngbDropdownToggle title="Abrir menú" aria-label="Abrir menú">
       &#9776;
     </button>
     <div ngbDropdownMenu class="dropdown-menu-flotante">
-      <button class="control-button w-100" ngbDropdownItem [routerLink]="['/pdf']" title="Ir a catalogo PDF">
+      <button class="control-button w-100" ngbDropdownItem routerLink="/pdf" routerLinkActive="active" title="Ir a catalogo PDF" aria-label="Ir a catalogo PDF">
         <span class="ico-pdf me-2"></span> PDF
       </button>
       <ng-container *ngIf="isAdmin">
-        <button class="control-button w-100" ngbDropdownItem [routerLink]="['/dashboard']" title="Ir a configuración">
+        <button class="control-button w-100" ngbDropdownItem routerLink="/dashboard" routerLinkActive="active" title="Ir a configuración" aria-label="Ir a configuración">
           <span class="ico-dashboard me-2"></span> Ajustes
         </button>
       </ng-container>
@@ -63,7 +63,7 @@
     </button>
   </ng-container>
   <ng-container *ngIf="showLogin">
-    <button class="control-button py-2 px-3 order-0" [routerLink]="['/login']" title="Iniciar Sesión" aria-label="Iniciar Sesión">
+    <button class="control-button py-2 px-3 order-0" routerLink="/login" title="Iniciar Sesión" aria-label="Iniciar Sesión">
       <span class="ico-login"></span>
     </button>
   </ng-container>

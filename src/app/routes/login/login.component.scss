@@ -1,0 +1,96 @@
+@import "local_variables";
+
+$input-bg: $secundary;
+$input-color: $primary;
+$input-border-color: $text-color;
+$input-placeholder-color: $background-main;
+
+$btn-outline-dark-color: $secundary;
+$btn-outline-dark-border-color: $secundary;
+$btn-outline-dark-hover-color: $primary;
+$btn-outline-dark-hover-bg: $secundary;
+
+:host {
+  display: flex;
+  height: 100%;
+  flex-direction: row;
+}
+
+.login-aside,
+.login-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.login-aside {
+  background-color: $login-bg-aside;
+  color: $login-color-aside;
+  text-align: right;
+  padding: 2rem 3rem 2rem 2rem;
+  justify-content: flex-end;
+
+  .aside-content {
+    h2,
+    p {
+      margin-bottom: 1rem;
+    }
+  }
+}
+
+.login-section {
+  background-color: $login-bg-section;
+  padding: 2rem 2rem 2rem 3rem;
+}
+
+.login-form {
+  display: grid;
+  gap: 1rem;
+
+  .form-group,
+  button {
+    margin: 0;
+  }
+
+  label {
+    color: $login-color-section;
+  }
+
+  .form-control {
+    background-color: $input-bg;
+    color: $input-color;
+    border-color: $input-border-color;
+
+    &::placeholder {
+      color: $input-placeholder-color;
+      border-color: $input-border-color;
+    }
+  }
+
+  button {
+    color: $btn-outline-dark-color;
+    border-color: $btn-outline-dark-border-color;
+
+    &:hover {
+        color: $btn-outline-dark-hover-color;
+        background-color: $btn-outline-dark-hover-bg;
+    }
+  }
+}
+
+@include media-breakpoint-down(xl) {
+  :host {
+    flex-direction: column;
+  }
+  .login-aside {
+    order: 2;
+    padding: 2rem;
+    justify-content: center;
+    text-align: center;
+  }
+  .login-section {
+    order: 1;
+    padding: 2rem;
+    justify-content: center;
+  }
+}
