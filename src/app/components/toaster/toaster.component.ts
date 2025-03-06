@@ -9,15 +9,16 @@ import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './toaster.component.html',
   styleUrl: './toaster.component.scss',
   host: {
-    class: "toaster position-fixed top-0 end-0 pe-2"
+    class: "toaster position-fixed top-0 start-0 ps-2"
   }
 })
 export class ToasterComponent {
+  
   constructor(
     private toast: ToastService,
   ) { }
 
-  public className({ type }: ToastInfo) {
+  public className({ type }: ToastInfo): "bg-success" | "bg-warning" | "bg-danger" {
     switch (type) {
       case 'success':
         return 'bg-success';
@@ -28,7 +29,7 @@ export class ToasterComponent {
     }
   }
 
-  public get toasts() {
+  public get toasts(): ToastInfo[] {
     return this.toast.get();
   }
 

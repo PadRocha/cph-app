@@ -1,0 +1,1 @@
+export { ThemeDirective } from './theme/theme.directive';

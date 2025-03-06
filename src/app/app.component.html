@@ -1,6 +1,6 @@
 <app-title-bar />
 <app-toaster />
-<main #content [attr.data-bs-theme]="theme">
+<main #content app-theme>
   <router-outlet />
 </main>
 <scroll-to-top [scrollableContainer]="content" />
