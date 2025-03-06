@@ -24,8 +24,10 @@ interface LoginForm {
 })
 export class LoginComponent {
   public userForm: FormGroup<LoginForm>;
+  public isLoading: boolean;
 
   constructor(private user: UserService, private router: Router, private toast: ToastService) {
+    this.isLoading = false;
     this.userForm = new FormGroup<LoginForm>(
       {
         nickname: new FormControl("", {
@@ -51,15 +53,27 @@ export class LoginComponent {
   public onSubmit(): void {
     if (!this.userForm.valid) return;
     const params = this.userForm.getRawValue();
+
+    this.isLoading = true;
     this.user.login(params).subscribe({
       next: ({ token }) => {
         this.userForm.reset();
         this.user.setToken(token);
-        this.user.update();
+        this.user.update().subscribe({
+          next: (info) => {
+            this.user.info = info;
+          },
+          error: () => {
+            this.toast.show('Login', 'danger');
+            this.isLoading = false;
+            this.user.destroy();
+          }
+        });
         this.router.navigateByUrl('/home');
       },
       error: () => {
-        this.toast.show('Login', 'danger')
+        this.toast.show('Login', 'danger');
+        this.isLoading = false;
       }
     })
   }

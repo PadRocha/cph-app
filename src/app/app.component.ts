@@ -5,6 +5,7 @@ import { TitleBarComponent } from "@components";
 import { ToasterComponent } from "./components/toaster/toaster.component";
 import { ScrollToTopComponent } from "./components/scroll-to-top/scroll-to-top.component";
 import { ThemeDirective } from "@shared/directives";
+import { UserService } from "@core/services";
 
 @Component({
   selector: "app-root",
@@ -14,5 +15,15 @@ import { ThemeDirective } from "@shared/directives";
 })
 export class AppComponent {
 
-  constructor() {}
+  constructor(private user: UserService) {
+    //TODO: Remover cuando esté en producción, solo para pruebas
+    this.user.update().subscribe({
+      next: (info) => {
+        this.user.info = info;
+      },
+      error: () => {
+        this.user.destroy();
+      }
+    });
+  }
 }

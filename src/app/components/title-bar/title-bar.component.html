@@ -1,83 +1,163 @@
 <div class="d-inline-flex align-items-center">
   @if (canGoBack()) {
-    <button class="control-button py-2 px-3" (click)="goBack()" title="Anterior" aria-label="Anterior">
+    <button
+      (click)="goBack()"
+      class="control-button py-2 px-3"
+      title="Anterior"
+      aria-label="Anterior">
       &#x2190;
     </button>
   }
   @if (canGoForward()) {
-    <button class="control-button py-2 px-3" (click)="goForward()" title="Siguiente" aria-label="Siguiente">
+    <button
+      (click)="goForward()"
+      class="control-button py-2 px-3"
+      title="Siguiente"
+      aria-label="Siguiente">
       &#x2192;
     </button>
   }
   @if (showDropdown()) {
     <div ngbDropdown class="d-inline-block">
-      <button ngbDropdownToggle type="button" class="control-button py-2 px-3 dropdown-toggle" (click)="toggleDropdown()" title="Historial" aria-label="Historial"></button>
+      <button
+        ngbDropdownToggle
+        (click)="toggleDropdown()"
+        type="button"
+        class="control-button py-2 px-3 dropdown-toggle"
+        title="Historial"
+        aria-label="Historial">
+      </button>
       <div ngbDropdownMenu class="dropdown-menu-flotante">
         @for (item of partialHistory; track $index) {
-          <button ngbDropdownItem [class.current]="isCurrent(item.index)" (click)="navigateTo(item.index)" [title]="item.route" [attr.aria-label]="'Ir a ' + item.route">
+          <button
+            ngbDropdownItem
+            [class.current]="isCurrent(item)"
+            (click)="navigateTo(item)"
+            [title]="item.route"
+            [attr.aria-label]="'Ir a ' + item.route">
             {{ item.route }}
           </button>
         }
       </div>
     </div>
   }
-  <button class="control-button py-2 px-3" (click)="onRefresh()" title="Actualizar" aria-label="Actualizar">
+  <button
+    (click)="onRefresh()"
+    class="control-button py-2 px-3"
+    title="Actualizar"
+    aria-label="Actualizar">
     &#x21bb;
   </button>
 </div>
-<div  class="drag-handle d-flex align-items-center justify-content-between flex-grow-1 px-2" >
-  <a class="d-flex align-items-center py-2 text-decoration-none" routerLink="/home" title="Ir a home">
-    <img src="title-icon.png" class="title-icon me-2" alt="Icono de la aplicación" title="Icono"/>
+
+<div class="drag-handle d-flex align-items-center justify-content-between flex-grow-1 px-2">
+  <a
+    routerLink="/home"
+    class="d-flex align-items-center py-2 text-decoration-none"
+    title="Ir a home">
+    <img
+      src="title-icon.png"
+      class="title-icon me-2"
+      alt="Icono de la aplicación"
+      title="Icono" />
     <span class="title-text" title="Catálogo">Catálogo</span>
   </a>
   <div class="d-none d-md-flex align-items-center gap-2">
-    <button class="control-button py-2 px-3" routerLink="/pdf" routerLinkActive="active" title="Ir a catalogo PDF" aria-label="Ir a catalogo PDF">
+    <button
+      routerLink="/pdf"
+      routerLinkActive="active"
+      class="control-button py-2 px-3"
+      title="Ir a catalogo PDF"
+      aria-label="Ir a catalogo PDF">
       <span class="ico-pdf me-2"></span> PDF
     </button>
     @if (isAdmin) {
-      <button class="control-button py-2 px-3" routerLink="/dashboard" routerLinkActive="active" title="Ir a configuración" aria-label="Ir a configuración">
+      <button
+        routerLink="/dashboard"
+        routerLinkActive="active"
+        class="control-button py-2 px-3"
+        title="Ir a configuración"
+        aria-label="Ir a configuración">
         <span class="ico-dashboard me-2"></span> Ajustes
       </button>
     }
   </div>
   <div class="d-md-none" ngbDropdown>
-    <button type="button" class="control-button py-2 px-3 dropdown-toggle" ngbDropdownToggle title="Abrir menú" aria-label="Abrir menú">
+    <button
+      ngbDropdownToggle
+      type="button"
+      class="control-button py-2 px-3 dropdown-toggle"
+      title="Abrir menú"
+      aria-label="Abrir menú">
       &#9776;
     </button>
     <div ngbDropdownMenu class="dropdown-menu-flotante">
-      <button class="control-button w-100" ngbDropdownItem routerLink="/pdf" routerLinkActive="active" title="Ir a catalogo PDF" aria-label="Ir a catalogo PDF">
+      <button
+        ngbDropdownItem
+        routerLink="/pdf"
+        routerLinkActive="active"
+        class="control-button w-100"
+        title="Ir a catalogo PDF"
+        aria-label="Ir a catalogo PDF">
         <span class="ico-pdf me-2"></span> PDF
       </button>
       @if (isAdmin) {
-        <button class="control-button w-100" ngbDropdownItem routerLink="/dashboard" routerLinkActive="active" title="Ir a configuración" aria-label="Ir a configuración">
+        <button
+          ngbDropdownItem
+          routerLink="/dashboard"
+          routerLinkActive="active"
+          class="control-button w-100"
+          title="Ir a configuración"
+          aria-label="Ir a configuración">
           <span class="ico-dashboard me-2"></span> Ajustes
         </button>
       }
     </div>
   </div>
 </div>
+
 <div class="d-inline-flex align-items-center">
   @if (showLogout) {
-    <button class="control-button py-2 px-3 order-0" (click)="onLogout()" title="Cerrar Sesión" aria-label="Cerrar Sesión">
+    <button
+      (click)="onLogout()"
+      class="control-button py-2 px-3 order-0"
+      title="Cerrar Sesión"
+      aria-label="Cerrar Sesión">
       <span class="ico-logout"></span>
     </button>
   }
   @if (showLogin) {
-    <button class="control-button py-2 px-3 order-0" routerLink="/login" title="Iniciar Sesión" aria-label="Iniciar Sesión">
+    <button
+      routerLink="/login"
+      class="control-button py-2 px-3 order-0"
+      title="Iniciar Sesión"
+      aria-label="Iniciar Sesión">
       <span class="ico-login"></span>
     </button>
   }
-  <button class="control-button py-2 px-3 order-1" (click)="onMinimize()" title="Minimizar" aria-label="Minimizar">
+  <button 
+    (click)="onMinimize()"
+    class="control-button py-2 px-3 order-1"
+    title="Minimizar"
+    aria-label="Minimizar">
     <span class="ico-minimize"></span>
   </button>
-  <button class="control-button py-2 px-3 order-2" (click)="onToggleMaximize()" title="Maximizar/restaurar" aria-label="Maximizar o restaurar">
+  <button
+    (click)="onToggleMaximize()"
+    class="control-button py-2 px-3 order-2"
+    title="Maximizar/restaurar"
+    aria-label="Maximizar o restaurar">
     @if (isMaximized()) {
       <span class="ico-unmaximize"></span>
     } @else {
       &#9744;
     }
   </button>
-  <button class="control-button py-2 px-3 order-3 close" (click)="onClose()" title="Cerrar" aria-label="Cerrar">
+  <button
+    (click)="onClose()"
+    class="control-button py-2 px-3 order-3 close"
+    title="Cerrar"
+    aria-label="Cerrar">
     &#10005;
   </button>
 </div>

@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable, InjectionToken, PLATFORM_ID, signal, WritableSignal } from '@angular/core';
+import { effect, Inject, Injectable, InjectionToken, PLATFORM_ID, signal, WritableSignal } from '@angular/core';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 
@@ -22,6 +23,7 @@ const initialIdentity: UserIdentity = {
 })
 export class UserService extends AuthService {
   private userSignal: WritableSignal<UserIdentity>;
+  private userChange$: BehaviorSubject<UserIdentity>;
 
   constructor(
     protected override http: HttpClient,
@@ -29,25 +31,42 @@ export class UserService extends AuthService {
     @Inject(PLATFORM_ID) protected override platformId: InjectionToken<Object>
   ) {
     super(http, router, platformId);
-    this.userSignal = signal<UserIdentity>(initialIdentity);
+    this.userSignal = signal(initialIdentity);
+    this.userChange$ = new BehaviorSubject<UserIdentity>(initialIdentity);
+
+    effect(() => {
+      const currentUser = this.userSignal();
+      console.log("current user has changed", currentUser);
+      
+      this.userChange$.next(currentUser);
+    });
+
     if (this.loggedIn) {
-      this.update();
+      this.update().subscribe({
+        next: (info) => {
+          this.info = info;
+        },
+        error: () => {
+          this.destroy();
+        }
+      });
     }
   }
 
-  public update(): void {
-    this.http.get<UserIdentity>(`${this.url}/user/info`).subscribe({
-      next: (user) => this.userSignal.set(user),
-      error: () => this.destroy(),
-    });
+  public update() {
+    return this.http.get<UserIdentity>(`${this.url}/user/info`);
   }
 
   public destroy(): void {
     this.userSignal.set(initialIdentity);
   }
 
-  public get user(): UserIdentity {
+  public get info(): UserIdentity {
     return this.userSignal();
+  }
+
+  public set info(data: UserIdentity) {
+    this.userSignal.set(data);
   }
 
   public get getId(): string | null {
@@ -72,6 +91,10 @@ export class UserService extends AuthService {
 
   public hasRole(...roles: authRole[]): boolean {
     return roles.some((r) => this.roles.includes(r));
+  }
+
+  public get userSync(): Observable<UserIdentity> {
+    return this.userChange$.asObservable();
   }
 }
 

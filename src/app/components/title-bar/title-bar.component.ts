@@ -3,7 +3,6 @@ import {
   Component,
   computed,
   HostListener,
-  OnInit,
   resource,
   ResourceRef,
   signal,
@@ -107,11 +106,11 @@ export class TitleBarComponent {
       .map((route, i) => ({ route, index: start + i }));
   }
 
-  public isCurrent(index: number) {
+  public isCurrent({ index }: { index: number }) {
     return index === this.history.index;
   }
 
-  public navigateTo(index: number): void {
+  public navigateTo({ index }: { index: number }): void {
     this.history.index = index;
     this.dropdownVisible = false;
   }
