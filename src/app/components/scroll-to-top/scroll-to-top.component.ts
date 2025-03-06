@@ -8,14 +8,14 @@ import { Component, HostBinding, HostListener, Input, OnInit, Renderer2 } from '
 })
 export class ScrollToTopComponent implements OnInit {
   private toggleRatio: number = 0.5;
-  @Input() scrollableContainer!: HTMLElement;
+  @Input() container!: HTMLElement;
   @HostBinding('class.showBtn') showBtn: boolean = false;
 
   constructor(private renderer: Renderer2) { }
 
   ngOnInit() {
-    if (this.scrollableContainer) {
-      this.renderer.listen(this.scrollableContainer, 'scroll', (event) => this.onScroll(event));
+    if (this.container) {
+      this.renderer.listen(this.container, 'scroll', (event) => this.onScroll(event));
     }
   }
 
@@ -27,8 +27,8 @@ export class ScrollToTopComponent implements OnInit {
 
   @HostListener('click')
   scrollToTop(): void {
-    if (this.scrollableContainer) {
-      this.scrollableContainer.scrollTo({ top: 0, behavior: 'smooth' });
+    if (this.container) {
+      this.container.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 }
