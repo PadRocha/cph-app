@@ -1,0 +1,86 @@
+$code_color: $secundary !default; // Puedes ajustar si lo deseas
+$yellow-800: #b58900 !default; // Color dorado oscuro, a modo de ejemplo
+$green-300: lighten($success, 20%) !default;
+$red-300: lighten($danger, 20%) !default;
+
+// ======================================================
+// Variables de texto
+// ======================================================
+$primary-text-emphasis-dark: tint-color($primary, 40%);
+$secondary-text-emphasis-dark: tint-color($secundary, 40%);
+$success-text-emphasis-dark: tint-color($success, 40%);
+$info-text-emphasis-dark: tint-color($info, 40%);
+$warning-text-emphasis-dark: tint-color($warning, 40%);
+$danger-text-emphasis-dark: tint-color($danger, 40%);
+$light-text-emphasis-dark: $gray-100;
+$dark-text-emphasis-dark: $gray-300;
+
+// ======================================================
+// Fondos sutiles
+// ======================================================
+$primary-bg-subtle-dark: shade-color($primary, 80%);
+$secondary-bg-subtle-dark: shade-color($secundary, 80%);
+$success-bg-subtle-dark: shade-color($success, 80%);
+$info-bg-subtle-dark: shade-color($info, 80%);
+$warning-bg-subtle-dark: shade-color($warning, 80%);
+$danger-bg-subtle-dark: shade-color($danger, 80%);
+$light-bg-subtle-dark: $gray-800;
+$dark-bg-subtle-dark: mix($gray-800, $black);
+
+// ======================================================
+// Bordes sutiles
+// ======================================================
+$primary-border-subtle-dark: shade-color($primary, 40%);
+$secondary-border-subtle-dark: shade-color($secundary, 40%);
+$success-border-subtle-dark: shade-color($success, 40%);
+$info-border-subtle-dark: shade-color($info, 40%);
+$warning-border-subtle-dark: shade-color($warning, 40%);
+$danger-border-subtle-dark: shade-color($danger, 40%);
+$light-border-subtle-dark: $gray-700;
+$dark-border-subtle-dark: $gray-800;
+
+// ======================================================
+// Configuración del body y fondos generales
+// ======================================================
+$body-color-dark: $primary; // Usamos el color primario (claro) para el texto
+$body-bg-dark: $secundary;    // Fondo oscuro basado en 'secundary'
+$body-secondary-color-dark: rgba($body-color-dark, .75);
+$body-secondary-bg-dark: $background-main-dark; // Utilizamos la variable calculada
+$body-tertiary-color-dark: rgba($body-color-dark, .5);
+$body-tertiary-bg-dark: mix($gray-800, $secundary, 50%);
+$body-emphasis-color-dark: $white;
+$border-color-dark: $text-color; // $text-color viene de tus cálculos
+$border-color-translucent-dark: rgba($white, .15);
+$headings-color-dark: inherit;
+
+// ======================================================
+// Enlaces y marcas
+// ======================================================
+$link-color-dark: tint-color($primary, 40%);
+$link-hover-color-dark: shift-color($link-color-dark, -$link_shade_percentage);
+$code-color-dark: tint-color($code_color, 40%);
+$mark-color-dark: $body-color-dark; // igual al texto del body
+$mark-bg-dark: $yellow-800;
+
+// ======================================================
+// Formularios
+// ======================================================
+$form-select-indicator-color-dark: $body-color-dark;
+$form-select-indicator-dark: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-select-indicator-color-dark}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>");
+
+$form-switch-color-dark: rgba($white, .25);
+$form-switch-bg-image-dark: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$form-switch-color-dark}'/></svg>");
+
+$form-valid-color-dark: $green-300;
+$form-valid-border-color-dark: $green-300;
+$form-invalid-color-dark: $red-300;
+$form-invalid-border-color-dark: $red-300;
+
+// ======================================================
+// Accordion
+// ======================================================
+$accordion-icon-color-dark: $primary-text-emphasis-dark;
+$accordion-icon-active-color-dark: $primary-text-emphasis-dark;
+
+$accordion-button-icon-dark: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$accordion-icon-color-dark}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>");
+$accordion-button-active-icon-dark: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$accordion-icon-active-color-dark}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>");

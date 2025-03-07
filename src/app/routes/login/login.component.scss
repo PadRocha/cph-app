@@ -1,14 +1,6 @@
 @import "local_variables";
 
-$input-bg: $secundary;
-$input-color: $primary;
-$input-border-color: $text-color;
-$input-placeholder-color: $background-main;
-
-$btn-outline-dark-color: $secundary;
-$btn-outline-dark-border-color: $secundary;
-$btn-outline-dark-hover-color: $primary;
-$btn-outline-dark-hover-bg: $secundary;
+$input-focus-border-color: red;
 
 :host {
   display: flex;
@@ -56,29 +48,8 @@ $btn-outline-dark-hover-bg: $secundary;
     color: $login-color-section;
   }
 
-  .form-control {
-    background-color: $input-bg;
-    color: $input-color;
-    border-color: $input-border-color;
-
-    &::placeholder {
-      color: $input-placeholder-color;
-      border-color: $input-border-color;
-    }
-  }
-
   button {
-    color: $btn-outline-dark-color;
-    border-color: $btn-outline-dark-border-color;
-
-    &:hover {
-        color: $btn-outline-dark-hover-color;
-        background-color: $btn-outline-dark-hover-bg;
-    }
-
-    &:active {
-      color: $btn-outline-dark-hover-color;
-    }
+    @include button-outline-variant($login-btn-color);
   }
 }
 

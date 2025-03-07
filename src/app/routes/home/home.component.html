@@ -1,1 +1,34 @@
-<p>home works!</p>
+<form class="d-grid sticky-top gap-3 py-3">
+  <input
+    id="search"
+    name="search"
+    type="search"
+    class="form-control"
+    placeholder="Clave y/o descripción"
+    autocomplete="off"
+    autofocus />
+  <div class="d-inline-flex justify-content-between">
+    <div class="d-inline-flex flex-wrap gap-2">
+      <span>Σ []</span>
+      <section>
+        <span class="ico-image pe-1"></span>
+        <div>[]%</div>
+      </section>
+    </div>
+    <div class="d-inline-flex px-lg-2 gap-2 flex-wrap">
+      <!-- <ng-container *ngFor="let s of status_list">
+          <button (click)="setStatus(s)" [ngClass]="statusClass(s)" [attr.data-info]="status(s)"
+            [title]="statusTitle(s)" type="button" class="flex-grow-1 p-0">
+            <span [ngClass]="statusIcon(s)"></span>
+          </button>
+        </ng-container> -->
+    </div>
+  </div>
+</form>
+<button
+  ngbTooltip="Listar Clave"
+  placement="end"
+  class="btn btn-lg btn-dark rounded-5 position-fixed bottom-0 start-0 ms-2 mb-2"
+  title="Listar Clave">
+  <span class="ico-left-bar"></span>
+</button>

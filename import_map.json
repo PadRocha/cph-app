@@ -1,0 +1,5 @@
+{
+    "imports": {
+        "rxjs": "npm:rxjs@7.8.2"
+    }
+}

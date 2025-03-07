@@ -1,0 +1,4 @@
+@import 'local_variables';
+@import 'local_mixins';
+
+@include iconsCollection($home-icon-collection);

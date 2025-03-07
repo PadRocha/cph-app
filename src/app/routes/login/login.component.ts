@@ -10,6 +10,7 @@ import {
 import { Router } from "@angular/router";
 import { UserService } from "@core/services";
 import { ToastService } from "@core/services/toast/toast.service";
+import { ThemeDirective } from "@shared/directives";
 
 interface LoginForm {
   nickname: FormControl<string>;

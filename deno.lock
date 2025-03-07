@@ -28,7 +28,7 @@
     "npm:karma-jasmine@5.1": "5.1.0_karma@6.4.4",
     "npm:karma@6.4": "6.4.4",
     "npm:rxjs@7.8": "7.8.1",
-    "npm:rxjs@^7.8.2": "7.8.2",
+    "npm:rxjs@7.8.1": "7.8.1",
     "npm:tslib@^2.3.0": "2.8.1",
     "npm:typescript@~5.5.4": "5.5.4",
     "npm:zone.js@0.15": "0.15.0"
@@ -45,7 +45,7 @@
       "integrity": "sha512-iCm6F4HYO5aIgjzhjOUPKnyFHcn6yVE8gCpjWFQL8JVqrVzFG27vMZ0wK8b8rMDIDt6/hr2FOSSwChVg/cv9GQ==",
       "dependencies": [
         "@angular-devkit/core",
-        "rxjs@7.8.1"
+        "rxjs"
       ]
     },
     "@angular-devkit/core@19.2.1_ajv@8.17.1": {
@@ -55,7 +55,7 @@
         "ajv-formats",
         "jsonc-parser",
         "picomatch@4.0.2",
-        "rxjs@7.8.1",
+        "rxjs",
         "source-map@0.7.4"
       ]
     },
@@ -66,7 +66,7 @@
         "jsonc-parser",
         "magic-string",
         "ora",
-        "rxjs@7.8.1"
+        "rxjs"
       ]
     },
     "@angular/animations@19.2.1_@angular+core@19.2.1__rxjs@7.8.1__zone.js@0.15.0_rxjs@7.8.1_zone.js@0.15.0": {
@@ -139,7 +139,7 @@
       "integrity": "sha512-k+ikxn6SlWXxXEtwRmsYZeknf3a6n3Oicde6zTLBrD/Rie/u0+okuoQcuYjntQWGgH//QBQxH4UQpvRw51AR8w==",
       "dependencies": [
         "@angular/core",
-        "rxjs@7.8.1",
+        "rxjs",
         "tslib"
       ]
     },
@@ -168,7 +168,7 @@
     "@angular/core@19.2.1_rxjs@7.8.1_zone.js@0.15.0": {
       "integrity": "sha512-gwdytbZSM9m5v9PhRsvh6Q13vI1Ydcx52QGs93bpWx5ACOGYGp/Y7zc2mcZb1aUM63zGBTpS9Qw9bEsPHeLZPA==",
       "dependencies": [
-        "rxjs@7.8.1",
+        "rxjs",
         "tslib",
         "zone.js"
       ]
@@ -179,7 +179,7 @@
         "@angular/common",
         "@angular/core",
         "@angular/platform-browser",
-        "rxjs@7.8.1",
+        "rxjs",
         "tslib"
       ]
     },
@@ -219,7 +219,7 @@
         "@angular/common",
         "@angular/core",
         "@angular/platform-browser",
-        "rxjs@7.8.1",
+        "rxjs",
         "tslib"
       ]
     },
@@ -826,7 +826,7 @@
         "@angular/forms",
         "@angular/localize",
         "@popperjs/core",
-        "rxjs@7.8.1",
+        "rxjs",
         "tslib"
       ]
     },
@@ -2890,12 +2890,6 @@
         "tslib"
       ]
     },
-    "rxjs@7.8.2": {
-      "integrity": "sha512-dhKf903U/PQZY6boNNtAGdWbG85WAbjT/1xYoZIC7FAY0yWapOBQVsVrDl58W86//e1VpMNBtRV4MaXfdMySFA==",
-      "dependencies": [
-        "tslib"
-      ]
-    },
     "safe-buffer@5.2.1": {
       "integrity": "sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ=="
     },
@@ -3420,7 +3414,7 @@
         "npm:karma-jasmine-html-reporter@2.1",
         "npm:karma-jasmine@5.1",
         "npm:karma@6.4",
-        "npm:rxjs@^7.8.2",
+        "npm:rxjs@7.8.1",
         "npm:tslib@^2.3.0",
         "npm:typescript@~5.5.4",
         "npm:zone.js@0.15"

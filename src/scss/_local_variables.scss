@@ -5,13 +5,13 @@
 //*------------------------------------------------------------------*/
 // * Main
 //*------------------------------------------------------------------*/
-$primary: #f5f5f5;;
+$primary: #f5f5f5;
 $secundary: #2d2d2d;
-$color-percent: 10%;
-$text-color: darken($secundary, $color-percent);
-$text-color-dark: lighten($primary, $color-percent);
-$background-main: darken($primary, $color-percent);
-$background-main-dark: lighten($secundary, $color-percent);
+$link_shade_percentage: 10% !default;
+$text-color: darken($secundary, $link_shade_percentage) ;
+$text-color-dark: lighten($primary, $link_shade_percentage);
+$background-main: darken($primary, $link_shade_percentage);
+$background-main-dark: lighten($secundary, $link_shade_percentage);
 $lighter: 20%;
 $darker: 20%;
 $icons-size: 1rem;
@@ -25,6 +25,10 @@ $option-collection: (
   #ae2aae,
   #00c200,
 );
+//*------------------------------------------------------------------*/
+// * Login
+//*------------------------------------------------------------------*/
+$login-btn-color: $secundary;
 //*------------------------------------------------------------------*/
 // * Title bar
 //*------------------------------------------------------------------*/
