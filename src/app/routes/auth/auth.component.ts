@@ -10,7 +10,6 @@ import {
 import { Router } from "@angular/router";
 import { UserService } from "@core/services";
 import { ToastService } from "@core/services/toast/toast.service";
-import { ThemeDirective } from "@shared/directives";
 
 interface LoginForm {
   nickname: FormControl<string>;
@@ -18,12 +17,12 @@ interface LoginForm {
 }
 
 @Component({
-  selector: "app-login",
+  selector: 'app-auth',
   imports: [ReactiveFormsModule],
-  templateUrl: "./login.component.html",
-  styleUrl: "./login.component.scss",
+  templateUrl: './auth.component.html',
+  styleUrl: './auth.component.scss'
 })
-export class LoginComponent {
+export class AuthComponent {
   public userForm: FormGroup<LoginForm>;
   public isLoading: boolean;
 
@@ -40,7 +39,7 @@ export class LoginComponent {
           nonNullable: true,
         }),
       },
-      LoginComponent.validLogin
+      AuthComponent.validLogin
     );
   }
 

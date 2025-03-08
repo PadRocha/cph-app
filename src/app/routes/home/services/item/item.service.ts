@@ -1,9 +1,9 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { computed, Injectable, Signal, signal, WritableSignal } from '@angular/core';
 import { environment } from '@environment';
 import { DocPaginate } from '@shared/models';
 import { forkJoin, lastValueFrom, map, Observable, take, tap } from 'rxjs';
-import { Item, Info, ItemModel, LeanItem, Search, status, Delete, Archive } from './item.model';
+import { Archive, Delete, Info, Item, ItemModel, LeanItem, Search, status } from './item.model';
 
 const initialInfo: Info = {
   status: {
@@ -28,51 +28,51 @@ const initialSearch: Search = {
 export class ItemService {
   private url: string;
   private headers: HttpHeaders;
-  private docs: ItemModel[];
-  private total_docs: number;
-  private limit_page: number;
-  private has_next_page: boolean;
-  private page: number;
-  private info: Info;
-  private params: Search;
+  private docs: WritableSignal<ItemModel[]>;
+  private total_docs: WritableSignal<number>;
+  private limit_page: WritableSignal<number>;
+  private has_next_page: WritableSignal<boolean>;
+  private page: WritableSignal<number>;
+  private info: WritableSignal<Info>;
+  private params: WritableSignal<Search>;
+  private sortedDocs: Signal<ItemModel[]>;
 
   constructor(private http: HttpClient) {
     this.url = environment.httpUrl;
     this.headers = new HttpHeaders().set("Content-Type", "application/json");
-    this.docs = [];
-    this.total_docs = 0;
-    this.limit_page = 25;
-    this.has_next_page = false;
-    this.page = 1;
-    this.info = initialInfo;
-    this.params = initialSearch;
-  }
-
-  private get details(): Observable<{ data: Info }> {
-    return this.http.get<{ data: Info }>(`${this.url}/item/info`, {
-      params: {
-        ...this.params,
-        page: this.page,
-      },
+    this.docs = signal([]);
+    this.total_docs = signal(0);
+    this.limit_page = signal(25);
+    this.has_next_page = signal(false);
+    this.page = signal(1);
+    this.info = signal(initialInfo);
+    this.params = signal(initialSearch);
+    this.sortedDocs = computed(() => {
+      return this.docs().slice().sort(({ code: a }, { code: b }) => (a > b ? 1 : b > a ? -1 : 0));
     });
   }
 
-  public get list(): Observable<{ data: ItemModel[] }> {
-    const httpParams = { params: { ...this.params, page: this.page } };
+  private get details(): Observable<{ data: Info }> {
+    const httpParams = { params: { ...this.params(), page: this.page() } };
+    return this.http.get<{ data: Info }>(`${this.url}/item/info`, httpParams);
+  }
+
+  private get list(): Observable<{ data: ItemModel[] }> {
+    const httpParams = { params: { ...this.params(), page: this.page() } };
     return this.http.get<DocPaginate<Item>>(`${this.url}/item`, httpParams)
       .pipe(
         map(({ data, metadata: { totalDocs, limit, hasNextPage, page } }): { data: ItemModel[] } => {
-          this.total_docs = totalDocs;
-          this.limit_page = limit;
-          this.has_next_page = hasNextPage;
-          this.page = page;
+          this.total_docs.set(totalDocs);
+          this.limit_page.set(limit);
+          this.has_next_page.set(hasNextPage);
+          this.page.set(page);
           return { data: data.map((item) => new ItemModel(item)) };
         }),
       );
   }
 
   public navigate(code: string, direction: "next" | "previous", status: status = -1): Observable<ItemModel> {
-    const httpParams = { params: { ...this.params, code, direction, status } };
+    const httpParams = { params: { ...this.params(), code, direction, status } };
     return this.http.get<{ data: Item }>(`${this.url}/item`, httpParams)
       .pipe(map(({ data }) => new ItemModel(data)));
   }
@@ -82,32 +82,48 @@ export class ItemService {
     return this.http.put<{ data: Item }>(`${this.url}/item`, item, httpParams)
       .pipe(
         map(({ data }) => new ItemModel(data)),
-        tap((doc) => {
-          const i = this.docs.findIndex(({ _id }) => _id === id);
-          if (i === -1) return;
-          this.docs[i] = doc;
+        tap((doc): void => {
+          const currentDocs = this.docs();
+          const index = currentDocs.findIndex(({ _id }) => _id === id);
+          if (index === -1) return;
+          //TODO: Evaluar si esto funciona
+          this.docs.update(docs => {
+            const newDocs = docs.slice();
+            newDocs[index] = doc;
+            return newDocs;
+          });
         }),
       );
   }
 
-  public delete(id: string) {
+  public delete(id: string): Observable<ItemModel> {
     const httpParams = { params: { id } };
     return this.http.delete<Delete>(`${this.url}/item`, httpParams)
       .pipe(
         map(({ data }) => new ItemModel(data)),
-        tap(async () => {
-          const i = this.docs.findIndex(({ _id }) => _id === id);
-          if (i === -1) return;
-          if (this.docs[i].hasStatus(5)) this.substractSuccess();
-          const all_status = this.docs[i].allStatus;
-          for (const _ of all_status) this.substractStatus(_);
-          this.docs.splice(i, 1);
+        tap(async (): Promise<void> => {
+          const currentDocs = this.docs();
+          const index = currentDocs.findIndex(({ _id }) => _id === id);
+          if (index === -1) return;
+          if (currentDocs[index].hasStatus(5)) this.substractSuccess();
+          for (const stat of currentDocs[index].allStatus) {
+            this.substractStatus(stat);
+          }
+          this.docs.update(docs => {
+            const newDocs = docs.slice();
+            newDocs.splice(index, 1);
+            return newDocs;
+          });
           try {
-            const last = this.docs.at(-1);
+            const last = this.docs().at(-1);
             if (!last) return;
             const next = await lastValueFrom(this.navigate(last.code, "next"));
-            for (const s of next.allStatus) this.addStatus(s);
-            this.docs.push(next);
+            for (const stat of next.allStatus) this.addStatus(stat);
+            this.docs.update(docs => {
+              const newDocs = docs.slice();
+              newDocs.push(next);
+              return newDocs;
+            });
           } catch {
             return;
           }
@@ -115,48 +131,59 @@ export class ItemService {
       );
   }
 
-  public reset(id: string, status: status = -1) {
+  public reset(id: string, status: status = -1): Observable<ItemModel> {
     const httpParams = { params: { id }, headers: this.headers };
     return this.http.put<Delete>(`${this.url}/item/reset`, { status }, httpParams)
       .pipe(
         map(({ data }) => new ItemModel(data)),
-        tap(() => {
-          const i = this.docs.findIndex(({ _id }) => _id === id);
-          if (i === -1) return;
-          if (this.docs[i].hasStatus(5)) this.substractSuccess();
-          const all_status = this.docs[i].allStatus;
-          for (const _ of all_status) {
-            this.substractStatus(_);
+        tap((): void => {
+          const currentDocs = this.docs();
+          const index = currentDocs.findIndex(({ _id }) => _id === id);
+          if (index === -1) return;
+          if (currentDocs[index].hasStatus(5)) this.substractSuccess();
+          for (const stat of currentDocs[index].allStatus) this.substractStatus(stat);
+          if (status !== -1) {
+            this.docs.update(docs => {
+              const newDocs = docs.slice();
+              newDocs[index].setImages(status);
+              return newDocs;
+            });
+            for (const stat of this.docs()[index].allStatus) {
+              this.addStatus(stat);
+            }
           }
-          this.docs[i].setImages(status);
-          if (status !== null)
-            for (const s of this.docs[i].allStatus) this.addStatus(s);
         })
       );
   }
 
   public uploadImage(id: string, idN: number, form: FormData) {
     return this.http.put<{ data: Archive }>(`${this.url}/image`, form, { params: { id, idN } })
-      .pipe(tap(() => {
-        const i = this.docs.findIndex(({ _id }) => _id === id);
-        if (i === -1) return;
-        const status = this.docs[i].getStatus(idN);
-        if (status === null || status === 5) return;
-        this.replaceStatus(status, 5);
+      .pipe(tap((): void => {
+        const currentDocs = this.docs();
+        const index = currentDocs.findIndex(({ _id }) => _id === id);
+        if (index === -1) return;
+        const current_status = currentDocs[index].getStatus(idN);
+        if (current_status === -1 || current_status === 5) return;
+        this.replaceStatus(current_status, 5);
         this.addSuccess();
-        this.docs[i].updateStatus(idN, 5);
+        this.docs.update(docs => {
+          const newDocs = docs.slice();
+          newDocs[index].updateStatus(idN, 5);
+          return newDocs;
+        });
       }));
   }
 
   public deleteImage(id: string, idN: number) {
     const httpParams = { params: { id, idN } };
     return this.http.delete<{ data: Archive }>(`${this.url}/image`, httpParams)
-      .pipe(tap(() => {
-        const i = this.docs.findIndex(({ _id }) => _id === id);
-        if (i === -1) return;
-        const status = this.docs[i].removeStatus(idN - 1);
-        if (status === null) return;
-        this.substractStatus(status);
+      .pipe(tap((): void => {
+        const currentDocs = this.docs();
+        const index = currentDocs.findIndex(({ _id }) => _id === id);
+        if (index === -1) return;
+        const current_status = currentDocs[index].removeStatus(idN);
+        if (current_status === -1) return;
+        this.substractStatus(current_status);
         this.substractSuccess();
       }));
   }
@@ -164,113 +191,125 @@ export class ItemService {
   public deleteStatus(id: string, idN: number) {
     const httpParams = { params: { id, idN } };
     return this.http.put<{ data: Omit<Archive, 'file' | 'key'> }>(`${this.url}/item/status`, null, httpParams)
-      .pipe(tap(() => {
-        const i = this.docs.findIndex(({ _id }) => _id === id);
-        if (i === -1) return;
-        const status = this.docs[i].removeStatus(idN);
-        if (status === null) return;
-        this.substractStatus(status);
+      .pipe(tap((): void => {
+        const currentDocs = this.docs();
+        const index = currentDocs.findIndex(({ _id }) => _id === id);
+        if (index === -1) return;
+        const current_status = currentDocs[index].removeStatus(idN);
+        if (current_status === -1) return;
+        this.substractStatus(current_status);
       }));
   }
 
   public updateStatus(id: string, idN: number, status: status) {
     const httpParams = { params: { id, idN }, headers: this.headers };
     return this.http.put<{ data: Omit<Archive, 'file' | 'key'> }>(`${this.url}/item/status`, { status }, httpParams)
-      .pipe(tap(() => {
-        const i = this.docs.findIndex(({ _id }) => _id === id);
-        if (i === -1) return;
-        const prev_status = this.docs[i].getStatus(idN);
-        if (prev_status !== null) {
+      .pipe(tap((): void => {
+        const currentDocs = this.docs();
+        const index = currentDocs.findIndex(({ _id }) => _id === id);
+        if (index === -1) return;
+        const prev_status = currentDocs[index].getStatus(idN);
+        if (prev_status !== -1) {
           this.replaceStatus(prev_status, status);
-          this.docs[i].updateStatus(idN, status);
+          this.docs.update(docs => {
+            const newDocs = docs.slice();
+            newDocs[index].updateStatus(idN, status);
+            return newDocs;
+          });
         } else {
-          this.docs[i].setStatus(idN, status);
+          this.docs.update(docs => {
+            const newDocs = docs.slice();
+            newDocs[index].setStatus(idN, status);
+            return newDocs;
+          });
           this.addStatus(status);
         }
       }));
   }
 
   public getData(params?: Search) {
-    if (!!params) this.params = params;
-    this.page = 1;
+    if (params) this.params.set(params);
+    this.page.set(1);
     this.clear();
     return forkJoin({
       items: this.list.pipe(take(1)),
       info: this.details.pipe(take(1)),
     }).pipe(
-      tap(({ items: { data }, info: { data: info } }) => {
-        this.docs = data;
-        this.info = info;
+      tap(({ items: { data }, info: { data: info } }): void => {
+        this.docs.set(data);
+        this.info.set(info);
       })
     );
   }
 
-  public more() {
-    ++this.page;
+  public get more(): Observable<{ data: ItemModel[] }> {
+    this.page.update(n => n + 1);
     return this.list.pipe(
-      tap(({ data }) => this.docs = this.docs.concat(data))
+      tap(({ data }) => this.docs.update(docs => docs.concat(data)))
     );
   }
 
-  public get getAll(): ItemModel[] {
-    return this.docs.sort(({ code: a }, { code: b }) => a > b ? 1 : b > a ? -1 : 0);
+  public get all(): ItemModel[] {
+    return this.sortedDocs();
   }
 
   public get noItems(): boolean {
-    return this.docs.length === 0;
+    return this.docs().length === 0;
   }
 
-  public get totalDocs(): number {
-    return this.total_docs;
+  public get total(): number {
+    return this.total_docs();
   }
 
-  public get hasNextPage(): boolean {
-    return this.has_next_page;
+  public get hasNext(): boolean {
+    return this.has_next_page();
   }
 
   public get percentage(): number {
-    if (!this.info?.success || this.info.success === 0) return 0;
-    return (100 * this.info.success) / this.total_docs;
+    const currentInfo = this.info();
+    if (currentInfo.success === 0) return 0;
+    return (100 * currentInfo.success) / this.total_docs();
   }
 
-  public get limitPage(): number {
-    return this.limit_page;
+  public get limit(): number {
+    return this.limit_page();
   }
 
   public get size(): number {
-    return this.docs.length;
+    return this.docs().length;
   }
 
   private clear(): void {
-    this.docs = [];
-    this.total_docs = 0;
-    this.has_next_page = false;
-    this.info = initialInfo;
+    this.docs.set([]);
+    this.total_docs.set(0);
+    this.has_next_page.set(false);
+    this.info.set(initialInfo);
   }
 
-  public find(code: string, dir: "prev" | "next"): ItemModel | null {
-    if (this.docs.length <= 1) return null;
-    let i = this.docs.findIndex(({ code: curr }) => curr === code);
-    if (i === -1) return null;
+  public find(code: string, dir: "previous" | "next"): ItemModel | null {
+    const currentDocs = this.docs();
+    if (currentDocs.length <= 1) return null;
+    let index = currentDocs.findIndex(({ code: curr }) => curr === code);
+    if (index === -1) return null;
     do {
-      if (dir === "prev") {
-        --i;
-        if (i < 0) break;
+      if (dir === "previous") {
+        index--;
+        if (index < 0) break;
       } else {
-        ++i;
-        if (i >= this.docs.length) break;
+        index++;
+        if (index >= currentDocs.length) break;
       }
-    } while (!this.docs[i].hasImages);
-    if (i >= 0 && i < this.docs.length) return this.docs[i];
+    } while (!currentDocs[index].hasImages);
+    if (index >= 0 && index < currentDocs.length) return currentDocs[index];
     return null;
   }
 
   private addSuccess(): void {
-    ++this.info.success;
+    this.info.update(info => ({ ...info, success: info.success + 1 }));
   }
 
   private substractSuccess(): void {
-    --this.info.success;
+    this.info.update(info => ({ ...info, success: info.success - 1 }));
   }
 
   public statusName(status: status): keyof Info["status"] {
@@ -293,22 +332,34 @@ export class ItemService {
   }
 
   public statusValue(status: keyof Info["status"]): number {
-    return this.info?.status[status] || 0;
+    return this.info().status[status];
   }
 
   public getInfoStatus(status: status): number {
     const name = this.statusName(status);
-    return this.info.status[name];
+    return this.info().status[name];
   }
 
   private addStatus(status: status): void {
     const name = this.statusName(status);
-    ++this.info.status[name];
+    this.info.update(info => ({
+      ...info,
+      status: {
+        ...info.status,
+        [name]: info.status[name] + 1,
+      },
+    }));
   }
 
   private substractStatus(status: status): void {
     const name = this.statusName(status);
-    --this.info.status[name];
+    this.info.update(info => ({
+      ...info,
+      status: {
+        ...info.status,
+        [name]: info.status[name] - 1,
+      },
+    }));
   }
 
   private replaceStatus(pre: status, next: status): void {

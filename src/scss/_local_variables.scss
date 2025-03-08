@@ -1,6 +1,6 @@
-@import 'bootstrap/scss/functions';
-@import 'bootstrap/scss/variables';
-@import 'bootstrap/scss/mixins';
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins";
 
 //*------------------------------------------------------------------*/
 // * Main
@@ -8,7 +8,7 @@
 $primary: #f5f5f5;
 $secundary: #2d2d2d;
 $link_shade_percentage: 10% !default;
-$text-color: darken($secundary, $link_shade_percentage) ;
+$text-color: darken($secundary, $link_shade_percentage);
 $text-color-dark: lighten($primary, $link_shade_percentage);
 $background-main: darken($primary, $link_shade_percentage);
 $background-main-dark: lighten($secundary, $link_shade_percentage);
@@ -17,14 +17,7 @@ $darker: 20%;
 $icons-size: 1rem;
 $scrollbar-thumb: #545456;
 $scrollbar-track: #060608;
-$option-collection: (
-  #ffffff,
-  #a09f9f,
-  #cd4b4b,
-  #4b4bff,
-  #ae2aae,
-  #00c200,
-);
+$option-collection: (#ffffff, #a09f9f, #cd4b4b, #4b4bff, #ae2aae, #00c200);
 //*------------------------------------------------------------------*/
 // * Login
 //*------------------------------------------------------------------*/
@@ -58,7 +51,7 @@ $title-bar-control-button-close-hover-bg: #e81123;
 //*------------------------------------------------------------------*/
 $login-bg-aside: $secundary;
 $login-color-aside: $primary;
-$login-bg-section: $primary; 
+$login-bg-section: $primary;
 $login-color-section: $secundary;
 //*------------------------------------------------------------------*/
 // * Toaster
@@ -79,12 +72,8 @@ $aside-error: #ff0000;
 //*------------------------------------------------------------------*/
 // * Item
 //*------------------------------------------------------------------*/
-$item-color: #ffF;
-$item-icon-collection: (
-  warning,
-  settings,
-  camera,
-);
+$item-color: #fff;
+$item-icon-collection: (warning, settings, camera);
 //*------------------------------------------------------------------*/
 // * Home
 //*------------------------------------------------------------------*/
@@ -96,16 +85,12 @@ $home-icon-collection: (
   prepared,
   edited,
   saved,
-  left-bar,
+  left-bar
 );
 //*------------------------------------------------------------------*/
 // * Modal Images
 //*------------------------------------------------------------------*/
-$images-icon-collection: (
-  arrow-left,
-  arrow-right,
-  back,
-);
+$images-icon-collection: (arrow-left, arrow-right, back);
 //*------------------------------------------------------------------*/
 // * Modal Image Editor
 //*------------------------------------------------------------------*/
@@ -121,5 +106,5 @@ $editor-icon-collection: (
   stroke,
   background,
   opacity,
-  round,
+  round
 );

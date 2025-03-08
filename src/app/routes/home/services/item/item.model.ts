@@ -22,7 +22,7 @@ interface Item {
   _id: string;
   code: string;
   desc: string;
-  images: Image[]
+  images: Image[];
   countItems?: number;
 }
 
@@ -40,15 +40,14 @@ interface Info {
   success: number;
 }
 
-interface Delete { 
-  data: Item; 
-  deletedStatus: Info["status"]; 
+interface Delete {
+  data: Item;
+  deletedStatus: Info["status"];
 }
 
 class ItemModel {
-  constructor(
-    private item: Item
-  ) { }
+
+  constructor(private item: Item) { }
 
   public get _id() {
     return this.item._id;
@@ -78,7 +77,7 @@ class ItemModel {
       key: this.key,
       code: this.code.slice(6, 10),
       desc: this.desc,
-    }
+    };
   }
 
   public set raw(item: Item) {
@@ -98,20 +97,20 @@ class ItemModel {
   }
 
   public hasStatus(status: status): boolean {
-    return this.item.images.some(({ status: _ }) => _ === status);
+    return this.item.images.some(({ status: s }) => s === status);
   }
 
   public isReseted(status: status): boolean {
-    return this.item.images.every(({ status: _ }) => _ === status);
+    return this.item.images.every(({ status: s }) => s === status);
   }
 
   private findImageIndex(_idN: number): number {
-    return this.item.images.findIndex(({ idN: _ }) => _ === (_idN + 1));
+    return this.item.images.findIndex(({ idN: n }) => n === (_idN + 1));
   }
 
-  public getStatus(_idN: number): status | null {
+  public getStatus(_idN: number): status {
     const i = this.findImageIndex(_idN);
-    if (i === -1) return null;
+    if (i === -1) return -1;
     return this.item.images[i].status;
   }
 
@@ -129,26 +128,24 @@ class ItemModel {
     this.item.images[i].status = status;
   }
 
-  public removeStatus(_idN: number): status | null {
+  public removeStatus(_idN: number): status {
     const i = this.findImageIndex(_idN);
-    if (i === -1) return null;
-    const status = this.getStatus(_idN);
+    if (i === -1) return -1;
+    const currentStatus = this.getStatus(_idN);
     this.item.images.splice(i, 1);
-    return status;
+    return currentStatus;
   }
 
-  public setImages(status: status | null): void {
-    const images = status !== null
+  public setImages(status: status): void {
+    const images = status > 0
       ? new Array(3)
-        .fill({ status })
-        .map(({ status }, _idN) => {
-          return { idN: _idN + 1, status };
-        })
+        .fill(null)
+        .map((_, idx) => ({ idN: idx + 1, status }))
       : [];
     this.item.images = images;
   }
 }
 
 export { ItemModel };
-export type { Archive, Delete, Item, Info, LeanItem, Search, status };
+export type { Archive, Delete, Info, Item, LeanItem, Search, status };
 

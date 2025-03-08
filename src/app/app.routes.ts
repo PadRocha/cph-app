@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { adminGuard, editGuard, notLoggedGuard } from '@core/guards';
-import { LoginComponent, PdfComponent } from '@routes';
+import { AuthComponent, PdfComponent } from '@routes';
 
 export const routes: Routes = [
   {
@@ -19,14 +19,14 @@ export const routes: Routes = [
     path: "dashboard",
     canMatch: [adminGuard],
     async loadComponent() {
-      const m = await import("./routes/dashboard/dashboard.component");
-      return m.DashboardComponent;
+      const m = await import("./routes/settings/settings.component");
+      return m.SettingsComponent;
     },
   },
   {
     path: "login",
     canActivate: [notLoggedGuard],
-    component: LoginComponent,
+    component: AuthComponent,
   },
   {
     path: "**",
