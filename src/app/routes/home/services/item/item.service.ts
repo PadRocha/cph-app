@@ -33,15 +33,25 @@ const initialSearch: Search = {
   providedIn: 'root'
 })
 export class ItemService {
+  /** URL base para las peticiones al backend. */
   private url: string;
+  /** Encabezados HTTP predefinidos para las peticiones. */
   private headers: HttpHeaders;
+  /** Señal que almacena el arreglo actual de items en formato ItemModel. */
   private docs: WritableSignal<ItemModel[]>;
+  /** Señal que almacena el total de documentos (items) disponibles. */
   private totalDocs: WritableSignal<number>;
+  /** Señal que almacena el límite de items por página. */
   private limitPage: WritableSignal<number>;
+  /** Señal que indica si hay una página siguiente disponible. */
   private hasNextPage: WritableSignal<boolean>;
+  /** Señal que almacena el número de página actual en la paginación. */
   private page: WritableSignal<number>;
+  /** Señal que almacena la información estadística (conteos de estados) de los items. */
   private info: WritableSignal<Info>;
+  /** Señal que almacena los parámetros de búsqueda actuales. */
   private params: WritableSignal<Search>;
+  /** Señal computada que retorna los items ordenados por código. */
   private sortedDocs: Signal<ItemModel[]>;
 
   /**
@@ -192,15 +202,13 @@ export class ItemService {
           if (index === -1) return;
           if (currentDocs[index].hasStatus(5)) this.substractSuccess();
           for (const stat of currentDocs[index].allStatus) this.substractStatus(stat);
+          this.docs.update(docs => {
+            const newDocs = docs.slice();
+            newDocs[index].setImages(status);
+            return newDocs;
+          });
           if (status !== -1) {
-            this.docs.update(docs => {
-              const newDocs = docs.slice();
-              newDocs[index].setImages(status);
-              return newDocs;
-            });
-            for (const stat of this.docs()[index].allStatus) {
-              this.addStatus(stat);
-            }
+            for (const stat of this.docs()[index].allStatus) this.addStatus(stat);
           }
         })
       );

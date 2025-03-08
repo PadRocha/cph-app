@@ -59,7 +59,7 @@ export class AuthComponent {
       next: ({ token }) => {
         this.userForm.reset();
         this.user.setToken(token);
-        this.user.update().subscribe({
+        this.user.update.subscribe({
           next: (info) => {
             this.user.info = info;
           },
