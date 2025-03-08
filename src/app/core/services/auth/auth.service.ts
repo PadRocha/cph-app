@@ -9,9 +9,25 @@ import {
   WritableSignal,
 } from "@angular/core";
 import { Router } from "@angular/router";
-import { User } from "@core/models";
 import { environment } from "@environment";
 import { Observable } from "rxjs";
+
+/**
+ * Interfaz que define la estructura de un usuario.
+ *
+ * @remarks
+ * Las propiedades son de solo lectura y algunas son opcionales.
+ */
+interface User {
+  /** Identificador único del usuario. */
+  readonly _id?: string;
+  /** Sub identificador o alias interno del usuario. */
+  readonly sub?: string;
+  /** Contraseña del usuario (no se recomienda exponerla en producción). */
+  readonly password?: string;
+  /** Rol o tipo de usuario. */
+  readonly role?: string;
+}
 
 type Token = { token: string };
 

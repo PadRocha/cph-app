@@ -3,6 +3,16 @@ import { Component } from '@angular/core';
 import { ToastService, ToastInfo } from '@core/services/toast/toast.service';
 import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
 
+/**
+ * Componente para mostrar notificaciones tipo toast.
+ *
+ * Renderiza los toasts activos y permite removerlos individualmente.
+ *
+ * @example
+ * ```html
+ * <app-toaster></app-toaster>
+ * ```
+ */
 @Component({
   selector: 'app-toaster',
   imports: [CommonModule, NgbToastModule],
@@ -13,11 +23,22 @@ import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
   }
 })
 export class ToasterComponent {
-  
+
+  /**
+   * Crea una instancia de ToasterComponent.
+   *
+   * @param toast - Servicio para gestionar los toasts.
+   */
   constructor(
     private toast: ToastService,
   ) { }
 
+  /**
+   * Devuelve la clase CSS asociada al tipo de toast.
+   *
+   * @param toast - Información del toast.
+   * @returns La clase CSS ("bg-success", "bg-warning" o "bg-danger").
+   */
   public className({ type }: ToastInfo): "bg-success" | "bg-warning" | "bg-danger" {
     switch (type) {
       case 'success':
@@ -29,10 +50,20 @@ export class ToasterComponent {
     }
   }
 
+  /**
+   * Obtiene la lista de toasts activos.
+   *
+   * @returns Arreglo de ToastInfo.
+   */
   public get toasts(): ToastInfo[] {
     return this.toast.get();
   }
 
+  /**
+   * Remueve un toast del listado.
+   *
+   * @param toast - El toast a remover.
+   */
   public remove(toast: ToastInfo): void {
     this.toast.remove(toast);
   }
