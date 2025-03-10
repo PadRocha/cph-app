@@ -1,4 +1,50 @@
+@import 'local_functions';
 @import 'local_variables';
 @import 'local_mixins';
 
 @include iconsCollection($home-icon-collection);
+
+@mixin idn_styles($color) {
+  color: $color;
+  background-color: inherit;
+  border: none;
+
+  &::after {
+    content: '[' attr(data-info) ']';
+    margin-left: 0.25rem !important;
+  }
+
+  &:hover,
+  &.active {
+    color: lighten($color, $darker);
+    background-color: contrast_color($color);
+  }
+
+  &:active {
+    color: lighten($color, $lighter);
+  }
+
+  &.active {
+    text-decoration-line: line-through;
+  }
+}
+
+@for $i from 1 through length($option-collection) {
+  .idN#{($i - 1)} {
+    $color: nth($option-collection, $i);
+    @include idn_styles($color);
+  }
+
+  [data-bs-theme=dark] .idN#{($i - 1)} {
+    $color: nth($option-collection-dark, $i);
+    @include idn_styles($color);
+  }
+}
+
+.idN0 {
+  color: #1a1a1a;
+}
+
+// [role='group'] {
+//   margin-top: $header-min-height;
+// }

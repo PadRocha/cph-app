@@ -16,7 +16,7 @@ export const routes: Routes = [
     component: PdfComponent,
   },
   {
-    path: "dashboard",
+    path: "settings",
     canMatch: [adminGuard],
     async loadComponent() {
       const m = await import("./routes/settings/settings.component");

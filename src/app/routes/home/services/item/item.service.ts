@@ -3,7 +3,7 @@ import { computed, Injectable, Signal, signal, WritableSignal } from '@angular/c
 import { environment } from '@environment';
 import { DocPaginate } from '@shared/models';
 import { forkJoin, lastValueFrom, map, Observable, take, tap } from 'rxjs';
-import { Archive, Delete, Info, Item, ItemModel, LeanItem, Search, status } from './item.model';
+import { Archive, Delete, Info, Item, ItemModel, LeanItem, Search, status } from '@home/models';
 
 /**
  * Estado inicial para la información de los items.
@@ -24,7 +24,7 @@ const initialInfo: Info = {
  * Parámetros de búsqueda iniciales.
  */
 const initialSearch: Search = {
-  page: 1,
+  // page: 1,
   search: '',
   status: -1
 };

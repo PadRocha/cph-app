@@ -65,16 +65,16 @@ export class AuthComponent {
           },
           error: () => {
             this.toast.show('Login', 'danger');
-            this.isLoading = false;
+            // this.isLoading = false;
             this.user.destroy();
           }
-        });
+        }).add(() => this.isLoading = false);;
         this.router.navigateByUrl('/home');
       },
       error: () => {
         this.toast.show('Login', 'danger');
-        this.isLoading = false;
+        // this.isLoading = false;
       }
-    })
+    }).add(() => this.isLoading = false);
   }
 }

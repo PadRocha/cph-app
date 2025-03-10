@@ -6,8 +6,7 @@ import { firstValueFrom, filter, take } from 'rxjs';
 export const adminGuard: CanMatchFn = async () => {
   const user = inject(UserService);
   const router = inject(Router);
-
-  // Esperamos hasta que la identidad tenga un identifier válido
+  
   await firstValueFrom(
     user.userSync.pipe(
       filter(u => u.identifier !== null),

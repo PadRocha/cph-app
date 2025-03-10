@@ -24,6 +24,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(
       routes,
       withRouterConfig({ onSameUrlNavigation: "reload" }),
+      
       // ...routesFeatures
     ),
     provideAnimations(),

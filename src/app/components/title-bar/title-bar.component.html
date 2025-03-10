@@ -35,21 +35,20 @@
             (click)="navigateTo(item)"
             [title]="item.route"
             [attr.aria-label]="'Ir a ' + item.route">
-            {{ item.route }}
+            {{ displayRoute(item) }}
           </button>
         }
       </div>
     </div>
   }
-  <button
+  <!-- <button
     (click)="onRefresh()"
     class="control-button py-2 px-3"
     title="Actualizar"
     aria-label="Actualizar">
     &#x21bb;
-  </button>
+  </button> -->
 </div>
-
 <div class="drag-handle d-flex align-items-center justify-content-between flex-grow-1 px-2">
   <a
     routerLink="/home"
@@ -73,7 +72,7 @@
     </button>
     @if (isAdmin) {
       <button
-        routerLink="/dashboard"
+        routerLink="/settings"
         routerLinkActive="active"
         class="control-button py-2 px-3"
         title="Ir a configuración"
@@ -104,7 +103,7 @@
       @if (isAdmin) {
         <button
           ngbDropdownItem
-          routerLink="/dashboard"
+          routerLink="/settings"
           routerLinkActive="active"
           class="control-button w-100"
           title="Ir a configuración"

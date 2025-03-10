@@ -10,7 +10,7 @@ import {
   WritableSignal,
 } from "@angular/core";
 import { NgbDropdownModule } from "@ng-bootstrap/ng-bootstrap";
-import { HistoryService, UserService } from "@core/services";
+import { NavigationService, Historian, UserService } from "@core/services";
 import { getCurrentWindow, Window } from "@tauri-apps/api/window";
 import { RouterModule } from "@angular/router";
 
@@ -47,10 +47,10 @@ export class TitleBarComponent {
   public dropdownVisible: boolean;
 
   /** Señal computada que indica si se puede navegar hacia atrás en el historial. */
-  public canGoBack: Signal<boolean>;
+  // public canGoBack: Signal<boolean>;
 
-  /** Señal computada que indica si se puede navegar hacia adelante en el historial. */
-  public canGoForward: Signal<boolean>;
+  // /** Señal computada que indica si se puede navegar hacia adelante en el historial. */
+  // public canGoForward: Signal<boolean>;
 
   /** Señal computada que indica si se debe mostrar el dropdown (basado en la longitud del historial). */
   public showDropdown: Signal<boolean>;
@@ -64,18 +64,18 @@ export class TitleBarComponent {
    * @param history - Servicio de historial para la navegación.
    * @param user - Servicio de usuario para gestionar la sesión.
    */
-  constructor(private history: HistoryService, private user: UserService) {
+  constructor(private navigation: NavigationService, private user: UserService) {
     this.window = getCurrentWindow();
     this.maximizedResource = resource({
       loader: async () => await this.window.isMaximized(),
     });
     this.isMaximized = computed(this.maximizedResource.value);
     this.dropdownVisible = false;
-    this.canGoBack = computed(() => this.history.index > 0);
-    this.canGoForward = computed(
-      () => this.history.index < this.history.getTrail().length - 1
-    );
-    this.showDropdown = computed(() => this.history.getTrail().length >= 3);
+    // this.canGoBack = computed(() => this.navigation.index > 0);
+    // this.canGoForward = computed(
+    //   () => this.navigation.index < this.navigation.history.length - 1
+    // );
+    this.showDropdown = computed(() => this.navigation.history.length >= 3);
     this.isCollapsed = signal(true);
   }
 
@@ -132,27 +132,35 @@ export class TitleBarComponent {
     await this.window.close();
   }
 
+  public canGoBack(): boolean {
+    return this.navigation.hasPast;
+  }
+
+  public canGoForward(): boolean {
+    return this.navigation.hasFuture;
+  }
+
   /**
    * Navega hacia atrás en el historial.
    */
   public goBack(): void {
-    this.history.goBack();
+    this.navigation.goBack();
   }
 
   /**
    * Navega hacia adelante en el historial.
    */
   public goForward(): void {
-    this.history.goForward();
+    this.navigation.goForward();
   }
 
   /**
    * Recarga la vista actual y recarga el recurso de estado maximizado.
    */
-  public async onRefresh(): Promise<void> {
-    this.history.reload();
-    this.maximizedResource.reload();
-  }
+  // public async onRefresh(): Promise<void> {
+  //   this.navigation.reload();
+  //   this.maximizedResource.reload();
+  // }
 
   /**
    * Alterna la visibilidad del dropdown.
@@ -166,15 +174,25 @@ export class TitleBarComponent {
    *
    * @returns Arreglo de objetos con la ruta y el índice en el historial.
    */
-  public get partialHistory(): { route: string; index: number }[] {
-    const hist = this.history.getTrail();
-    const currentIndex = this.history.index;
-    const range = 2;
+  public get partialHistory(): Historian[] {
+    const hist = this.navigation.history;
+    // const currentIndex = this.navigation.index;
+    const currentIndex = this.navigation.now?.id ?? 0;
+    const range = 4;
     const start = Math.max(0, currentIndex - range);
     const end = Math.min(hist.length, currentIndex + range + 1);
-    return hist
-      .slice(start, end)
-      .map((route, i) => ({ route, index: start + i }));
+    return hist.slice(start, end);
+  }
+
+  public displayRoute({ base, params }: Historian) {
+    const paramsEntries = Object.entries(params).filter(([_, value]) => value !== '' && value != -1);
+    if (paramsEntries.length) {
+      const paramsStr = paramsEntries
+        .map(([key, value]) => `${key}: ${value}`)
+        .join(', ');
+      return `${base} { ${paramsStr} }`;
+    }
+    return base;
   }
 
   /**
@@ -183,8 +201,8 @@ export class TitleBarComponent {
    * @param param0 - Objeto con la propiedad index.
    * @returns True si es la ruta actual, false en caso contrario.
    */
-  public isCurrent({ index }: { index: number }): boolean {
-    return index === this.history.index;
+  public isCurrent({ id }: Historian): boolean {
+    return this.navigation.now.id === id;
   }
 
   /**
@@ -192,8 +210,8 @@ export class TitleBarComponent {
    *
    * @param param0 - Objeto con la propiedad index.
    */
-  public navigateTo({ index }: { index: number }): void {
-    this.history.index = index;
+  public navigateTo({ id }: Historian): void {
+    this.navigation.now = id;
     this.dropdownVisible = false;
   }
 
@@ -203,7 +221,7 @@ export class TitleBarComponent {
    * @returns True si el usuario no está logueado y la URL actual es "/pdf".
    */
   public get showLogin(): boolean {
-    return !this.user.logged && this.history.url === "/pdf";
+    return !this.user.logged && this.navigation.now.route === "/pdf";
   }
 
   /**
@@ -223,11 +241,6 @@ export class TitleBarComponent {
   public get isAdmin(): boolean {
     return this.user.hasRole("GRANT", "ADMIN");
   }
-
-  /**
-   * Método placeholder para la acción de login.
-   */
-  public onLogin(): void { }
 
   /**
    * Realiza el logout y destruye la sesión del usuario.

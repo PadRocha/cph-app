@@ -1,27 +1,31 @@
-<form class="d-grid sticky-top gap-3 py-3">
+<form [formGroup]="searchForm" class="d-grid sticky-top gap-3 py-3">
   <input
+    formControlName="search"
     id="search"
     name="search"
     type="search"
-    class="form-control"
+    class="form-control form-control-sm"
     placeholder="Clave y/o descripción"
     autocomplete="off"
-    autofocus />
+    autofocus
+    aria-autocomplete="none" />
   <div class="d-inline-flex justify-content-between">
-    <div class="d-inline-flex flex-wrap gap-2">
-      <span>Σ []</span>
-      <section>
+    <div class="d-inline-flex flex-wrap ps-2 gap-2">
+      <span>Σ [{{ success }}]</span>
+      <section class="">
         <span class="ico-image pe-1"></span>
-        <div>[]%</div>
+        <div>[{{ percentage | number: '1.2-2' }}]%</div>
       </section>
     </div>
-    <div class="d-inline-flex px-lg-2 gap-2 flex-wrap">
-      <!-- <ng-container *ngFor="let s of status_list">
-          <button (click)="setStatus(s)" [ngClass]="statusClass(s)" [attr.data-info]="status(s)"
-            [title]="statusTitle(s)" type="button" class="flex-grow-1 p-0">
-            <span [ngClass]="statusIcon(s)"></span>
-          </button>
-        </ng-container> -->
+    <div app-theme class="d-inline-flex px-lg-2 gap-2 flex-wrap">
+      @for (stat of statusList; track $index) {
+        <button
+          (click)="setStatus(stat)"
+          [status]="stat"
+          [active]="activeStatus"
+          type="button">
+        </button>
+      }
     </div>
   </div>
 </form>

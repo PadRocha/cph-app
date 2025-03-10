@@ -12,8 +12,8 @@ type status = -1 | 0 | 1 | 2 | 3 | 4 | 5;
  * Parámetros de búsqueda para filtrar items.
  */
 interface Search {
-  /** Página actual de la búsqueda. */
-  page: number;
+  // /** Página actual de la búsqueda. */
+  // page: number;
   /** Texto a buscar. */
   search: string;
   /** Estado a filtrar. */

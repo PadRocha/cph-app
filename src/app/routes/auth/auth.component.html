@@ -23,6 +23,7 @@
         placeholder="Usuario" 
         autocomplete="off" 
         autofocus 
+        aria-autocomplete="none"
         aria-required="true" />
     </div>
     <div class="form-group">
@@ -34,7 +35,8 @@
         type="password" 
         class="form-control" 
         placeholder="Contraseña" 
-        autocomplete="off" 
+        autocomplete="off"
+        aria-autocomplete="none"
         aria-required="true" />
     </div>
     <button [disabled]="isLoading" type="submit" class="btn btn-outline-dark">Entrar</button>
