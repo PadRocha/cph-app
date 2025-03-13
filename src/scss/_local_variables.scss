@@ -17,7 +17,7 @@ $darker: 20%;
 $icons-size: 1rem;
 $scrollbar-thumb: #545456;
 $scrollbar-track: #060608;
-$option-collection: (#ffffff, #a09f9f, #cd4b4b, #4b4bff, #ae2aae, #00c200);
+$option-collection: (#ffffff, #707070, #cd4b4b, #4b4bff, #ae2aae, #005f00);
 $option-collection-dark: (
   rgb(255, 255, 255),
   rgb(208, 208, 208),
@@ -47,7 +47,9 @@ $title-bar-icon-collection: (
   pdf,
   dashboard,
   minimize,
-  unmaximize
+  unmaximize,
+  light-mode,
+  dark-mode
 );
 // Botones de control en el title-bar
 $title-bar-control-button-bg: transparent;
@@ -93,7 +95,9 @@ $home-icon-collection: (
   prepared,
   edited,
   saved,
-  left-bar
+  left-bar,
+  camera,
+  config
 );
 //*------------------------------------------------------------------*/
 // * Modal Images

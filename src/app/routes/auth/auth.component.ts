@@ -51,7 +51,7 @@ export class AuthComponent {
   }
 
   public onSubmit(): void {
-    if (!this.userForm.valid) return;
+    if (!this.userForm.valid) return this.toast.show("Login <no datos>", 'warning');
     const params = this.userForm.getRawValue();
 
     this.isLoading = true;
@@ -67,6 +67,7 @@ export class AuthComponent {
             this.toast.show('Login', 'danger');
             // this.isLoading = false;
             this.user.destroy();
+            this.user.logout();
           }
         }).add(() => this.isLoading = false);;
         this.router.navigateByUrl('/home');

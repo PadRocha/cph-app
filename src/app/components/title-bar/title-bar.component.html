@@ -135,6 +135,17 @@
     </button>
   }
   <button 
+    (click)="toogleTheme()"
+    class="control-button py-2 px-3 order-1"
+    title="Cambiar tema"
+    aria-label="Cambiar tema">
+    @if(isDarkTheme) {
+      <span class="ico-dark-mode"></span>
+    } @else {
+      <span class="ico-light-mode"></span>
+    }
+  </button>
+  <button 
     (click)="onMinimize()"
     class="control-button py-2 px-3 order-1"
     title="Minimizar"

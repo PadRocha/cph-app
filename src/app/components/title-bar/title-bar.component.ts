@@ -10,8 +10,8 @@ import {
   WritableSignal,
 } from "@angular/core";
 import { NgbDropdownModule } from "@ng-bootstrap/ng-bootstrap";
-import { NavigationService, Historian, UserService } from "@core/services";
-import { getCurrentWindow, Window } from "@tauri-apps/api/window";
+import { NavigationService, Historian, UserService, StorageService } from "@core/services";
+import { getCurrentWindow, Theme, Window } from "@tauri-apps/api/window";
 import { RouterModule } from "@angular/router";
 
 /**
@@ -64,7 +64,7 @@ export class TitleBarComponent {
    * @param history - Servicio de historial para la navegación.
    * @param user - Servicio de usuario para gestionar la sesión.
    */
-  constructor(private navigation: NavigationService, private user: UserService) {
+  constructor(private navigation: NavigationService, private user: UserService, private storage: StorageService) {
     this.window = getCurrentWindow();
     this.maximizedResource = resource({
       loader: async () => await this.window.isMaximized(),
@@ -255,5 +255,13 @@ export class TitleBarComponent {
    */
   public toggleNav(): void {
     this.isCollapsed.update((val) => !val);
+  }
+
+  public get isDarkTheme(): boolean {
+    return this.storage.theme === 'dark';
+  }
+
+  public toogleTheme(): void {
+    this.storage.theme = this.isDarkTheme ? 'light' : 'dark';
   }
 }

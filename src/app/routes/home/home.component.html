@@ -1,4 +1,4 @@
-<form [formGroup]="searchForm" class="d-grid sticky-top gap-3 py-3">
+<form [formGroup]="searchForm" app-theme class="d-grid sticky-top gap-3 py-3">
   <input
     formControlName="search"
     id="search"
@@ -8,27 +8,78 @@
     placeholder="Clave y/o descripción"
     autocomplete="off"
     autofocus
-    aria-autocomplete="none" />
+    aria-autocomplete="none"/>
   <div class="d-inline-flex justify-content-between">
-    <div class="d-inline-flex flex-wrap ps-2 gap-2">
+    <div class="d-none d-md-inline-flex flex-wrap ps-2 gap-2">
       <span>Σ [{{ success }}]</span>
-      <section class="">
+      <span>
         <span class="ico-image pe-1"></span>
-        <div>[{{ percentage | number: '1.2-2' }}]%</div>
-      </section>
+        <div>[{{ percentage | number : "1.2-2" }}]%</div>
+      </span>
     </div>
     <div app-theme class="d-inline-flex px-lg-2 gap-2 flex-wrap">
       @for (stat of statusList; track $index) {
-        <button
-          (click)="setStatus(stat)"
-          [status]="stat"
-          [active]="activeStatus"
-          type="button">
-        </button>
+      <button
+        (click)="setStatus(stat)"
+        [status]="stat"
+        [active]="activeStatus"
+        type="button"
+      ></button>
       }
     </div>
   </div>
 </form>
+<section app-theme class="grid">
+  @for (item of itemArray; track $index) {
+    <article class="item-card p-2">
+      <header class="d-flex justify-content-between align-items-center mb-2">
+        <h5>{{ item.code }}</h5>
+        <button
+          type="button"
+          class="btn p-0 border-0 three-dots"
+          aria-label="Modificar">
+          <span class="ico-config"></span>
+        </button>
+      </header>
+      <div class="img-placeholder mb-2">
+        <!-- Espacio para la imagen -->
+      </div>
+      <div class="input-group mb-2">
+        <button class="btn btn-outline-secondary" type="button">
+          <span class="ico-camera"></span>
+        </button>
+        <select class="form-select" title="Cambiar estado">
+          <option>a</option>
+        </select>
+        <select class="form-select" title="Cambiar estado">
+          <option>a</option>
+        </select>
+        <select class="form-select" title="Cambiar estado">
+          <option>a</option>
+        </select>
+      </div>
+      <p class="mb-0">{{ item.desc }}</p>
+    </article>
+  } 
+  @if (isLoading()) { 
+    @for (fake of [1, 2, 3, 4]; track $index) {
+      <article class="item-card p-2 loading">
+        <header class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="skeleton skeleton-text w-50 m-0"></h5>
+          <span class="skeleton skeleton-button"></span>
+        </header>
+        <div class="img-placeholder skeleton skeleton-rect mb-2"></div>
+        <div class="input-group mb-2">
+          <span class="skeleton skeleton-btn"></span>
+          <span class="skeleton skeleton-select"></span>
+          <span class="skeleton skeleton-select"></span>
+          <span class="skeleton skeleton-select"></span>
+        </div>
+        <p class="skeleton skeleton-text w-75 mb-0"></p>
+      </article>
+    } 
+  }
+</section>
 <button
   ngbTooltip="Listar Clave"
   placement="end"
