@@ -19,57 +19,38 @@
     </div>
     <div app-theme class="d-inline-flex px-lg-2 gap-2 flex-wrap">
       @for (stat of statusList; track $index) {
-      <button
-        (click)="setStatus(stat)"
-        [status]="stat"
-        [active]="activeStatus"
-        type="button"
-      ></button>
+        <button
+          (click)="setStatus(stat)"
+          [status]="stat"
+          [active]="activeStatus"
+          type="button">
+        </button>
       }
     </div>
   </div>
 </form>
 <section app-theme class="grid">
+  <!-- Mostrar ítems ya cargados -->
   @for (item of itemArray; track $index) {
-    <article class="item-card p-2">
-      <header class="d-flex justify-content-between align-items-center mb-2">
-        <h5>{{ item.code }}</h5>
-        <button
-          type="button"
-          class="btn p-0 border-0 three-dots"
-          aria-label="Modificar">
-          <span class="ico-config"></span>
-        </button>
-      </header>
-      <div class="img-placeholder mb-2">
-        <!-- Espacio para la imagen -->
+    <app-item [item]="item"></app-item>
+  } @empty {
+    <!-- Aquí podrías colocar un mensaje bonito si no hay nada -->
+    @if (!isLoading()) {
+      <div class="empty-state text-center p-4">
+        <p>Oh, parece que no hay nada por aquí...</p>
       </div>
-      <div class="input-group mb-2">
-        <button class="btn btn-outline-secondary" type="button">
-          <span class="ico-camera"></span>
-        </button>
-        <select class="form-select" title="Cambiar estado">
-          <option>a</option>
-        </select>
-        <select class="form-select" title="Cambiar estado">
-          <option>a</option>
-        </select>
-        <select class="form-select" title="Cambiar estado">
-          <option>a</option>
-        </select>
-      </div>
-      <p class="mb-0">{{ item.desc }}</p>
-    </article>
-  } 
+    }
+  }
+  <!-- Cuando se carga más, se agregan skeletons al final -->
   @if (isLoading()) { 
-    @for (fake of [1, 2, 3, 4]; track $index) {
+    @for (fake of [1, 2, 3, 4, 5]; track $index) {
       <article class="item-card p-2 loading">
         <header class="d-flex justify-content-between align-items-center mb-2">
           <h5 class="skeleton skeleton-text w-50 m-0"></h5>
           <span class="skeleton skeleton-button"></span>
         </header>
         <div class="img-placeholder skeleton skeleton-rect mb-2"></div>
-        <div class="input-group mb-2">
+        <div class="input-group mb-2 d-flex flex-wrap gap-1">
           <span class="skeleton skeleton-btn"></span>
           <span class="skeleton skeleton-select"></span>
           <span class="skeleton skeleton-select"></span>

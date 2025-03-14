@@ -83,7 +83,7 @@ $aside-error: #ff0000;
 // * Item
 //*------------------------------------------------------------------*/
 $item-color: #fff;
-$item-icon-collection: (warning, settings, camera);
+$item-icon-collection: (camera, config);
 //*------------------------------------------------------------------*/
 // * Home
 //*------------------------------------------------------------------*/
@@ -96,8 +96,6 @@ $home-icon-collection: (
   edited,
   saved,
   left-bar,
-  camera,
-  config
 );
 //*------------------------------------------------------------------*/
 // * Modal Images

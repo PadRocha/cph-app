@@ -1,0 +1,56 @@
+@import 'local_functions';
+@import 'local_variables';
+@import 'local_mixins';
+
+@include iconsCollection($item-icon-collection);
+
+:host {
+  display: block;
+  padding: 0.5rem !important;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.25rem;
+  background-color: $primary;
+
+  [data-bs-theme=dark] & {
+    background-color: $secundary;
+    color: $text-color-dark;
+  }
+
+  header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+    [data-bs-theme=dark] & {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    & h5 {
+      margin-bottom: 0;
+    }
+  }
+
+  .img-placeholder {
+    min-height: 160px;
+    background-color: rgba(#000, 0.05);
+    border: 1px dashed rgba(#000, 0.2);
+    border-radius: 0.25rem;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 0.25rem;
+    }
+
+    [data-bs-theme=dark] & {
+      background-color: rgba(#fff, 0.05);
+      border-color: rgba(#fff, 0.2);
+    }
+  }
+
+  .form-select {
+    background-image: none !important; // Quita la flecha
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+}

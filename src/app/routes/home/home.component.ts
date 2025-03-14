@@ -8,6 +8,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { StatusButtonDirective } from './directives';
 import { ItemModel, status } from './models';
 import { ItemService } from './services';
+import { ItemComponent } from './components';
 
 export interface Search {
   search: FormControl<string>;
@@ -16,11 +17,11 @@ export interface Search {
 
 @Component({
   selector: 'app-home',
-  imports: [DecimalPipe, ReactiveFormsModule, NgbTooltipModule, ThemeDirective, StatusButtonDirective],
+  imports: [DecimalPipe, ReactiveFormsModule, NgbTooltipModule, ThemeDirective, StatusButtonDirective, ItemComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
   host: {
-    class: 'd-block container'
+    class: 'd-block container pb-3'
   }
 })
 export class HomeComponent implements OnInit {

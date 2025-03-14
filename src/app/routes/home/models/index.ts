@@ -154,6 +154,10 @@ class ItemModel {
       .sort((a, b) => a - b);
   }
 
+  public get images(): Image[] {
+    return this.item.images;
+  }
+
   /**
    * Obtiene una representación "lean" del item.
    *
@@ -174,6 +178,7 @@ class ItemModel {
    */
   public set raw(item: Item) {
     this.item = item;
+    
   }
 
   /**

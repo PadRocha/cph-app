@@ -1,6 +1,6 @@
-@import 'local_functions';
-@import 'local_variables';
-@import 'local_mixins';
+@import "local_functions";
+@import "local_variables";
+@import "local_mixins";
 
 @include iconsCollection($home-icon-collection);
 
@@ -10,7 +10,7 @@
   border: none;
 
   &::after {
-    content: '[' attr(data-info) ']';
+    content: "[" attr(data-info) "]";
     margin-left: 0.25rem !important;
   }
 
@@ -35,7 +35,7 @@
     @include idn_styles($color);
   }
 
-  [data-bs-theme=dark] .idN#{($i - 1)} {
+  [data-bs-theme="dark"] .idN#{($i - 1)} {
     $color: nth($option-collection-dark, $i);
     @include idn_styles($color);
   }
@@ -45,25 +45,27 @@
   color: #1a1a1a;
 }
 
+// ====================================================
+// Estilos del formulario
+// ====================================================
 form {
   background-color: $background-main;
   color: $text-color;
 
-  &[data-bs-theme=dark] {
+  &[data-bs-theme="dark"] {
     background-color: $background-main-dark;
     color: $text-color-dark;
   }
 }
 
-//========================================================
-// Grid y tarjetas
-//========================================================
-
+// ====================================================
+// Grid para disposición de las tarjetas (y skeleton loader)
+// ====================================================
 .grid {
   display: grid;
-  // Una columna por defecto en pantallas pequeñas
-  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
+  // Definición responsive de columnas:
+  grid-template-columns: repeat(2, 1fr);
 
   @include media-breakpoint-up(md) {
     grid-template-columns: repeat(2, 1fr);
@@ -79,75 +81,18 @@ form {
   }
 }
 
-.item-card {
-  border: 1px solid rgba(0, 0, 0, 0.125);
-  border-radius: 0.25rem;
-  background-color: $primary;
-
-  [data-bs-theme=dark] & {
-    background-color: $secundary;
-    color: $text-color-dark;
-  }
-
-  header {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-
-    [data-bs-theme=dark] & {
-      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    & h5 {
-      margin-bottom: 0;
-    }
-  }
-
-  .img-placeholder {
-    min-height: 120px;
-    background-color: rgba(#000, 0.05);
-    border: 1px dashed rgba(#000, 0.2);
-    border-radius: 0.25rem;
-    [data-bs-theme=dark] & {
-      background-color: rgba(#fff, 0.05);
-      border-color: rgba(#fff, 0.2);
-    }
-  }
-
-  .form-select {
-    background-image: none !important; // Quita la flecha
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    // display: flex;
-    // align-items: center;
-    // justify-content: center;
-    // text-align: center;
-    // padding: 0.375rem 0.75rem; 
-  }
-}
-
-//========================================================
-// Skeleton loader
-//========================================================
-
+// ====================================================
+// Reglas específicas para el skeleton loader
+// ====================================================
 .skeleton {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(
-    100deg,
-    #e9ecef 30%,
-    #f8f9fa 50%,
-    #e9ecef 70%
-  );
+  background: linear-gradient(100deg, #e9ecef 30%, #f8f9fa 50%, #e9ecef 70%);
   background-size: 200% 100%;
   animation: wave 1.5s ease-in-out infinite;
-  
-  [data-bs-theme=dark] & {
-    background: linear-gradient(
-      100deg,
-      #444 30%,
-      #666 50%,
-      #444 70%
-    );
+
+  [data-bs-theme="dark"] & {
+    background: linear-gradient(100deg, #444 30%, #666 50%, #444 70%);
     background-size: 200% 100%;
   }
 
@@ -164,23 +109,43 @@ form {
 
   &.skeleton-rect {
     border-radius: 0.25rem;
-    min-height: 120px;
+    min-height: 160px;
   }
 
-  // Actualización para los select: uso de flex para ser responsive
   &.skeleton-select {
-    flex: 1 1; // base de 80px, pero permite crecer o contraerse
+    flex: 1 1;
     height: 38px;
     border-radius: 0.25rem;
   }
 
   &.skeleton-button {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 0.25rem;
   }
 }
 
+// Hacemos que el contenedor del input group en modo loading sea flexible
+.item-card.loading {
+  padding: 0.5rem !important;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.25rem;
+  background-color: $primary;
+
+  [data-bs-theme="dark"] & {
+    background-color: $secundary;
+    color: $text-color-dark;
+  }
+
+  &.input-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.125rem;
+    align-items: center;
+  }
+}
+
+// Delay escalonado para el efecto wave en cada tarjeta skeleton
 .item-card.loading:nth-child(1) .skeleton {
   animation-delay: 0.1s;
 }
@@ -195,23 +160,22 @@ form {
 }
 
 @keyframes wave {
-  0% {
+  from {
     background-position: 200% 0;
   }
-  100% {
+  to {
     background-position: -200% 0;
   }
 }
 
-//========================================================
+// ====================================================
 // Estado vacío
-//========================================================
-
+// ====================================================
 .empty-state {
   color: $text-color;
   opacity: 0.8;
 
-  [data-bs-theme=dark] & {
+  [data-bs-theme="dark"] & {
     color: $text-color-dark;
   }
 }
