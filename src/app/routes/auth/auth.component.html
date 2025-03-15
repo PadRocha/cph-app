@@ -1,0 +1,44 @@
+<aside class="login-aside" role="complementary" aria-label="Información de inicio de sesión">
+  <div class="aside-content">
+    <h2>Aplicación para consultas</h2>
+    <h2>y almacenaje de productos</h2>
+    <p>Introduce tu usuario asignado con la respectiva clave</p>
+  </div>
+</aside>
+<section class="login-section">
+  <form 
+    [formGroup]="userForm"
+    (ngSubmit)="onSubmit()"
+    autocomplete="off"
+    class="login-form"
+    aria-label="Formulario de inicio de sesión">
+    <div class="form-group">
+      <label for="nickname">Introduce Usuario</label>
+      <input 
+        formControlName="nickname" 
+        id="nickname" 
+        name="nickname" 
+        type="text" 
+        class="form-control" 
+        placeholder="Usuario" 
+        autocomplete="off" 
+        autofocus 
+        aria-autocomplete="none"
+        aria-required="true" />
+    </div>
+    <div class="form-group">
+      <label for="password">Introduce clave de acceso</label>
+      <input 
+        formControlName="password" 
+        id="password" 
+        name="password" 
+        type="password" 
+        class="form-control" 
+        placeholder="Contraseña" 
+        autocomplete="off"
+        aria-autocomplete="none"
+        aria-required="true" />
+    </div>
+    <button [disabled]="isLoading" type="submit" class="btn btn-outline-dark">Entrar</button>
+  </form>
+</section>

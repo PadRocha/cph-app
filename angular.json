@@ -49,7 +49,8 @@
             "index": "src/index.html",
             "outputPath": "dist/cph-app",
             "polyfills": [
-              "zone.js"
+              "zone.js",
+              "@angular/localize/init"
             ],
             "preserveSymlinks": true,
             "scripts": [],

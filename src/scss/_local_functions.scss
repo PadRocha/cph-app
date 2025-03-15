@@ -1,2 +1,15 @@
 // Bootstrap imports
-@use 'functions';
+@use 'bootstrap/scss/functions';
+@import 'local_variables';
+
+@function contrast_color($color) {
+  $r: red($color);
+  $g: green($color);
+  $b: blue($color);
+  $brightness: (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+  @if ($brightness > 128) {
+    @return $secundary;
+  } @else {
+    @return $primary;
+  }
+}

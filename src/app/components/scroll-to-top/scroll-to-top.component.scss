@@ -1,0 +1,33 @@
+@import 'local_variables';
+
+:host {
+  border-radius: 50%;
+  font-size: 1.5rem;
+  background-color: $scroll-top-background;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  width: $scroll-top-size;
+  height: $scroll-top-size;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  margin-right: $scroll-top-spacing + 1rem !important;
+  margin-bottom: $scroll-top-spacing !important;
+  z-index: $scroll-top-zindex;
+  opacity: 0;
+  transform: translateY(100px);
+  transition: all 0.5s ease;
+  align-items: center;
+  align-content: center;
+  text-align: center;
+
+  &::after {
+    content: '^';
+  }
+}
+
+:host(.showBtn) {
+  opacity: 1;
+  transform: translateY(0);
+}

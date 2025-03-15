@@ -16,7 +16,7 @@ const interceptors: HttpInterceptorFn[] = [
   locationInterceptor,
 ];
 
-const routesFeatures = environment.production ? [] : [withDebugTracing()];
+// const routesFeatures = environment.production ? [] : [withDebugTracing()];
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -24,7 +24,8 @@ export const appConfig: ApplicationConfig = {
     provideRouter(
       routes,
       withRouterConfig({ onSameUrlNavigation: "reload" }),
-      ...routesFeatures
+      
+      // ...routesFeatures
     ),
     provideAnimations(),
     provideHttpClient(withInterceptors(interceptors)),

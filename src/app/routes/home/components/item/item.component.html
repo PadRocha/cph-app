@@ -1,0 +1,39 @@
+<header class="d-flex justify-content-between align-items-center mb-2">
+  <h5>{{ item.code }}</h5>
+  <button
+    type="button"
+    class="btn p-0 border-0 three-dots"
+    aria-label="Modificar">
+    <span class="ico-config"></span>
+  </button>
+</header>
+<div class="img-placeholder mb-2">
+  <img #lazyImage
+    [hidden]="noImages"
+    sizes="
+      (min-width: 1400px) 226px,
+      (min-width: 1200px) 230px,
+      (min-width: 992px) 281px,
+      (min-width: 768px) 247px,
+      320px"
+    loading="lazy"
+    draggable="false"
+    alt="imagen responsive"
+    crossorigin="anonymous"/>
+</div>
+<form [formGroup]="statusForm">
+  <div formArrayName="images" class="input-group mb-2">
+    <button [disabled]="noImages" class="btn btn-outline-secondary" type="button">
+      <span class="ico-camera"></span>
+    </button>
+    @for (control of forms.controls; track $index) {
+      <select  [formControlName]="$index" class="form-select" title="Cambiar estado">
+        <option value="-1"></option>
+        @for (status of options; track $index) {
+          <option [value]="status">{{ status }}</option>
+        }
+      </select>
+    }
+  </div>
+</form>
+<p class="mb-0">{{ item.desc }}</p>

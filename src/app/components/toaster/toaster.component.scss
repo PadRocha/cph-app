@@ -1,0 +1,6 @@
+@import 'local_variables';
+
+:host {
+    z-index: $toaster-zindex;
+    padding-top: $title-bar-height + 0.5rem;
+}

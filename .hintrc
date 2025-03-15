@@ -3,6 +3,21 @@
     "development"
   ],
   "hints": {
-    "button-type": "off"
+    "button-type": "off",
+    "compat-api/css": [
+      "default",
+      {
+        "ignore": [
+          "scrollbar-color",
+          "background-position"
+        ]
+      }
+    ],
+    "axe/name-role-value": [
+      "default",
+      {
+        "button-name": "off"
+      }
+    ]
   }
 }

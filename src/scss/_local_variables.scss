@@ -1,72 +1,80 @@
-@import 'bootstrap/scss/functions';
-@import 'bootstrap/scss/variables';
-@import 'bootstrap/scss/mixins';
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins";
 
 //*------------------------------------------------------------------*/
 // * Main
 //*------------------------------------------------------------------*/
-$primary: #fff;
-$secundary: #000;
+$primary: #f5f5f5;
+$secundary: #2d2d2d;
+$link_shade_percentage: 10% !default;
+$text-color: darken($secundary, $link_shade_percentage);
+$text-color-dark: lighten($primary, $link_shade_percentage);
+$background-main: darken($primary, $link_shade_percentage);
+$background-main-dark: lighten($secundary, $link_shade_percentage);
 $lighter: 20%;
 $darker: 20%;
 $icons-size: 1rem;
 $scrollbar-thumb: #545456;
 $scrollbar-track: #060608;
-$option-collection: (
-  #ffffff,
-  #a09f9f,
-  #cd4b4b,
-  #4b4bff,
-  #ae2aae,
-  #00c200,
+$option-collection: (#ffffff, #707070, #cd4b4b, #4b4bff, #ae2aae, #005f00);
+$option-collection-dark: (
+  rgb(255, 255, 255),
+  rgb(208, 208, 208),
+  rgb(196, 146, 146),
+  rgb(124, 137, 255),
+  rgb(228, 137, 228),
+  rgb(108, 226, 108)
 );
 
 //*------------------------------------------------------------------*/
-// * Header
+// * Login
+//*------------------------------------------------------------------*/
+$login-btn-color: $secundary;
+//*------------------------------------------------------------------*/
+// * Title bar
 //*------------------------------------------------------------------*/
 $title-bar-height: 2.313rem;
-$title-bar-zindex: 1030;
+$title-bar-zindex: 1040;
+$title-bar-icon-size: 1rem;
+$title-bar-bg: $secundary;
+$title-bar-text: $primary;
+$title-bar-dropdown-bg: #3a3a3a;
+$title-bar-current-bg: rgba(255, 255, 255, 0.3);
+$title-bar-font-size: 14px;
 $title-bar-icon-collection: (
   logout,
   login,
   pdf,
   dashboard,
   minimize,
-  unmaximize
+  unmaximize,
+  light-mode,
+  dark-mode
 );
-
-// Estilos generales del title-bar
-$title-bar-bg: #2d2d2d;
-$title-bar-text: $primary; // Asumimos que $primary es #fff
-
 // Botones de control en el title-bar
-$title-bar-control-button-font-size: 14px;
 $title-bar-control-button-bg: transparent;
-$title-bar-control-button-border: none;
 $title-bar-control-button-color: $title-bar-text;
 $title-bar-control-button-hover-bg: rgba(255, 255, 255, 0.2);
 $title-bar-control-button-close-hover-bg: #e81123;
-
-// Icono del title-bar
-$title-bar-icon-size: 1rem;
-
-// Dropdown de historial
-$title-bar-dropdown-bg: #3a3a3a;
-$title-bar-dropdown-border: #555;
-$title-bar-dropdown-border-radius: 4px;
-$title-bar-dropdown-z-index: 10;
-$title-bar-dropdown-min-width: 200px;
-$title-bar-dropdown-padding-vertical: 0.5rem;
-$title-bar-dropdown-button-padding: 0.5rem 1rem;
-
-// Estado actual (ruta seleccionada)
-$title-bar-current-bg: rgba(255, 255, 255, 0.3);
+//*------------------------------------------------------------------*/
+// * Login
+//*------------------------------------------------------------------*/
+$login-bg-aside: $secundary;
+$login-color-aside: $primary;
+$login-bg-section: $primary;
+$login-color-section: $secundary;
+//*------------------------------------------------------------------*/
+// * Toaster
+//*------------------------------------------------------------------*/
+$toaster-zindex: 1030;
 //*------------------------------------------------------------------*/
 // * Scroll To Top
 //*------------------------------------------------------------------*/
 $scroll-top-background: #9055a2dc;
-$scroll-top-spacing: 1rem;
+$scroll-top-spacing: 0.5rem;
 $scroll-top-size: 35px;
+$scroll-top-zindex: 990;
 //*------------------------------------------------------------------*/
 // * Aside Lines
 //*------------------------------------------------------------------*/
@@ -75,12 +83,8 @@ $aside-error: #ff0000;
 //*------------------------------------------------------------------*/
 // * Item
 //*------------------------------------------------------------------*/
-$item-color: #ffF;
-$item-icon-collection: (
-  warning,
-  settings,
-  camera,
-);
+$item-color: #fff;
+$item-icon-collection: (camera, config);
 //*------------------------------------------------------------------*/
 // * Home
 //*------------------------------------------------------------------*/
@@ -97,11 +101,7 @@ $home-icon-collection: (
 //*------------------------------------------------------------------*/
 // * Modal Images
 //*------------------------------------------------------------------*/
-$images-icon-collection: (
-  arrow-left,
-  arrow-right,
-  back,
-);
+$images-icon-collection: (arrow-left, arrow-right, back);
 //*------------------------------------------------------------------*/
 // * Modal Image Editor
 //*------------------------------------------------------------------*/
@@ -117,5 +117,5 @@ $editor-icon-collection: (
   stroke,
   background,
   opacity,
-  round,
+  round
 );

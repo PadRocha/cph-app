@@ -1,8 +1,8 @@
 // scss-docs-start import-stack
 // Configuration
-@import "bootstrap/scss/functions";
+@import "local_functions";
 @import "local_variables";
-@import "bootstrap/scss/variables-dark";
+@import "local_variables_dark";
 @import "bootstrap/scss/maps";
 @import "local_mixins";
 @import "bootstrap/scss/utilities";
@@ -46,11 +46,6 @@
 // Utilities
 @import "bootstrap/scss/utilities/api";
 
-body {
-    background-color: rbg(219, 219, 219);
-    @include scroll;
-}
-
 *:has(> [class^='ico-']) {
     display: flex;
     align-items: center !important;
@@ -62,8 +57,4 @@ body {
 
 .aside-width {
     width: 260px !important;
-}
-
-.sticky-top {
-  top: $title-bar-height !important; // en tu caso, 2.313rem
 }
