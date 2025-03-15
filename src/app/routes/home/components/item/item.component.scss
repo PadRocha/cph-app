@@ -1,6 +1,6 @@
-@import 'local_functions';
-@import 'local_variables';
-@import 'local_mixins';
+@import "local_functions";
+@import "local_variables";
+@import "local_mixins";
 
 @include iconsCollection($item-icon-collection);
 
@@ -29,16 +29,41 @@
   }
 
   .img-placeholder {
+    position: relative;
     min-height: 160px;
     background-color: rgba(#000, 0.05);
     border: 1px dashed rgba(#000, 0.2);
     border-radius: 0.25rem;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease, filter 0.2s ease;
+
+    &:hover {
+      transform: scale(0.98);
+      filter: brightness(0.75);
+    }
+
+    &:active {
+      transform: scale(0.95);
+      filter: brightness(0.7);
+    }
+
+    &:has(img[hidden]) {
+      cursor: default;
+
+      &:hover,
+      &:active {
+        transform: none;
+        filter: none;
+      }
+    }
 
     img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       border-radius: 0.25rem;
+      transition: inherit;
     }
 
     [data-bs-theme=dark] & {
@@ -46,11 +71,22 @@
       border-color: rgba(#fff, 0.2);
     }
   }
+}
 
-  .form-select {
-    background-image: none !important; // Quita la flecha
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
+@for $i from 1 through length($option-collection-dark) {
+  $color: nth($option-collection, $i);
+
+  .form-select option:nth-child(#{$i + 1}),
+  .value-#{($i - 1)} {
+    background-color: $color;
+  }
+
+  [data-bs-theme=dark] {
+    $color-dark: nth($option-collection-dark, $i);
+
+    & .form-select option:nth-child(#{$i + 1}),
+    & .value-#{($i - 1)} {
+      background-color: $color-dark;
+    }
   }
 }

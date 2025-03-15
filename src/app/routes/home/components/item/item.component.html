@@ -23,14 +23,11 @@
 </div>
 <form [formGroup]="statusForm">
   <div formArrayName="images" class="input-group mb-2">
-    <button [disabled]="noImages" class="btn btn-outline-secondary" type="button">
-      <span class="ico-camera"></span>
-    </button>
     @for (control of forms.controls; track $index) {
-      <select  [formControlName]="$index" class="form-select" title="Cambiar estado">
+      <select  [formControlName]="$index" [class]="selectClass($index)" class="form-select" title="Cambiar estado">
         <option value="-1"></option>
         @for (status of options; track $index) {
-          <option [value]="status">{{ status }}</option>
+          <option [value]="status">{{ statusChar(status) }}</option>
         }
       </select>
     }

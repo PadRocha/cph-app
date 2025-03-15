@@ -17,9 +17,9 @@ $darker: 20%;
 $icons-size: 1rem;
 $scrollbar-thumb: #545456;
 $scrollbar-track: #060608;
-$option-collection: (#ffffff, #707070, #cd4b4b, #4b4bff, #ae2aae, #005f00);
+$option-collection: (#fff12e, #707070, #cd4b4b, #4b4bff, #ae2aae, #005f00);
 $option-collection-dark: (
-  rgb(255, 255, 255),
+  #fff78b,
   rgb(208, 208, 208),
   rgb(196, 146, 146),
   rgb(124, 137, 255),
@@ -84,7 +84,7 @@ $aside-error: #ff0000;
 // * Item
 //*------------------------------------------------------------------*/
 $item-color: #fff;
-$item-icon-collection: (camera, config);
+$item-icon-collection: (config);
 //*------------------------------------------------------------------*/
 // * Home
 //*------------------------------------------------------------------*/

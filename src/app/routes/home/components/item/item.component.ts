@@ -3,6 +3,7 @@ import { FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular
 import { environment } from '@environment';
 import { ItemModel } from '@home/models';
 import { status } from '@home/models';
+import { ItemService } from '@home/services';
 
 interface StatusControl {
   images: FormArray<FormControl<number>>
@@ -107,4 +108,27 @@ export class ItemComponent implements OnInit, AfterViewInit {
     return srcset;
   }
 
+  public selectClass(index: number) {
+    const status = this.forms.at(index).value;
+    return `value-${status}`
+  }
+
+  public statusChar(value: status): string {
+    switch (value) {
+      case 0:
+        return "❌";
+      case 1:
+        return "✅";
+      case 2:
+        return "📸";
+      case 3:
+        return "🛠";
+      case 4:
+        return "✏️";
+      case 5:
+        return "💾";
+      default:
+        return "❓";
+    }
+  }
 }

@@ -35,7 +35,7 @@
     @include idn_styles($color);
   }
 
-  [data-bs-theme="dark"] .idN#{($i - 1)} {
+  [data-bs-theme=dark] .idN#{($i - 1)} {
     $color: nth($option-collection-dark, $i);
     @include idn_styles($color);
   }
@@ -52,7 +52,7 @@ form {
   background-color: $background-main;
   color: $text-color;
 
-  &[data-bs-theme="dark"] {
+  &[data-bs-theme=dark] {
     background-color: $background-main-dark;
     color: $text-color-dark;
   }
@@ -91,7 +91,7 @@ form {
   background-size: 200% 100%;
   animation: wave 1.5s ease-in-out infinite;
 
-  [data-bs-theme="dark"] & {
+  [data-bs-theme=dark] & {
     background: linear-gradient(100deg, #444 30%, #666 50%, #444 70%);
     background-size: 200% 100%;
   }
@@ -99,12 +99,6 @@ form {
   &.skeleton-text {
     border-radius: 4px;
     height: 1rem;
-  }
-
-  &.skeleton-btn {
-    width: 38px;
-    height: 38px;
-    border-radius: 0.25rem;
   }
 
   &.skeleton-rect {
@@ -125,14 +119,13 @@ form {
   }
 }
 
-// Hacemos que el contenedor del input group en modo loading sea flexible
 .item-card.loading {
   padding: 0.5rem !important;
   border: 1px solid rgba(0, 0, 0, 0.125);
   border-radius: 0.25rem;
   background-color: $primary;
 
-  [data-bs-theme="dark"] & {
+  [data-bs-theme=dark] & {
     background-color: $secundary;
     color: $text-color-dark;
   }
@@ -145,7 +138,6 @@ form {
   }
 }
 
-// Delay escalonado para el efecto wave en cada tarjeta skeleton
 .item-card.loading:nth-child(1) .skeleton {
   animation-delay: 0.1s;
 }
@@ -175,7 +167,7 @@ form {
   color: $text-color;
   opacity: 0.8;
 
-  [data-bs-theme="dark"] & {
+  [data-bs-theme=dark] & {
     color: $text-color-dark;
   }
 }
