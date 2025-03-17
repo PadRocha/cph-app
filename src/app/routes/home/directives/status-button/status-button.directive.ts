@@ -1,4 +1,4 @@
-import { Directive, effect, ElementRef, Input, OnChanges, Renderer2, SimpleChanges } from '@angular/core';
+import { Directive, effect, ElementRef, OnChanges, Renderer2, SimpleChanges, input } from '@angular/core';
 import { status } from '@home/models';
 import { ItemService } from '@home/services';
 
@@ -6,8 +6,8 @@ import { ItemService } from '@home/services';
   selector: '[status]'
 })
 export class StatusButtonDirective implements OnChanges {
-  @Input('status') buttonStatus!: status;
-  @Input() active!: status;
+  readonly buttonStatus = input.required<status>({ alias: "status" });
+  readonly active = input.required<status>();
 
   constructor(private el: ElementRef<HTMLButtonElement>, private renderer: Renderer2, private item: ItemService) {
     effect(() => {
@@ -23,7 +23,7 @@ export class StatusButtonDirective implements OnChanges {
   }
 
   private updateAttributes(): void {
-    const name = this.item.statusName(this.buttonStatus);
+    const name = this.item.statusName(this.buttonStatus());
     const value = this.item.statusValue(name);
 
     this.renderer.setAttribute(this.el.nativeElement, 'id', name);
@@ -31,8 +31,8 @@ export class StatusButtonDirective implements OnChanges {
     this.renderer.setAttribute(this.el.nativeElement, 'data-info', value.toString());
     this.renderer.setAttribute(this.el.nativeElement, 'title', `Buscar status "${name}"`);
 
-    let className = `idN${this.buttonStatus}`;
-    if (this.active === this.buttonStatus) {
+    let className = `idN${this.buttonStatus()}`;
+    if (this.active() === this.buttonStatus()) {
       className += ' active';
     }
 

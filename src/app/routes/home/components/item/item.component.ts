@@ -1,9 +1,7 @@
-import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, input, InputSignal, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { environment } from '@environment';
-import { ItemModel } from '@home/models';
-import { status } from '@home/models';
-import { ItemService } from '@home/services';
+import { ItemModel, status } from '@home/models';
 
 interface StatusControl {
   images: FormArray<FormControl<number>>
@@ -20,13 +18,14 @@ export class ItemComponent implements OnInit, AfterViewInit {
   private location: string;
   public statusForm: FormGroup<StatusControl>;
   public options: status[]
-  @Input() item!: ItemModel;
+  readonly item = input.required<ItemModel>();
   @ViewChild('lazyImage') lazyImage!: ElementRef<HTMLImageElement>;
 
   constructor() {
     this.url = environment.httpUrl;
     this.location = environment.location;
     this.options = [0, 1, 2, 3, 4, 5];
+    // this.item = input()
     this.statusForm = new FormGroup({
       images: new FormArray(
         Array.from({ length: 3 }, () => new FormControl(-1, { nonNullable: true }))
@@ -58,7 +57,7 @@ export class ItemComponent implements OnInit, AfterViewInit {
     const formArray = this.forms;
     const images = formArray.getRawValue();
 
-    this.item.images.forEach(({ idN, status }) => {
+    this.item().images.forEach(({ idN, status }) => {
       const index = idN - 1;
       if (index >= 0 && index < images.length) {
         images[index] = status;
@@ -73,17 +72,25 @@ export class ItemComponent implements OnInit, AfterViewInit {
     this.statusForm.patchValue({ images });
   }
 
+  public get code(): string {
+    return this.item().code;
+  }
+
+  public get desc(): string {
+    return this.item().desc;
+  }
+
   public get noImages(): boolean {
-    return !this.item.hasImages;
+    return !this.item().hasImages;
   }
 
   public get forms() {
-    return this.statusForm.get('images') as FormArray<FormControl<number>>;
+    return this.statusForm.get('images') as StatusControl['images'];
   }
 
   public get src(): string {
-    const file = this.item.images.at(0)!;
-    const image = encodeURIComponent(`${this.item.code} ${file.idN}`);
+    const file = this.item().images.at(0)!;
+    const image = encodeURIComponent(`${this.item().code} ${file.idN}`);
     let query = 'height=160&quality=50&';
     if (this.location) {
       query += `location=${encodeURIComponent(this.location)}`;
@@ -93,8 +100,8 @@ export class ItemComponent implements OnInit, AfterViewInit {
   }
 
   public get srcset(): string {
-    const file = this.item.images.at(0)!;
-    const image = encodeURIComponent(`${this.item.code} ${file.idN}`);
+    const file = this.item().images.at(0)!;
+    const image = encodeURIComponent(`${this.item().code} ${file.idN}`);
     let query = 'quality=50&';
 
     if (this.location) {

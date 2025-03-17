@@ -1,4 +1,4 @@
-import { Component, HostBinding, HostListener, Input, OnInit, Renderer2 } from '@angular/core';
+import { Component, HostBinding, HostListener, OnInit, Renderer2, input } from '@angular/core';
 
 /**
  * Componente que muestra un botón para desplazar la vista hacia el inicio del contenedor.
@@ -30,7 +30,7 @@ export class ScrollToTopComponent implements OnInit {
    *
    * Se debe asignar mediante el decorador @Input().
    */
-  @Input() container!: HTMLElement;
+  readonly container = input.required<HTMLElement>();
 
   /**
    * Controla la visibilidad del botón mediante una clase CSS.
@@ -50,8 +50,9 @@ export class ScrollToTopComponent implements OnInit {
    * Inicializa el componente y configura el listener de scroll sobre el contenedor.
    */
   ngOnInit(): void {
-    if (this.container) {
-      this.renderer.listen(this.container, 'scroll', (event) => this.onScroll(event));
+    const container = this.container();
+    if (container) {
+      this.renderer.listen(container, 'scroll', (event) => this.onScroll(event));
     }
   }
 
@@ -75,8 +76,9 @@ export class ScrollToTopComponent implements OnInit {
    */
   @HostListener('click')
   scrollToTop(): void {
-    if (this.container) {
-      this.container.scrollTo({ top: 0, behavior: 'smooth' });
+    const container = this.container();
+    if (container) {
+      container.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 }
