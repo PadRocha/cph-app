@@ -28,46 +28,21 @@ const initialIdentity: UserIdentity = {
   roles: [],
 };
 
-/**
- * Servicio para gestionar la información del usuario.
- *
- * Extiende AuthService e incluye funcionalidades para obtener y
- * actualizar la identidad del usuario.
- *
- * @remarks
- * Este servicio expone tanto señales reactivas como un observable para cambios.
- */
 @Injectable({
   providedIn: "root",
 })
 export class UserService extends AuthService {
   /** Señal que almacena la identidad actual del usuario. */
-  private userSignal: WritableSignal<UserIdentity>;
+  private userSignal = signal(initialIdentity);
   /** BehaviorSubject que emite cada vez que cambia la identidad del usuario. */
-  private userChange$: BehaviorSubject<UserIdentity>;
+  private userChange$ = new BehaviorSubject<UserIdentity>(initialIdentity);
+  userChange = effect(() => {
+    const currentUser = this.userSignal();
+    this.userChange$.next(currentUser);
+  });
 
-  /**
-   * Crea una instancia de UserService.
-   *
-   * @param http - Cliente HTTP.
-   * @param router - Router para navegación.
-   * @param platformId - Token de inyección para detectar la plataforma.
-   */
-  constructor(
-    protected override http: HttpClient,
-    protected override router: Router,
-    @Inject(PLATFORM_ID) protected override platformId: InjectionToken<Object>
-  ) {
-    super(http, router, platformId);
-    this.userSignal = signal(initialIdentity);
-    this.userChange$ = new BehaviorSubject<UserIdentity>(initialIdentity);
-
-    // Actualiza el BehaviorSubject cuando la identidad cambia
-    effect(() => {
-      const currentUser = this.userSignal();
-      this.userChange$.next(currentUser);
-    });
-
+  constructor() {
+    super();
     // Si está logueado, se suscribe a la actualización de la identidad
     if (this.loggedIn) {
       this.update.subscribe({

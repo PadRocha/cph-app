@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import {
   AbstractControl,
   FormControl,
@@ -23,25 +23,24 @@ interface LoginForm {
   styleUrl: './auth.component.scss'
 })
 export class AuthComponent {
-  public userForm: FormGroup<LoginForm>;
-  public isLoading: boolean;
-
-  constructor(private user: UserService, private router: Router, private toast: ToastService) {
-    this.isLoading = false;
-    this.userForm = new FormGroup<LoginForm>(
-      {
-        nickname: new FormControl("", {
-          validators: Validators.required,
-          nonNullable: true,
-        }),
-        password: new FormControl("", {
-          validators: Validators.required,
-          nonNullable: true,
-        }),
-      },
-      AuthComponent.validLogin
-    );
-  }
+  private readonly user = inject(UserService);
+  private readonly router = inject(Router);
+  private readonly toast = inject(ToastService);
+  public isLoading = false;
+  
+  public userForm = new FormGroup<LoginForm>(
+    {
+      nickname: new FormControl("", {
+        validators: Validators.required,
+        nonNullable: true,
+      }),
+      password: new FormControl("", {
+        validators: Validators.required,
+        nonNullable: true,
+      }),
+    },
+    AuthComponent.validLogin
+  );
 
   private static validLogin({ get }: AbstractControl): ValidationErrors | null {
     const nickname = get("nickname");

@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, inject, OnInit } from "@angular/core";
 import { RouterModule, RouterOutlet } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { TitleBarComponent } from "@components";
@@ -14,8 +14,9 @@ import { NavigationService, UserService } from "@core/services";
   styleUrls: ["./app.component.scss"],
 })
 export class AppComponent {
+  private readonly _navigation = inject(NavigationService);
 
-  constructor(private user: UserService, private navigation: NavigationService) {
+  constructor(private user: UserService) {
     //TODO: Remover cuando esté en producción, solo para pruebas
     this.user.update.subscribe({
       next: (info) => {

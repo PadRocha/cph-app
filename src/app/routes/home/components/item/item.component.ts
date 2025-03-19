@@ -14,24 +14,17 @@ interface StatusControl {
   styleUrl: './item.component.scss'
 })
 export class ItemComponent implements OnInit, AfterViewInit {
-  private url: string;
-  private location: string;
-  public statusForm: FormGroup<StatusControl>;
-  public options: status[]
-  readonly item = input.required<ItemModel>();
   @ViewChild('lazyImage') lazyImage!: ElementRef<HTMLImageElement>;
+  private readonly url = environment.httpUrl;
+  private readonly location = environment.location;
+  public readonly options: status[] = [0, 1, 2, 3, 4, 5];
+  public readonly item = input.required<ItemModel>();
 
-  constructor() {
-    this.url = environment.httpUrl;
-    this.location = environment.location;
-    this.options = [0, 1, 2, 3, 4, 5];
-    // this.item = input()
-    this.statusForm = new FormGroup({
-      images: new FormArray(
-        Array.from({ length: 3 }, () => new FormControl(-1, { nonNullable: true }))
-      )
-    });
-  }
+  public statusForm = new FormGroup<StatusControl>({
+    images: new FormArray(
+      Array.from({ length: 3 }, () => new FormControl(-1, { nonNullable: true }))
+    )
+  });
 
   ngAfterViewInit(): void {
     if (this.noImages) {

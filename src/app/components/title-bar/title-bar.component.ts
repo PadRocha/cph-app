@@ -1,18 +1,9 @@
 import { CommonModule } from "@angular/common";
-import {
-  Component,
-  computed,
-  HostListener,
-  resource,
-  ResourceRef,
-  signal,
-  Signal,
-  WritableSignal,
-} from "@angular/core";
+import { Component, computed, HostListener, inject, resource, signal } from "@angular/core";
 import { NgbDropdownModule } from "@ng-bootstrap/ng-bootstrap";
 import { NavigationService, Historian, UserService, StorageService } from "@core/services";
-import { getCurrentWindow, Theme, Window } from "@tauri-apps/api/window";
-import { RouterModule } from "@angular/router";
+import { getCurrentWindow } from "@tauri-apps/api/window";
+import { RouterLink, RouterLinkActive } from "@angular/router";
 
 /**
  * Componente que representa la barra de título de la aplicación.
@@ -22,7 +13,7 @@ import { RouterModule } from "@angular/router";
  */
 @Component({
   selector: "app-title-bar",
-  imports: [CommonModule, RouterModule, NgbDropdownModule],
+  imports: [CommonModule, RouterLink, RouterLinkActive, NgbDropdownModule],
   templateUrl: "./title-bar.component.html",
   styleUrl: "./title-bar.component.scss",
   host: {
@@ -30,54 +21,19 @@ import { RouterModule } from "@angular/router";
   },
 })
 export class TitleBarComponent {
-  /** Referencia a la ventana actual obtenida mediante la API de Tauri. */
-  private window: Window;
+  private readonly navigation = inject(NavigationService);
+  private readonly user = inject(UserService);
+  private readonly storage = inject(StorageService);
+  private readonly window = getCurrentWindow();
 
-  /**
-   * Recurso que mantiene el estado de si la ventana está maximizada.
-   *
-   * Se carga de forma asíncrona y se puede recargar.
-   */
-  private maximizedResource: ResourceRef<boolean | undefined>;
-
-  /** Señal computada que indica si la ventana está maximizada. */
-  public isMaximized: Signal<boolean | undefined>;
-
-  /** Bandera que indica si el dropdown está visible. */
-  public dropdownVisible: boolean;
-
-  /** Señal computada que indica si se puede navegar hacia atrás en el historial. */
-  // public canGoBack: Signal<boolean>;
-
-  // /** Señal computada que indica si se puede navegar hacia adelante en el historial. */
-  // public canGoForward: Signal<boolean>;
-
-  /** Señal computada que indica si se debe mostrar el dropdown (basado en la longitud del historial). */
-  public showDropdown: Signal<boolean>;
-
-  /** Señal que indica si el menú lateral se encuentra colapsado. */
-  public isCollapsed: WritableSignal<boolean>;
-
-  /**
-   * Crea una instancia de TitleBarComponent.
-   *
-   * @param history - Servicio de historial para la navegación.
-   * @param user - Servicio de usuario para gestionar la sesión.
-   */
-  constructor(private navigation: NavigationService, private user: UserService, private storage: StorageService) {
-    this.window = getCurrentWindow();
-    this.maximizedResource = resource({
-      loader: async () => await this.window.isMaximized(),
-    });
-    this.isMaximized = computed(this.maximizedResource.value);
-    this.dropdownVisible = false;
-    // this.canGoBack = computed(() => this.navigation.index > 0);
-    // this.canGoForward = computed(
-    //   () => this.navigation.index < this.navigation.history.length - 1
-    // );
-    this.showDropdown = computed(() => this.navigation.history.length >= 3);
-    this.isCollapsed = signal(true);
-  }
+  public dropdownVisible = false;
+  
+  private maximizedResource = resource({
+    loader: async () => await this.window.isMaximized(),
+  });;
+  public isMaximized = computed(this.maximizedResource.value);
+  public showDropdown = computed(() => this.navigation.history.length >= 3);
+  public isCollapsed = signal(true);
 
   /**
    * Maneja el evento mousedown sobre el componente.

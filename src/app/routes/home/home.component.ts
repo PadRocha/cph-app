@@ -1,5 +1,5 @@
 import { DecimalPipe } from '@angular/common';
-import { Component, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
@@ -25,18 +25,16 @@ export interface Search {
   }
 })
 export class HomeComponent implements OnInit {
-  public searchForm: FormGroup<Search>;
-  public statusList: status[];
-  public isLoading: WritableSignal<boolean>;
-
-  constructor( private itemService: ItemService, private router: Router, private route: ActivatedRoute) {
-    this.searchForm = new FormGroup<Search>({
-      search: new FormControl("", { nonNullable: true }),
-      status: new FormControl(-1, { nonNullable: true }),
-    });
-    this.statusList = [1, 2, 3, 4, 5];
-    this.isLoading = signal(false);
-  }
+  private readonly itemService = inject(ItemService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  public readonly statusList: status[] = [1, 2, 3, 4, 5];
+  public isLoading = signal(false);
+  
+  public searchForm = new FormGroup<Search>({
+    search: new FormControl("", { nonNullable: true }),
+    status: new FormControl(-1, { nonNullable: true }),
+  });
 
   ngOnInit(): void {
     // 1. Sincroniza el formulario con los queryParams al inicio.

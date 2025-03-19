@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { computed, Injectable, Signal, signal, WritableSignal } from '@angular/core';
+import { computed, inject, Injectable, Signal, signal, WritableSignal } from '@angular/core';
 import { environment } from '@environment';
 import { DocPaginate } from '@shared/models';
 import { forkJoin, lastValueFrom, map, Observable, take, tap } from 'rxjs';
@@ -33,46 +33,29 @@ const initialSearch: Search = {
   providedIn: 'root'
 })
 export class ItemService {
+  private readonly http = inject(HttpClient);
   /** URL base para las peticiones al backend. */
-  private url: string;
+  private readonly url = environment.httpUrl;
   /** Encabezados HTTP predefinidos para las peticiones. */
-  private headers: HttpHeaders;
+  private readonly headers = new HttpHeaders().set("Content-Type", "application/json");
   /** Señal que almacena el arreglo actual de items en formato ItemModel. */
-  private docs: WritableSignal<ItemModel[]>;
+  private docs = signal<ItemModel[]>([]);
   /** Señal que almacena el total de documentos (items) disponibles. */
-  private totalDocs: WritableSignal<number>;
+  private totalDocs = signal(0);
   /** Señal que almacena el límite de items por página. */
-  private limitPage: WritableSignal<number>;
+  private limitPage = signal(25);
   /** Señal que indica si hay una página siguiente disponible. */
-  private hasNextPage: WritableSignal<boolean>;
+  private hasNextPage = signal(false);
   /** Señal que almacena el número de página actual en la paginación. */
-  private page: WritableSignal<number>;
+  private page = signal(1);
   /** Señal que almacena la información estadística (conteos de estados) de los items. */
-  private info: WritableSignal<Info>;
+  private info = signal(initialInfo);
   /** Señal que almacena los parámetros de búsqueda actuales. */
-  private params: WritableSignal<Search>;
+  private params = signal(initialSearch);
   /** Señal computada que retorna los items ordenados por código. */
-  private sortedDocs: Signal<ItemModel[]>;
-
-  /**
-   * Crea una instancia de ItemService.
-   *
-   * @param http - Cliente HTTP inyectado para realizar peticiones.
-   */
-  constructor(private http: HttpClient) {
-    this.url = environment.httpUrl;
-    this.headers = new HttpHeaders().set("Content-Type", "application/json");
-    this.docs = signal([]);
-    this.totalDocs = signal(0);
-    this.limitPage = signal(25);
-    this.hasNextPage = signal(false);
-    this.page = signal(1);
-    this.info = signal(initialInfo);
-    this.params = signal(initialSearch);
-    this.sortedDocs = computed(() => {
-      return this.docs().slice().sort(({ code: a }, { code: b }) => (a > b ? 1 : b > a ? -1 : 0));
-    });
-  }
+  private sortedDocs = computed(() => {
+    return this.docs().slice().sort(({ code: a }, { code: b }) => (a > b ? 1 : b > a ? -1 : 0));
+  });
 
   /**
    * Obtiene la información detallada de los items.

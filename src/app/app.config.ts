@@ -18,7 +18,7 @@ const interceptors: HttpInterceptorFn[] = [
 
 // const routesFeatures = environment.production ? [] : [withDebugTracing()];
 
-export const appConfig: ApplicationConfig = {
+export const appConfig: ApplicationConfig = { 
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(

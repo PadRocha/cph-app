@@ -31,18 +31,15 @@
   </div>
 </form>
 <section app-theme class="grid">
-  <!-- Mostrar ítems ya cargados -->
   @for (item of itemArray; track $index) {
     <app-item [item]="item"></app-item>
   } @empty {
-    <!-- Aquí podrías colocar un mensaje bonito si no hay nada -->
     @if (!isLoading()) {
       <div class="empty-state text-center p-4">
         <p>Oh, parece que no hay nada por aquí...</p>
       </div>
     }
   }
-  <!-- Cuando se carga más, se agregan skeletons al final -->
   @if (isLoading()) { 
     @for (fake of [1, 2, 3, 4, 5]; track $index) {
       <article class="item-card p-2 loading" aria-hidden="true">

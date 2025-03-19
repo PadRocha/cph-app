@@ -1,69 +1,31 @@
 import { isPlatformBrowser } from "@angular/common";
-import {
-  Inject,
-  Injectable,
-  InjectionToken,
-  PLATFORM_ID,
-  signal,
-  WritableSignal,
-} from "@angular/core";
+import { inject, Injectable, PLATFORM_ID, signal } from "@angular/core";
 
 /** Opciones para temas, incluye automático */
 type theme = "dark" | "light" | "auto";
 
-/**
- * Servicio de almacenamiento local.
- *
- * Administra el guardado y recuperación de datos de configuración como la ubicación
- * y el tema visual, utilizando localStorage cuando se ejecuta en el navegador.
- *
- * @remarks
- * Además, este servicio observa cambios en el sistema de preferencia de color para
- * actualizar el tema cuando está configurado en "auto".
- */
 @Injectable({
   providedIn: "root",
 })
 export class StorageService {
-  /** Instancia del almacenamiento (localStorage en navegador). */
-  private storage!: Storage;
-  /** Señal que almacena la ubicación guardada o null. */
-  private locationSignal: WritableSignal<string | null>;
-  /** Señal que almacena el tema actual. */
-  private themeSignal: WritableSignal<theme>;
+  private readonly platformId = inject(PLATFORM_ID);
+  private locationSignal = signal<string>('');
+  private themeSignal = signal<theme>("auto");
 
-  /**
-   * Crea una instancia de StorageService.
-   *
-   * @param platformId - Token para detectar la plataforma de ejecución.
-   */
-  constructor(@Inject(PLATFORM_ID) private platformId: InjectionToken<Object>) {
-    this.locationSignal = signal(null);
-    this.themeSignal = signal("auto");
-
+  constructor() {
     if (isPlatformBrowser(this.platformId)) {
-      this.storage = localStorage;
+      const location = localStorage.getItem("location");
+      if (location) this.locationSignal.set(location);
 
-      const location = this.storage.getItem("location");
-      if (location) {
-        this.locationSignal.set(location);
-      }
-
-      const theme = this.storage.getItem("theme") as theme;
-      if (theme) {
-        this.themeSignal.set(theme);
-      }
+      const theme = localStorage.getItem("theme") as theme;
+      if (theme) this.themeSignal.set(theme);
 
       if (window.matchMedia) {
         const media = window.matchMedia("(prefers-color-scheme: dark)");
-        if (this.theme === 'auto') {
-          this.theme = media.matches ? "dark" : "light";
-        }
+        if (this.theme === 'auto') this.theme = media.matches ? "dark" : "light";
 
-        media.addEventListener("change", (event: MediaQueryListEvent) => {
-          if (this.theme === 'auto') {
-            this.theme = event.matches ? "dark" : "light";
-          }
+        media.addEventListener("change", ({ matches }: MediaQueryListEvent) => {
+          if (this.theme === 'auto') this.theme = matches ? "dark" : "light";
         });
       }
     }
@@ -74,12 +36,12 @@ export class StorageService {
    *
    * @param value - La ubicación a guardar o null para eliminarla.
    */
-  public set location(value: string | null) {
+  public set location(value: string) {
     if (isPlatformBrowser(this.platformId)) {
-      if (value === null) {
-        this.storage.removeItem("location");
+      if (!value) {
+        localStorage.removeItem("location");
       } else {
-        this.storage.setItem("location", value);
+        localStorage.setItem("location", value);
       }
     }
     this.locationSignal.set(value);
@@ -90,7 +52,7 @@ export class StorageService {
    *
    * @returns La ubicación guardada o null.
    */
-  public get location(): string | null {
+  public get location(): string {
     return this.locationSignal();
   }
 
@@ -102,9 +64,9 @@ export class StorageService {
   public set theme(value: theme) {
     if (isPlatformBrowser(this.platformId)) {
       if (value === "auto") {
-        this.storage.removeItem("theme");
+        localStorage.removeItem("theme");
       } else {
-        this.storage.setItem("theme", value);
+        localStorage.setItem("theme", value);
       }
     }
     this.themeSignal.set(value);

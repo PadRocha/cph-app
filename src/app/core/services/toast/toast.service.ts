@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 
 /**
  * Interfaz que define la información de un toast.
@@ -13,32 +13,12 @@ export interface ToastInfo {
   delay: number;
 }
 
-/**
- * Servicio para gestionar notificaciones tipo toast.
- *
- * Permite mostrar, remover, obtener y limpiar toasts.
- *
- * @remarks
- * Este servicio se asegura de que sólo se ejecuten métodos relacionados con la
- * manipulación de toasts cuando se está en un entorno de navegador.
- */
 @Injectable({
   providedIn: 'root'
 })
 export class ToastService {
-  /** Arreglo interno de toasts activos. */
-  private toasts: ToastInfo[];
-
-  /**
-   * Crea una instancia de ToastService.
-   *
-   * @param plataform - Token de plataforma para determinar si se ejecuta en navegador.
-   */
-  constructor(
-    @Inject(PLATFORM_ID) private plataform: Object,
-  ) {
-    this.toasts = [];
-  }
+  private readonly platformId = inject(PLATFORM_ID);
+  private toasts: ToastInfo[] = [];
 
   /**
    * Muestra un toast en pantalla.
@@ -56,7 +36,7 @@ export class ToastService {
     header: string,
     type: 'success' | 'warning' | 'danger',
   ): void {
-    if (isPlatformBrowser(this.plataform)) {
+    if (isPlatformBrowser(this.platformId)) {
       let delay: number;
       switch (type) {
         case 'success':

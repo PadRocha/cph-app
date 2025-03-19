@@ -1,6 +1,7 @@
 import { isPlatformBrowser } from "@angular/common";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import {
+  inject,
   Inject,
   Injectable,
   InjectionToken,
@@ -52,28 +53,15 @@ type Token = { token: string };
   providedIn: "root",
 })
 export class AuthService {
-  /** URL base para las peticiones HTTP. */
-  protected url: String;
-  /** Instancia del almacenamiento (sessionStorage en navegador). */
+  protected readonly url = environment.httpUrl;
+  protected readonly http = inject(HttpClient);
+  protected readonly router = inject(Router);
+  protected readonly platformId = inject(PLATFORM_ID);
+  private tokenSignal = signal<string|null>(null);
   private storage!: Storage;
-  /** Señal que almacena el token actual o null si no existe. */
-  private tokenSignal: WritableSignal<string | null>;
 
-  /**
-   * Crea una instancia de AuthService.
-   *
-   * @param http - Cliente HTTP para realizar peticiones.
-   * @param router - Router para gestionar redirecciones.
-   * @param platformId - Token de inyección para detectar la plataforma.
-   */
   constructor(
-    protected http: HttpClient,
-    protected router: Router,
-    @Inject(PLATFORM_ID) protected platformId: InjectionToken<Object>
   ) {
-    this.url = environment.httpUrl;
-    this.tokenSignal = signal(null);
-
     if (isPlatformBrowser(this.platformId)) {
       this.storage = sessionStorage;
       const tokenStr = this.storage.getItem("token");

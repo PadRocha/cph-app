@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ToastService, ToastInfo } from '@core/services/toast/toast.service';
 import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
 
@@ -23,15 +23,7 @@ import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
   }
 })
 export class ToasterComponent {
-
-  /**
-   * Crea una instancia de ToasterComponent.
-   *
-   * @param toast - Servicio para gestionar los toasts.
-   */
-  constructor(
-    private toast: ToastService,
-  ) { }
+  private readonly toast = inject(ToastService)
 
   /**
    * Devuelve la clase CSS asociada al tipo de toast.

@@ -1,4 +1,4 @@
-import { Component, HostBinding, HostListener, OnInit, Renderer2, input } from '@angular/core';
+import { Component, HostBinding, HostListener, OnInit, Renderer2, inject, input } from '@angular/core';
 
 /**
  * Componente que muestra un botón para desplazar la vista hacia el inicio del contenedor.
@@ -18,6 +18,7 @@ import { Component, HostBinding, HostListener, OnInit, Renderer2, input } from '
   styleUrl: './scroll-to-top.component.scss'
 })
 export class ScrollToTopComponent implements OnInit {
+  private readonly renderer = inject(Renderer2);
   /**
    * Umbral (en porcentaje de scroll) a partir del cual se muestra el botón.
    *
@@ -38,13 +39,6 @@ export class ScrollToTopComponent implements OnInit {
    * Si es true, se agrega la clase 'showBtn' al host, mostrando el botón.
    */
   @HostBinding('class.showBtn') showBtn: boolean = false;
-
-  /**
-   * Crea una instancia de ScrollToTopComponent.
-   *
-   * @param renderer - Servicio para manipular el DOM de forma segura.
-   */
-  constructor(private renderer: Renderer2) { }
 
   /**
    * Inicializa el componente y configura el listener de scroll sobre el contenedor.

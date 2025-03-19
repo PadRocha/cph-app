@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Injectable, signal, WritableSignal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { NavigationEnd, Params, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { UserService } from '../user/user.service';
@@ -10,41 +10,41 @@ export interface Historian {
   base: string;
   params: Params
   past: string | null;
-  future: string | null;
+  future: string | null;  
 }
 
 interface RouteAuth {
   [route: string]: ('EDIT' | 'GRANT' | 'ADMIN')[];
 }
 
+const initialPresent: Historian = {
+  id: 0,
+  route: '',
+  base: '',
+  params: {},
+  past: null,
+  future: null,
+};
+
 @Injectable({
   providedIn: 'root'
 })
 export class NavigationService {
-  private counter: number;
-  private permissions: RouteAuth;
-  private past: WritableSignal<Historian[]>;
-  private present: WritableSignal<Historian>;
-  private future: WritableSignal<Historian[]>;
+  private readonly router = inject(Router);
+  private readonly location = inject(Location);
+  private readonly user = inject(UserService);
+  private readonly permissions: RouteAuth = {
+    "/pdf": [],
+    "/login": [],
+    "/home": ["EDIT", "GRANT", "ADMIN"],
+    "/settings": ["GRANT", "ADMIN"],
+  };
+  private counter = 0;
+  private past = signal<Historian[]>([]);
+  private present = signal(initialPresent);
+  private future = signal<Historian[]>([]);
 
-  constructor(private router: Router, private location: Location, private user: UserService) {
-    this.counter = 0;
-    this.permissions = {
-      "/pdf": [],
-      "/login": [],
-      "/home": ["EDIT", "GRANT", "ADMIN"],
-      "/settings": ["GRANT", "ADMIN"],
-    };
-    this.past = signal([]);
-    this.present = signal({
-      id: this.counter,
-      route: '',
-      base: '',
-      params: {},
-      past: null,
-      future: null,
-    });
-    this.future = signal([]);
+  constructor() {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
@@ -56,7 +56,7 @@ export class NavigationService {
 
         if (!this.present().route) {
           this.present.set({
-            id: this.counter++,
+            id: ++this.counter,
             route,
             base,
             params,
@@ -71,7 +71,7 @@ export class NavigationService {
         this.past.update((history) => [...history.filter((route) => this.canAccessRoute(route)), newPast]);
         this.future.set([]);
         this.present.set({
-          id: this.counter++,
+          id: ++this.counter,
           route,
           base,
           params,
