@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ElementRef, input, InputSignal, OnInit, ViewC
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { environment } from '@environment';
 import { ItemModel, status } from '@home/models';
+import { ThemeDirective } from '@shared/directives';
 
 interface StatusControl {
   images: FormArray<FormControl<number>>
@@ -9,7 +10,7 @@ interface StatusControl {
 
 @Component({
   selector: 'app-item',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, ThemeDirective],
   templateUrl: './item.component.html',
   styleUrl: './item.component.scss'
 })
@@ -27,9 +28,7 @@ export class ItemComponent implements OnInit, AfterViewInit {
   });
 
   ngAfterViewInit(): void {
-    if (this.noImages) {
-      return;
-    }
+    if (this.noImages) return;
     const observer = new IntersectionObserver((entries, observer) => {
       entries.forEach(({ isIntersecting, target }) => {
         if (isIntersecting) {
@@ -42,7 +41,6 @@ export class ItemComponent implements OnInit, AfterViewInit {
     }, {
       rootMargin: '50px'
     });
-
     observer.observe(this.lazyImage.nativeElement);
   }
 
@@ -85,10 +83,7 @@ export class ItemComponent implements OnInit, AfterViewInit {
     const file = this.item().images.at(0)!;
     const image = encodeURIComponent(`${this.item().code} ${file.idN}`);
     let query = 'height=160&quality=50&';
-    if (this.location) {
-      query += `location=${encodeURIComponent(this.location)}`;
-    }
-
+    if (this.location) query += `location=${encodeURIComponent(this.location)}`;
     return `${this.url}/image/${image}?${query}`;
   }
 
@@ -96,15 +91,10 @@ export class ItemComponent implements OnInit, AfterViewInit {
     const file = this.item().images.at(0)!;
     const image = encodeURIComponent(`${this.item().code} ${file.idN}`);
     let query = 'quality=50&';
-
-    if (this.location) {
-      query += `location=${encodeURIComponent(this.location)}&`;
-    }
-
+    if (this.location) query += `location=${encodeURIComponent(this.location)}&`;
     const srcset = [320, 281, 247, 230, 226]
       .map(width => `${this.url}/image/${image}?${query}width=${width} ${width}w`)
       .join(', ');
-
     return srcset;
   }
 

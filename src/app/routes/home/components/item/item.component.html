@@ -1,8 +1,10 @@
 <header class="d-flex justify-content-between align-items-center mb-2">
   <h5>{{ code }}</h5>
   <button
+    app-theme
     type="button"
-    class="btn p-0 border-0 three-dots"
+    class="btn p-0 border-0"
+    title="Modificar elemento"
     [attr.aria-label]="'Modificar elemento ' + code">
     <span class="ico-config"></span>
   </button>

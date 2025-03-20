@@ -26,6 +26,66 @@
     & h5 {
       margin-bottom: 0;
     }
+
+   button {
+      position: relative;
+      padding: 0.5rem 1rem;
+      background: transparent;
+      border: none;
+      border-radius: 0.25rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+
+      &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: rgba(#fff, 0.2);
+        opacity: 0;
+        transform: scale(0.8);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        pointer-events: none;
+      }
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        
+        &::before {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      &:active {
+        transform: translateY(1px) scale(0.98);
+        filter: brightness(0.9);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+        &::before {
+          opacity: 0.5;
+        }
+      }
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba($primary, 0.4);
+      }
+
+      [data-bs-theme=dark] & {
+        background: $secundary;
+        color: $text-color-dark;
+
+        &::before {
+          background: rgba(#000, 0.3);
+        }
+
+        &:hover {
+          box-shadow: 0 4px 8px rgba(#fff, 0.25);
+        }
+      }
+    }
   }
 
   .img-placeholder {
