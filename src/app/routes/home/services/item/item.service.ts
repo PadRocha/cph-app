@@ -1,8 +1,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { computed, inject, Injectable, Signal, signal, WritableSignal } from '@angular/core';
 import { environment } from '@environment';
-import { DocPaginate } from '@shared/models';
-import { forkJoin, lastValueFrom, map, Observable, take, tap } from 'rxjs';
+import { DocPaginate, Paginate } from '@shared/models';
+import { combineLatest, forkJoin, lastValueFrom, map, Observable, take, tap } from 'rxjs';
 import { Archive, Delete, Info, Item, ItemModel, LeanItem, Search, status } from '@home/models';
 
 /**
@@ -53,9 +53,9 @@ export class ItemService {
   /** Señal que almacena los parámetros de búsqueda actuales. */
   private params = signal(initialSearch);
   /** Señal computada que retorna los items ordenados por código. */
-  private sortedDocs = computed(() => {
-    return this.docs().slice().sort(({ code: a }, { code: b }) => (a > b ? 1 : b > a ? -1 : 0));
-  });
+  // private sortedDocs = computed(() => {
+  //   // return this.docs().slice().sort(({ code: a }, { code: b }) => (a > b ? 1 : b > a ? -1 : 0));
+  // });
 
   /**
    * Obtiene la información detallada de los items.
@@ -308,15 +308,22 @@ export class ItemService {
     if (params) this.params.set(params);
     this.page.set(1);
     this.clear();
-    return forkJoin({
-      items: this.list.pipe(take(1)),
-      info: this.details.pipe(take(1)),
-    }).pipe(
-      tap(({ items: { data }, info: { data: info } }): void => {
-        this.docs.set(data);
-        this.info.set(info);
-      })
-    );
+    const httpParams = { params: { ...this.params(), page: 1 } };
+
+    return this.http
+      .get<{ data: Item[], metadata: Paginate & Info }>(`${this.url}/item/summary`, httpParams)
+      .pipe(
+        map(({ data, metadata: { totalDocs, limit, hasNextPage, page, status, success } }) => {
+          this.totalDocs.set(totalDocs);
+          this.limitPage.set(limit);
+          this.hasNextPage.set(hasNextPage);
+          this.page.set(page);
+          this.info.set({ status, success });
+          const items = data.map((item) => new ItemModel(item));
+          this.docs.set(items);
+          return { data: items };
+        }),
+      );
   }
 
   /**
@@ -337,7 +344,7 @@ export class ItemService {
    * @returns Un arreglo de ItemModel.
    */
   public get all(): ItemModel[] {
-    return this.sortedDocs();
+    return this.docs();
   }
 
   /**

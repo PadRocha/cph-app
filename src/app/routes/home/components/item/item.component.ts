@@ -1,4 +1,5 @@
-import { AfterViewInit, Component, ElementRef, input, InputSignal, OnInit, ViewChild } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { AfterViewInit, Component, ElementRef, inject, input, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { environment } from '@environment';
 import { ItemModel, status } from '@home/models';
@@ -16,10 +17,12 @@ interface StatusControl {
 })
 export class ItemComponent implements OnInit, AfterViewInit {
   @ViewChild('lazyImage') lazyImage!: ElementRef<HTMLImageElement>;
+
+  private readonly http = inject(HttpClient);
+  public readonly item = input.required<ItemModel>();
   private readonly url = environment.httpUrl;
   private readonly location = environment.location;
   public readonly options: status[] = [0, 1, 2, 3, 4, 5];
-  public readonly item = input.required<ItemModel>();
 
   public statusForm = new FormGroup<StatusControl>({
     images: new FormArray(
@@ -27,8 +30,46 @@ export class ItemComponent implements OnInit, AfterViewInit {
     )
   });
 
+  ngOnInit(): void {
+    const images = this.statusForm.get('images') as FormArray<FormControl<number>>;
+    const itemData = this.item();
+    const imageStatuses = images.getRawValue();
+
+    itemData.images.forEach(({ idN, status }) => {
+      const index = idN - 1;
+      if (index >= 0 && index < imageStatuses.length) {
+        imageStatuses[index] = status;
+        images.at(index)[status === 5 ? 'disable' : 'enable']();
+      }
+    });
+    this.statusForm.patchValue({ images: imageStatuses });
+  }
+
   ngAfterViewInit(): void {
     if (this.noImages) return;
+    this.loadPlaceholder();
+    this.observeLazyImage();
+  }
+
+  private loadPlaceholder(): void {
+    const params: {
+      mode : string;
+      location?:string;
+    }= {
+      mode: "PLACEHOLDER"
+    }
+    if (this.location) params.location = this.location;
+    const { key, code, images: itemImages } = this.item();
+    const firstImage = itemImages.at(0)!;
+    const imageId = `${code} ${firstImage.idN}`;
+    this.http.get(`${this.url}/image/${key}/${imageId}`, { params, responseType: 'blob' })
+      .subscribe({
+        next: (blob) => this.lazyImage.nativeElement.src = URL.createObjectURL(blob),
+        error: err => console.error('Error al cargar el placeholder:', err)
+      });
+  }
+
+  private observeLazyImage(): void {
     const observer = new IntersectionObserver((entries, observer) => {
       entries.forEach(({ isIntersecting, target }) => {
         if (isIntersecting) {
@@ -38,29 +79,8 @@ export class ItemComponent implements OnInit, AfterViewInit {
           observer.unobserve(target);
         }
       });
-    }, {
-      rootMargin: '50px'
-    });
+    }, { rootMargin: '50px' });
     observer.observe(this.lazyImage.nativeElement);
-  }
-
-  ngOnInit(): void {
-    const formArray = this.forms;
-    const images = formArray.getRawValue();
-
-    this.item().images.forEach(({ idN, status }) => {
-      const index = idN - 1;
-      if (index >= 0 && index < images.length) {
-        images[index] = status;
-        if (status === 5) {
-          formArray.at(index).disable();
-        } else {
-          formArray.at(index).enable();
-        }
-      }
-    });
-
-    this.statusForm.patchValue({ images });
   }
 
   public get code(): string {
@@ -75,50 +95,45 @@ export class ItemComponent implements OnInit, AfterViewInit {
     return !this.item().hasImages;
   }
 
-  public get forms() {
-    return this.statusForm.get('images') as StatusControl['images'];
+  public get forms(): FormArray<FormControl<number>> {
+    return this.statusForm.get('images') as FormArray<FormControl<number>>;
+  }
+
+  private buildImageUrl(queryParams: string): string {
+    const { key, code, images: itemImages } = this.item();
+    const firstImage = itemImages.at(0)!;
+    const imageId = encodeURIComponent(`${code} ${firstImage.idN}`);
+    return `${this.url}/image/${key}/${imageId}?${queryParams}`;
   }
 
   public get src(): string {
-    const file = this.item().images.at(0)!;
-    const image = encodeURIComponent(`${this.item().code} ${file.idN}`);
     let query = 'height=160&quality=50&';
     if (this.location) query += `location=${encodeURIComponent(this.location)}`;
-    return `${this.url}/image/${image}?${query}`;
+    return this.buildImageUrl(query);
   }
 
   public get srcset(): string {
-    const file = this.item().images.at(0)!;
-    const image = encodeURIComponent(`${this.item().code} ${file.idN}`);
     let query = 'quality=50&';
     if (this.location) query += `location=${encodeURIComponent(this.location)}&`;
-    const srcset = [320, 281, 247, 230, 226]
-      .map(width => `${this.url}/image/${image}?${query}width=${width} ${width}w`)
+    const widths = [320, 281, 247, 230, 226];
+    return widths
+      .map(width => `${this.buildImageUrl(`${query}width=${width}`)} ${width}w`)
       .join(', ');
-    return srcset;
   }
 
-  public selectClass(index: number) {
-    const status = this.forms.at(index).value;
-    return `value-${status}`
+  public selectClass(index: number): string {
+    return `value-${this.forms.at(index).value}`;
   }
 
   public statusChar(value: status): string {
     switch (value) {
-      case 0:
-        return "❌";
-      case 1:
-        return "✅";
-      case 2:
-        return "📸";
-      case 3:
-        return "🛠";
-      case 4:
-        return "✏️";
-      case 5:
-        return "💾";
-      default:
-        return "❓";
+      case 0: return "❌";
+      case 1: return "✅";
+      case 2: return "📸";
+      case 3: return "🛠";
+      case 4: return "✏️";
+      case 5: return "💾";
+      default: return "❓";
     }
   }
 }
