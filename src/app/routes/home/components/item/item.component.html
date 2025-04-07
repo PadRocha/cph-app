@@ -12,6 +12,7 @@
 <div class="img-placeholder mb-2">
   <img #lazyImage
     [hidden]="noImages"
+    (click)="open()"
     src="default.png"
     sizes="
       (min-width: 1400px) 226px,

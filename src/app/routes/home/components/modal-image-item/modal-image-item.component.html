@@ -1,0 +1,67 @@
+<div class="modal-header">
+  <h4 class="modal-title">
+    {{ code }}
+    @if (editionMode()) {
+      <small><span class="badge bg-info bg-gradient">Editando</span></small>
+    }
+  </h4>
+  <button
+    (click)="close('Cross click')"
+    type="button"
+    class="btn-close"
+    aria-label="Close">
+  </button>
+</div>
+<div class="modal-body position-relative overflow-hidden">
+  <div class="content-wrapper">
+    @if (editionMode()) {
+      <!-- tu canvas u otro contenido -->
+    } @else {
+      <div [@slideAnimation]="index()" class="carousel-wrapper">
+        <img
+          #itemImage
+          src="default.png"
+          alt="Imagen del item"
+          draggable="false"
+          crossorigin="anonymous"
+          sizes="
+            (min-width: 992px) 708px,
+            (min-width: 576px) 466px,
+            466px
+          "/>
+        @if (hasPrev) {
+          <button
+            (click)="prevImage($event)"
+            type="button"
+            class="carousel-button prev">
+          </button>
+        }
+        @if (hasNext) {
+          <button
+            (click)="nextImage($event)"
+            type="button"
+            class="carousel-button next">
+          </button>
+        }
+      </div>
+      @if (images.length > 1) {
+        <div class="carousel-indicators">
+          @for (current of images; track $index; let i = $index) {
+            <button
+              type="button"
+              class="indicator"
+              [class.active]="i === index()"
+              (click)="goToImage(i)"
+              [attr.aria-label]="'Ir a la imagen ' + (i + 1)">
+            </button>
+          }
+        </div>
+      }
+    }
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="close()">
+    Close
+  </button>
+</div>

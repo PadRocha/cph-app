@@ -4,6 +4,9 @@ import { FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular
 import { environment } from '@environment';
 import { ItemModel, status } from '@home/models';
 import { ThemeDirective } from '@shared/directives';
+import { trigger, transition, style, animate } from '@angular/animations';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ModalImageItemComponent } from '../modal-image-item/modal-image-item.component';
 
 interface StatusControl {
   images: FormArray<FormControl<number>>
@@ -13,12 +16,25 @@ interface StatusControl {
   selector: 'app-item',
   imports: [ReactiveFormsModule, ThemeDirective],
   templateUrl: './item.component.html',
-  styleUrl: './item.component.scss'
+  styleUrl: './item.component.scss',
+  animations: [
+    trigger('fadeSlide', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(20px)' }),
+        animate('600ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+      ]),
+      transition(':leave', [
+        animate('400ms ease-in', style({ opacity: 0, transform: 'translateY(20px)' }))
+      ])
+    ])
+  ],
+  host: { '[@fadeSlide]': '' }
 })
 export class ItemComponent implements OnInit, AfterViewInit {
   @ViewChild('lazyImage') lazyImage!: ElementRef<HTMLImageElement>;
 
   private readonly http = inject(HttpClient);
+  private readonly modal = inject(NgbModal);
   public readonly item = input.required<ItemModel>();
   private readonly url = environment.httpUrl;
   private readonly location = environment.location;
@@ -53,9 +69,9 @@ export class ItemComponent implements OnInit, AfterViewInit {
 
   private loadPlaceholder(): void {
     const params: {
-      mode : string;
-      location?:string;
-    }= {
+      mode: string;
+      location?: string;
+    } = {
       mode: "PLACEHOLDER"
     }
     if (this.location) params.location = this.location;
@@ -135,5 +151,11 @@ export class ItemComponent implements OnInit, AfterViewInit {
       case 5: return "💾";
       default: return "❓";
     }
+  }
+
+  public open() {
+    const modalRef = this.modal.open(ModalImageItemComponent, { size: "lg", animation: true, centered: true });
+    const instancia = modalRef.componentInstance as ModalImageItemComponent;
+    instancia.item = this.item;
   }
 }

@@ -158,6 +158,10 @@ class ItemModel {
     return this.item.images;
   }
 
+  public get total(): number {
+    return this.item.images.length;
+  }
+
   /**
    * Obtiene una representación "lean" del item.
    *

@@ -1,0 +1,32 @@
+<form [formGroup]="searchForm" app-theme  role="search" class="d-grid sticky-top gap-3 py-3">
+  <input
+    formControlName="search"
+    id="search"
+    name="search"
+    type="search"
+    class="form-control form-control-sm"
+    placeholder="Clave y/o descripción"
+    autocomplete="off"
+    autofocus
+    aria-label="Buscar por clave y/o descripción"
+    aria-autocomplete="none"/>
+  <div class="d-inline-flex justify-content-between">
+    <div class="d-none d-md-inline-flex flex-wrap ps-2 gap-2">
+      <span>Σ [{{ success }}]</span>
+      <span>
+        <span class="ico-image pe-1"></span>
+        <div>[{{ percentage | number : "1.2-2" }}]%</div>
+      </span>
+    </div>
+    <div app-theme class="d-inline-flex px-lg-2 gap-2 flex-wrap">
+      @for (stat of statusList; track $index) {
+        <button
+          (click)="setStatus(stat)"
+          [status]="stat"
+          [active]="activeStatus"
+          type="button">
+        </button>
+      }
+    </div>
+  </div>
+</form>
