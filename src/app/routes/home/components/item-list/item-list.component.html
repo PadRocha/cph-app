@@ -1,16 +1,16 @@
 <section [@listAnim] app-theme class="grid">
   <!-- 1) Items: se animan al entrar y salir -->
   @for (item of items; track $index) {
-    <app-item [item]="item"></app-item>
+    <item [item]="item"></item>
   } @empty {
-    @if (!loading()) {
+    @if (!loading) {
       <div class="empty-state text-center p-4">
         <p>Oh, parece que no hay nada por aquí...</p>
       </div>
     }
   }
   <!-- 2) Skeleton: se anima al entrar y al salir -->
-  @if (loading()) {
+  @if (loading) {
     @for (fake of [1, 2, 3, 4, 5]; track $index) {
       <article class="item-card p-2 loading" aria-hidden="true">
         <header class="d-flex justify-content-between align-items-center mb-2">

@@ -1,4 +1,4 @@
-import { Component, inject, model, OnInit } from '@angular/core';
+import { Component, effect, inject, model, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { Search, status } from '@home/models';
@@ -22,15 +22,19 @@ export class ItemSearchComponent implements OnInit {
 
   public readonly statusList: status[] = [1, 2, 3, 4, 5];
   
-  public search = model.required<Search>();
   public searchForm = new FormGroup<SearchControls>({
     search: new FormControl("", { nonNullable: true }),
     status: new FormControl(-1, { nonNullable: true }),
   });
+  public searchChange = effect(() => {
+    const search = this.itemService.searchParams;
+    this.searchForm.patchValue(search, { emitEvent: false });
+  });
 
   ngOnInit(): void {
     // Sincronizamos el formulario con el valor actual del signal
-    this.searchForm.patchValue(this.search(), { emitEvent: false });
+    const search = this.itemService.searchParams;
+    this.searchForm.patchValue(search, { emitEvent: false });
     // Cada vez que el formulario cambie, actualizamos el signal
     this.searchForm.valueChanges
       .pipe(
@@ -38,7 +42,7 @@ export class ItemSearchComponent implements OnInit {
         distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
       )
       .subscribe(() => {
-        this.search.set(this.searchForm.getRawValue());
+        this.itemService.searchParams = this.searchForm.getRawValue();
       });
   }
 

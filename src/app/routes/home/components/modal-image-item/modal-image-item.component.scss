@@ -1,3 +1,8 @@
+@import "local_variables";
+@import "local_mixins";
+
+@include iconsCollection($images-icon-collection);
+
 .content-wrapper {
   max-width: 708px;
   max-height: 500px;
@@ -35,25 +40,24 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background-color 0.3s ease, transform 0.3s ease;
+      transition: opacity 0.3s ease, background-color 0.3s ease, transform 0.3s ease;
+      opacity: 0;
+      pointer-events: none;
 
       &:hover {
         background-color: rgba(0, 0, 0, 0.7);
         transform: translateY(-50%) scale(1.05);
       }
-
       &:focus {
         outline: none;
         background-color: rgba(0, 0, 0, 0.7);
       }
-
       &.prev {
         left: 1rem;
         &::before {
           content: "❮";
         }
       }
-
       &.next {
         right: 1rem;
         &::before {
@@ -61,31 +65,36 @@
         }
       }
     }
-  }
 
-  .carousel-indicators {
-    display: flex;
-    justify-content: center;
-    margin-top: 0.5rem;
-
-    .indicator {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      margin: 0 6px;
-      background-color: #ccc;
-      cursor: pointer;
-      opacity: 0.7;
-      transition: background-color 0.3s, transform 0.3s;
-
-      &:hover {
+    // Al pasar el cursor sobre el contenedor de la imagen, se muestran los botones
+    &:hover {
+      .carousel-button {
         opacity: 1;
-      }
-
-      &.active {
-        background-color: #fff;
-        transform: scale(1.2);
+        pointer-events: auto;
       }
     }
   }
+}
+
+@include media-breakpoint-up(sm) {
+  .content-wrapper {
+    height: 329px;
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  .content-wrapper {
+    height: 500px;
+  }
+}
+
+nav button {
+  width: 1.938rem;
+  height: 1.938rem;
+}
+
+.modal-header[data-bs-theme="dark"],
+.modal-footer[data-bs-theme="dark"] {
+  background-color: $secundary;
+  color: $text-color-dark;
 }

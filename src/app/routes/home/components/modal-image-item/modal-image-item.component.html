@@ -1,4 +1,4 @@
-<div class="modal-header">
+<header app-theme class="modal-header">
   <h4 class="modal-title">
     {{ code }}
     @if (editionMode()) {
@@ -9,13 +9,13 @@
     (click)="close('Cross click')"
     type="button"
     class="btn-close"
-    aria-label="Close">
-  </button>
-</div>
+    aria-label="Close"
+  ></button>
+</header>
 <div class="modal-body position-relative overflow-hidden">
   <div class="content-wrapper">
     @if (editionMode()) {
-      <!-- tu canvas u otro contenido -->
+      <image-editor [item]="item()"></image-editor>
     } @else {
       <div [@slideAnimation]="index()" class="carousel-wrapper">
         <img
@@ -25,43 +25,63 @@
           draggable="false"
           crossorigin="anonymous"
           sizes="
-            (min-width: 992px) 708px,
-            (min-width: 576px) 466px,
-            466px
-          "/>
+              (min-width: 992px) 708px,
+              (min-width: 576px) 466px,
+              466px
+            "
+        />
         @if (hasPrev) {
           <button
             (click)="prevImage($event)"
             type="button"
-            class="carousel-button prev">
-          </button>
+            class="carousel-button prev"
+          ></button>
         }
         @if (hasNext) {
           <button
             (click)="nextImage($event)"
             type="button"
-            class="carousel-button next">
-          </button>
+            class="carousel-button next"
+          ></button>
         }
       </div>
-      @if (images.length > 1) {
-        <div class="carousel-indicators">
-          @for (current of images; track $index; let i = $index) {
-            <button
-              type="button"
-              class="indicator"
-              [class.active]="i === index()"
-              (click)="goToImage(i)"
-              [attr.aria-label]="'Ir a la imagen ' + (i + 1)">
-            </button>
-          }
-        </div>
-      }
     }
   </div>
 </div>
-<div class="modal-footer">
-  <button type="button" class="btn btn-outline-secondary" (click)="close()">
-    Close
-  </button>
-</div>
+<footer app-theme class="modal-footer justify-content-between">
+  @if (hasAuth) {
+    <button class="btn btn-sm btn-outline-danger">Remover</button>
+  } 
+  @if (images.length > 1) {
+    <nav class="d-flex gap-2">
+      @for (current of images; track $index; let i = $index) {
+        <button
+          (click)="goToImage(i)"
+          [class.active]="i === index()"
+          [disabled]="editionMode() && i !== index()"
+          [attr.aria-label]="'Ir a la imagen ' + (i + 1)"
+          type="button"
+          class="btn btn-sm btn-outline-success rounded-circle"
+          data-bs-toogle="button"
+          aria-pressed="true"
+        >
+          {{ i + 1 }}
+        </button>
+      }
+    </nav>
+  }
+  @if (hasAuth) {
+    <div class="btn-group" role="group" aria-label="Edition Section">
+      @if (editionMode()) {
+        <button (click)="toogleEdition()" class="btn btn-sm btn-outline-secondary active" [disabled]="loading()">
+          <span class="ico-back"></span>
+        </button>
+        <button class="btn btn-sm btn-outline-success" [disabled]="loading()">Editar</button>
+      } @else {
+        <button (click)="toogleEdition()" class="btn btn-sm btn-outline-secondary">
+          Editar
+        </button>
+      }
+    </div>
+  } 
+</footer>

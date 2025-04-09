@@ -52,19 +52,47 @@ export class ItemService {
   private info = signal(initialInfo);
   /** Señal que almacena los parámetros de búsqueda actuales. */
   private params = signal(initialSearch);
-  /** Señal computada que retorna los items ordenados por código. */
-  // private sortedDocs = computed(() => {
-  //   // return this.docs().slice().sort(({ code: a }, { code: b }) => (a > b ? 1 : b > a ? -1 : 0));
-  // });
+  /** Señal que indica si se está cargando información. */
+  private isLoading = signal(false);
+
+  
+  /**
+   * Getter for the loading state.
+   * This property returns the result of the `isLoading` method,
+   * indicating whether a loading operation is in progress.
+   */
+  public get loading() {
+    return this.isLoading();
+  }
 
   /**
-   * Obtiene la información detallada de los items.
-   *
-   * @returns Un observable que emite un objeto con la información de los items.
+   * Sets the loading state of the service.
+   * 
+   * @param value - A boolean indicating whether the service is in a loading state.
    */
-  private get details(): Observable<{ data: Info }> {
-    const httpParams = { params: { ...this.params(), page: this.page() } };
-    return this.http.get<{ data: Info }>(`${this.url}/item/info`, httpParams);
+  public set loading(value: boolean) {
+    this.isLoading.set(value);
+  }
+
+
+  /**
+   * Updates the search parameters by merging the existing parameters with the provided ones.
+   * 
+   * @param params - An object containing the new search parameters to be set.
+   */
+  public set searchParams(params: Search) {
+    this.params.set({ ...this.params(), ...params });
+  }
+
+  /**
+   * Retrieves the current search parameters.
+   * This getter provides access to the search parameters
+   * used within the service.
+   *
+   * @returns {Search} The current search parameters.
+   */
+  public get searchParams(): Search {
+    return this.params();
   }
 
   /**
@@ -250,6 +278,7 @@ export class ItemService {
    * @param id - El identificador del item.
    * @param idN - El identificador de la imagen cuyo estado se desea eliminar.
    * @returns Un observable que emite la respuesta.
+   * @deprecated Este método ya no es requerido, ya que el estado se elimina al enviar -1 como estado.
    */
   public deleteStatus(id: string, idN: number) {
     const httpParams = { params: { id, idN } };
@@ -273,30 +302,45 @@ export class ItemService {
    * @returns Un observable que emite la respuesta.
    */
   public updateStatus(id: string, idN: number, status: status) {
-    const httpParams = { params: { id, idN }, headers: this.headers };
-    return this.http.put<{ data: Omit<Archive, 'file' | 'key'> }>(`${this.url}/item/status`, { status }, httpParams)
-      .pipe(tap((): void => {
-        const currentDocs = this.docs();
-        const index = currentDocs.findIndex(({ _id }) => _id === id);
-        if (index === -1) return;
-        const prev_status = currentDocs[index].getStatus(idN);
-        if (prev_status !== -1) {
-          this.replaceStatus(prev_status, status);
-          this.docs.update(docs => {
-            const newDocs = docs.slice();
-            newDocs[index].updateStatus(idN, status);
-            return newDocs;
-          });
-        } else {
-          this.docs.update(docs => {
-            const newDocs = docs.slice();
-            newDocs[index].setStatus(idN, status);
-            return newDocs;
-          });
-          this.addStatus(status);
-        }
-      }));
+    const httpParams = { params: { id, idN, status }, headers: this.headers };
+
+    return this.http.put<{ data: Omit<Archive, 'file' | 'key'> }>(`${this.url}/item/status`, null, httpParams)
+      .pipe(
+        tap((): void => {
+          const currentDocs = this.docs();
+          const index = currentDocs.findIndex(({ _id }) => _id === id);
+          if (index === -1) return;
+          const prevStatus = currentDocs[index].getStatus(idN);
+          // Caso especial: status = -1 significa que se debe eliminar el estado
+          if (status === -1) {
+            if (prevStatus !== -1) {
+              // Solo restamos si había algo antes
+              this.substractStatus(prevStatus);
+              currentDocs[index].removeStatus(idN);
+            }
+            return;
+          }
+          // Si ya había estado previo, lo reemplazamos
+          if (prevStatus !== -1) {
+            this.replaceStatus(prevStatus, status);
+            this.docs.update(docs => {
+              const newDocs = docs.slice();
+              newDocs[index].updateStatus(idN, status);
+              return newDocs;
+            });
+          } else {
+            // No había estado, lo agregamos y sumamos
+            this.addStatus(status);
+            this.docs.update(docs => {
+              const newDocs = docs.slice();
+              newDocs[index].setStatus(idN, status);
+              return newDocs;
+            });
+          }
+        })
+      );
   }
+
 
   /**
    * Recupera datos de items y su información asociada.

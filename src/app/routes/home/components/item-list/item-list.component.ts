@@ -29,9 +29,11 @@ import { ItemModel } from '@home/models';
 export class ItemListComponent {
   private readonly itemService = inject(ItemService);
 
-  public loading = input.required<boolean>();
-
   public get items(): ItemModel[] {
     return this.itemService.all;
+  }
+
+  public get loading(): boolean {
+    return this.itemService.loading
   }
 }

@@ -31,9 +31,9 @@
       <select  
         [formControlName]="$index" 
         [class]="selectClass($index)" 
+        [attr.aria-label]="'Cambiar estado de la imagen ' + ($index + 1)"
         class="form-select" 
-        title="Cambiar estado"
-        [attr.aria-label]="'Cambiar estado de la imagen ' + ($index + 1)">
+        title="Cambiar estado">
         <option value="-1"></option>
         @for (status of options; track $index) {
           <option [value]="status">{{ statusChar(status) }}</option>
