@@ -1,16 +1,16 @@
+import { animate, style, transition, trigger } from '@angular/animations';
 import { HttpClient } from '@angular/common/http';
 import { Component, effect, ElementRef, inject, model, OnDestroy, OnInit, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { ToastService } from '@core/services/toast/toast.service';
 import { environment } from '@environment';
 import { ItemModel, status } from '@home/models';
-import { ThemeDirective } from '@shared/directives';
-import { trigger, transition, style, animate } from '@angular/animations';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ModalImageItemComponent } from '../modal-image-item/modal-image-item.component';
-import { debounceTime, filter, map, pairwise } from 'rxjs';
 import { ItemService } from '@home/services';
-import { ToastService } from '@core/services/toast/toast.service';
+import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
+import { ThemeDirective } from '@shared/directives';
+import { debounceTime, filter, map, pairwise } from 'rxjs';
+import { ModalImageItemComponent } from '../modal-image-item/modal-image-item.component';
 
 interface StatusControl {
   images: FormArray<FormControl<number>>
@@ -42,6 +42,12 @@ export class ItemComponent implements OnInit, OnDestroy {
   private readonly url = environment.httpUrl;
   private readonly location = environment.location;
   public readonly options: status[] = [0, 1, 2, 3, 4, 5];
+  private readonly modalOptions: NgbModalOptions = {
+    size: "lg",
+    animation: true,
+    centered: true,
+    backdropClass: "blurred-backdrop"
+  };
 
   private readonly lazyImage = viewChild.required<ElementRef<HTMLImageElement>>('lazyImage');
   public readonly item = model.required<ItemModel>();
@@ -70,29 +76,20 @@ export class ItemComponent implements OnInit, OnDestroy {
     );
   }
   private eventSave = toSignal(this.onStatusChange((prev, status) => prev !== 5 && status === 5));
-  readonly effectSave = effect(() => {
+  readonly effectSave = effect(async () => {
     const saved = this.eventSave();
     if (saved && saved.length > 0) {
       const { index, status, prev } = saved.at(0)!;
       this.forms.at(index).disable({ emitEvent: false });
-      /**
-       * TODO: Aquí se va a agregar un modal que pedirá la imagen a subir, e caso de haber un dismiss, regresa el valor previo y lo hará enable
-       */
-      // const modalRef = this.modal.open(ModalImageItemComponent, { size: 'lg', animation: true, centered: true });
-      // const instancia = modalRef.componentInstance as ModalImageItemComponent;
-      // instancia.item = this.item;
-      // modalRef.result
-      //   .then((result) => {
-      //     if (result) {
-      //       console.log(`Imagen subida para el índice ${index} con estado ${status}`);
-      //       // Aquí puedes manejar el resultado de la imagen subida
-      //     }
-      //   })
-      //   .catch(() => {
-      //     console.log(`Modal cerrado sin subir imagen para el índice ${index}`);
-      //     this.forms.at(index).setValue(saved.at(0)!.prev, { emitEvent: false });
-      //     this.forms.at(index).enable({ emitEvent: false });
-      //   });
+      const modalRef = this.modal.open(ModalImageItemComponent, { size: 'lg', animation: true, centered: true });
+      const instancia = modalRef.componentInstance as ModalImageItemComponent;
+      instancia.item = this.item;
+      try {
+        const result = await modalRef.result;
+      } catch  {
+        this.forms.at(index).setValue(prev);
+        this.forms.at(index).enable({ emitEvent: false });
+      }
     }
   });
   private eventStatus = toSignal(this.onStatusChange((prev, status) => status !== 5 && status !== prev));
@@ -154,6 +151,7 @@ export class ItemComponent implements OnInit, OnDestroy {
     if (this.lazyObserver) {
       this.lazyObserver.disconnect();
     }
+    this.modal.dismissAll();
   }
 
   // Getters usados en la plantilla
@@ -197,7 +195,7 @@ export class ItemComponent implements OnInit, OnDestroy {
   }
 
   public open() {
-    const modalRef = this.modal.open(ModalImageItemComponent, { size: "lg", animation: true, centered: true });
+    const modalRef = this.modal.open(ModalImageItemComponent, this.modalOptions);
     const instancia = modalRef.componentInstance as ModalImageItemComponent;
     instancia.item = this.item;
   }

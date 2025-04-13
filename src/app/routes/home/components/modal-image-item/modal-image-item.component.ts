@@ -1,17 +1,18 @@
 import { trigger, transition, style, animate } from '@angular/animations';
 import { Component, effect, ElementRef, HostListener, inject, model, signal, viewChild } from '@angular/core';
-import { UserService } from '@core/services';
+import { ConfirmService, UserService } from '@core/services';
 import { environment } from '@environment';
 import { ItemModel } from '@home/models';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ThemeDirective } from '@shared/directives';
 import { ImageEditorComponent } from '../image-editor/image-editor.component';
+import { ItemService } from '@home/services';
 
 @Component({
   selector: 'app-modal-image-item',
   imports: [ThemeDirective, ImageEditorComponent],
   templateUrl: './modal-image-item.component.html',
-  styleUrl: './modal-image-item.component.scss',
+  styleUrls: ['./modal-image-item.component.scss'],
   animations: [
     trigger('slideAnimation', [
       transition(':increment', [
@@ -27,7 +28,7 @@ import { ImageEditorComponent } from '../image-editor/image-editor.component';
 })
 export class ModalImageItemComponent {
   private readonly itemImage = viewChild<ElementRef<HTMLImageElement>>('itemImage');
-  private itemImageChange = effect(()=> {
+  readonly itemImageChange = effect(()=> {
     const ref = this.itemImage();
     if (ref) {
       const nativeImg = ref.nativeElement;
@@ -45,6 +46,8 @@ export class ModalImageItemComponent {
   
   private readonly activeModal = inject(NgbActiveModal);
   private readonly user = inject(UserService);
+  private readonly confirm = inject(ConfirmService);
+  private readonly itemService = inject(ItemService);
   private readonly url = environment.httpUrl;
   private readonly location = environment.location;
   public item = model.required<ItemModel>();
@@ -95,7 +98,7 @@ export class ModalImageItemComponent {
     let query = 'quality=50&';
     if (this.location) query += `location=${encodeURIComponent(this.location)}&`;
     if (force) query += 'v=1&';
-    const widths = [320, 281, 247, 230, 226];
+    const widths = [708, 466];
     return widths
       .map(width => `${this.buildImageUrl(`${query}width=${width}`)} ${width}w`)
       .join(', ');
@@ -132,6 +135,25 @@ export class ModalImageItemComponent {
       this.activeModal.dismiss(reason)
     } else {
       this.activeModal.close();
+    }
+  }
+
+  async onRemove(): Promise<void> {
+    const allowed = await this.confirm.ask({
+      intent: 'eliminar',
+      subject: 'imagen',
+      token: `${this.item().code} ${this.index() + 1}`
+    });
+    if (allowed) {
+      this.itemService.loading = true;
+      this.itemService
+      .deleteImage(this.item()._id, this.index() + 1)
+      .subscribe({
+        next: () => {
+          //
+        }
+      })
+      .add(()=> this.itemService.loading = false);
     }
   }
 

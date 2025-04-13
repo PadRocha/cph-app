@@ -21,14 +21,14 @@
         <img
           #itemImage
           src="default.png"
-          alt="Imagen del item"
+          alt="Imagen del item" 
           draggable="false"
           crossorigin="anonymous"
           sizes="
-              (min-width: 992px) 708px,
-              (min-width: 576px) 466px,
-              466px
-            "
+            (min-width: 992px) 708px,
+            (min-width: 576px) 466px,
+            466px
+          "
         />
         @if (hasPrev) {
           <button
@@ -50,7 +50,7 @@
 </div>
 <footer app-theme class="modal-footer justify-content-between">
   @if (hasAuth) {
-    <button class="btn btn-sm btn-outline-danger">Remover</button>
+    <button (click)="onRemove()" class="btn btn-sm btn-outline-danger">Remover</button>
   } 
   @if (images.length > 1) {
     <nav class="d-flex gap-2">

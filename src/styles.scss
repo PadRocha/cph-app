@@ -58,3 +58,10 @@
 .aside-width {
     width: 260px !important;
 }
+
+.blurred-backdrop {
+  background-color: rgba(0, 0, 0, 0.2); // Fondo negro semitransparente
+  -webkit-backdrop-filter: blur(10px); // Desenfoque gaussiano
+  backdrop-filter: blur(10px); // Compatibilidad con Safari
+  opacity: 1 !important; // Asegura que el efecto sea visible
+}

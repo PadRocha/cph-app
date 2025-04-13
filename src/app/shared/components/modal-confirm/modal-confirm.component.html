@@ -1,0 +1,34 @@
+<div class="modal-header">
+  <h4 class="modal-title">Confirmar</h4>
+  <button
+    type="button"
+    ngbAutofocus
+    class="btn-close"
+    aria-label="Close"
+    (click)="cancel()"
+  ></button>
+</div>
+<div class="modal-body">
+  <p>
+    Para <strong>{{ context().intent }}</strong>&nbsp;<i>{{ context().subject }}</i>, escriba: 
+    <code (click)="copyToken()">{{ context().token }}</code> para confirmar.
+  </p>
+  <input
+    type="text"
+    class="form-control"
+    [formControl]="confirmInput"
+    placeholder="Escriba el texto exacto"
+    autocomplete="off"
+  />
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-danger btn-sm" (click)="cancel()">Cancelar</button>
+  <button
+    type="button"
+    class="btn btn-outline-dark btn-sm"
+    [disabled]="!isValid()"
+    (click)="confirm()"
+  >
+    {{ textButton() | capitalize }}
+  </button>
+</div>
