@@ -9,11 +9,17 @@ import { ItemModel, status } from '@home/models';
 import { ItemService } from '@home/services';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { ThemeDirective } from '@shared/directives';
-import { debounceTime, filter, map, pairwise } from 'rxjs';
+import { debounceTime, filter, map, Observable, pairwise } from 'rxjs';
 import { ModalImageItemComponent } from '../modal-image-item/modal-image-item.component';
 
 interface StatusControl {
   images: FormArray<FormControl<number>>
+}
+
+interface StatusChange {
+  index: number;
+  status: status;
+  prev: number;
 }
 
 @Component({
@@ -60,60 +66,68 @@ export class ItemComponent implements OnInit, OnDestroy {
   public get forms(): FormArray<FormControl<number>> {
     return this.statusForm.get('images') as FormArray<FormControl<number>>;
   }
-  private onStatusChange(filtro: (prev: number, curr: number) => boolean) {
+  private onStatusChange(filtro: (prev: number, curr: number) => boolean): Observable<StatusChange[]> {
     return this.forms.valueChanges.pipe(
       debounceTime(500),
       map(() => this.statusForm.getRawValue().images),
       pairwise(),
       map(([prev, curr]) =>
-        curr.map((status, index) => ({
-          index,
-          status: Number(status) as status,
-          prev: Number(prev[index])
-        })).filter(({ prev, status }) => filtro(prev, status))
+        curr.map((value, index) => {
+          const status = Number(value) as status;
+          const prevStatus = Number(prev[index]) as status;
+          return { index, status, prev: prevStatus };
+        }).filter(({ prev, status }) => prev !== 5 && filtro(prev, status))
       ),
       filter(array => array.length > 0)
     );
   }
-  private eventSave = toSignal(this.onStatusChange((prev, status) => prev !== 5 && status === 5));
+  private eventSave = toSignal(this.onStatusChange((_, curr) => curr === 5));
   readonly effectSave = effect(async () => {
     const saved = this.eventSave();
-    if (saved && saved.length > 0) {
-      const { index, status, prev } = saved.at(0)!;
-      this.forms.at(index).disable({ emitEvent: false });
-      const modalRef = this.modal.open(ModalImageItemComponent, { size: 'lg', animation: true, centered: true });
-      const instancia = modalRef.componentInstance as ModalImageItemComponent;
-      instancia.item = this.item;
-      try {
-        const result = await modalRef.result;
-      } catch  {
-        this.forms.at(index).setValue(prev);
-        this.forms.at(index).enable({ emitEvent: false });
-      }
+    if (!saved?.length) return;
+    const { index, status, prev } = saved.at(0)!;
+    const control = this.forms.at(index);
+    control.disable({ emitEvent: false });
+
+    const modalRef = this.modal.open(ModalImageItemComponent, this.modalOptions);
+    const instance = modalRef.componentInstance as ModalImageItemComponent;
+    instance.item = this.item;
+    instance.index.set(index);
+    instance.editionMode.set(true);
+
+    try {
+      await modalRef.result;
+    } catch {
+      control.setValue(prev);
+    } finally {
+      control.enable({ emitEvent: false });
     }
   });
-  private eventStatus = toSignal(this.onStatusChange((prev, status) => status !== 5 && status !== prev));
+  private eventStatus = toSignal(this.onStatusChange((prev, curr) => curr !== 5 && curr !== prev));
   readonly effectStatus = effect(() => {
     const form = this.eventStatus();
     if (form && form.length > 0) {
       const { index, status, prev } = form.at(0)!;
       const image = this.forms.at(index);
       image.disable({ emitEvent: false });
+
       this.itemService
         .updateStatus(this.item()._id, index + 1, status)
         .subscribe({
           next: () => {
-
+            //
           },
-          error: () => {
+          error: (err) => {
             image.setValue(prev, { emitEvent: false });
           }
-        }).add(() => image.enable({ emitEvent: false }));
+        })
+        .add(() => image.enable({ emitEvent: false }));
     }
   });
 
+
   private placeholderURL: string | null = null;
-  private lazyObserver: IntersectionObserver = new IntersectionObserver((entries, observer) => {
+  private lazyObserver = new IntersectionObserver((entries, observer) => {
     entries.forEach(({ isIntersecting, target }) => {
       if (isIntersecting) {
         const img = target as HTMLImageElement;

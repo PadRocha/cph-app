@@ -1,6 +1,10 @@
 <header app-theme class="modal-header">
   <h4 class="modal-title">
-    {{ code }}
+    @if (isNewImageSlot()) {
+      {{ code }} {{ index() + 1 }}
+    } @else {
+      {{ code }}
+    }
     @if (editionMode()) {
       <small><span class="badge bg-info bg-gradient">Editando</span></small>
     }
@@ -13,9 +17,9 @@
   ></button>
 </header>
 <div class="modal-body position-relative overflow-hidden">
-  <div class="content-wrapper">
+  <div #content class="content-wrapper">
     @if (editionMode()) {
-      <image-editor [item]="item()"></image-editor>
+      <image-editor [item]="item()" [index]="index()" [dimensions]="dimensions()"></image-editor>
     } @else {
       <div [@slideAnimation]="index()" class="carousel-wrapper">
         <img
@@ -50,9 +54,13 @@
 </div>
 <footer app-theme class="modal-footer justify-content-between">
   @if (hasAuth) {
-    <button (click)="onRemove()" class="btn btn-sm btn-outline-danger">Remover</button>
-  } 
-  @if (images.length > 1) {
+    @if (isNewImageSlot()) {
+      <button (click)="close('Cancelar')" type="button" class="btn btn-outline-danger btn-sm">Cancelar</button>
+    } @else {
+      <button (click)="onRemove()" class="btn btn-sm btn-outline-danger">Remover</button>
+    } 
+  }
+  @if (!isNewImageSlot() && images.length > 1) {
     <nav class="d-flex gap-2">
       @for (current of images; track $index; let i = $index) {
         <button
@@ -72,13 +80,15 @@
   }
   @if (hasAuth) {
     <div class="btn-group" role="group" aria-label="Edition Section">
-      @if (editionMode()) {
-        <button (click)="toogleEdition()" class="btn btn-sm btn-outline-secondary active" [disabled]="loading()">
+      @if (isNewImageSlot() && editionMode()) {
+        <button class="btn btn-sm btn-outline-success" [disabled]="loading()">Subir Imagen</button>
+      } @else if (editionMode()) {
+        <button (click)="toogleEdition(false)" [disabled]="loading()" class="btn btn-sm btn-outline-secondary active">
           <span class="ico-back"></span>
         </button>
-        <button class="btn btn-sm btn-outline-success" [disabled]="loading()">Editar</button>
+        <button [disabled]="loading()" class="btn btn-sm btn-outline-success">Actualizar</button>
       } @else {
-        <button (click)="toogleEdition()" class="btn btn-sm btn-outline-secondary">
+        <button (click)="toogleEdition(true)" class="btn btn-sm btn-outline-secondary">
           Editar
         </button>
       }

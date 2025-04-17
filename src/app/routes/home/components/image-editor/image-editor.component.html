@@ -1,1 +1,103 @@
-<p>image-editor works!</p>
+<div class="d-inline-block position-relative">
+  <canvas #canvas class="border-start border-end"></canvas>
+  <div
+    #trigger
+    [ngbPopover]
+    [style.left.px]="leftX()"
+    [style.top.px]="topY()"
+    popoverTitle="Editar Selección"
+    popoverClass="forms-objects"
+    placement="bottom"
+    container="body"
+    triggers="manual"
+    autoClose="outside"
+    class="position-absolute"
+  ></div>
+</div>
+<ng-template #linePopover>
+  <form
+    [formGroup]="lineForm"
+    class="d-flex flex-nowrap gap-1 justify-content-start">
+    <div class="input-group input-group-sm w-auto">
+      <span class="input-group-text">
+        <i class="ico-opacity"></i>
+      </span>
+      <input
+        formControlName="opacity"
+        type="number"
+        min="0.1"
+        step="0.1"
+        max="1"
+        class="form-control form-control-sm"
+      />
+    </div>
+    <div class="input-group input-group-sm w-auto">
+      <span class="input-group-text">
+        <i class="ico-stroke"></i>
+      </span>
+      <input
+        formControlName="stroke"
+        type="color"
+        class="form-control form-control-sm form-control-color"
+      />
+    </div>
+    <div class="input-group input-group-sm w-auto">
+      <span class="input-group-text">
+        <i class="ico-background"></i>
+      </span>
+      <input
+        formControlName="backgroundColor"
+        type="color"
+        class="form-control form-control-sm form-control-color"
+      />
+      <button type="button" data-action class="btn btn-sm">
+        <span class="ico-transparent"></span>
+      </button>
+    </div>
+    <button
+      [openDelay]="1000"
+      popoverTitle="Final de línea (shift+C)"
+      ngbPopover="Curva o Cudrado en final de línea."
+      triggers="mouseenter:mouseleave"
+      popoverClass="popover-custom"
+      class="btn btn-sm btn-outline-dark">
+      <span class="ico-round"></span>
+    </button>
+  </form>
+</ng-template>
+<ng-template #textPopover>
+  Contenido del popover con información de texto.
+</ng-template>
+<ng-template #fileModal let-modal>
+  <div class="modal-header">
+    <label class="modal-title h4" id="modal-basic-title" for="file_canvas">
+      Selecciona una imagen
+    </label>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <input
+      #inputFile
+      (change)="inputFile.blur()"
+      type="file"
+      class="form-control form-control-sm"
+      id="file_canvas"
+      accept="image/png, image/jpeg"
+      title="Elija un archivo de imagen para cargar"
+      placeholder="Select an image"
+    />
+  </div>
+  <div class="modal-footer">
+    <button
+      (click)="changeBackground(inputFile, modal)"
+      type="button"
+      class="btn btn-outline-secondary">
+      Cargar imagen
+    </button>
+  </div>
+</ng-template>

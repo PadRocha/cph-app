@@ -26,6 +26,7 @@
     "npm:@tauri-apps/api@2": "2.1.1",
     "npm:@tauri-apps/api@^2.3.0": "2.3.0",
     "npm:@tauri-apps/cli@^2.3.1": "2.3.1",
+    "npm:@tauri-apps/plugin-fs@2": "2.2.1",
     "npm:@tauri-apps/plugin-shell@2": "2.2.0",
     "npm:@tauri-apps/plugin-updater@~2.6.1": "2.6.1",
     "npm:@types/jasmine@^5.1.7": "5.1.7",
@@ -98,8 +99,8 @@
       "dependencies": [
         "@ampproject/remapping",
         "@angular-devkit/architect",
-        "@angular/compiler@19.2.1_@angular+core@19.2.1__rxjs@7.8.1__zone.js@0.15.0_rxjs@7.8.1_zone.js@0.15.0",
         "@angular/compiler-cli@19.2.1_@angular+compiler@19.2.1__@angular+core@19.2.1___rxjs@7.8.1___zone.js@0.15.0__rxjs@7.8.1__zone.js@0.15.0_typescript@5.5.4_@angular+core@19.2.1__rxjs@7.8.1__zone.js@0.15.0_rxjs@7.8.1_zone.js@0.15.0",
+        "@angular/compiler@19.2.1_@angular+core@19.2.1__rxjs@7.8.1__zone.js@0.15.0_rxjs@7.8.1_zone.js@0.15.0",
         "@angular/localize@19.2.1_@angular+compiler@19.2.1__@angular+core@19.2.1___rxjs@7.8.1___zone.js@0.15.0__rxjs@7.8.1__zone.js@0.15.0_@angular+compiler-cli@19.2.1__@angular+compiler@19.2.1___@angular+core@19.2.1____rxjs@7.8.1____zone.js@0.15.0___rxjs@7.8.1___zone.js@0.15.0__typescript@5.5.4__@angular+core@19.2.1___rxjs@7.8.1___zone.js@0.15.0__rxjs@7.8.1__zone.js@0.15.0_@angular+core@19.2.1__rxjs@7.8.1__zone.js@0.15.0_typescript@5.5.4_rxjs@7.8.1_zone.js@0.15.0",
         "@babel/core@7.26.10",
         "@babel/helper-annotate-as-pure",
@@ -260,8 +261,8 @@
     "@angular/localize@19.2.1_@angular+compiler@19.2.1__@angular+core@19.2.1___rxjs@7.8.1___zone.js@0.15.0__rxjs@7.8.1__zone.js@0.15.0_@angular+compiler-cli@19.2.1__@angular+compiler@19.2.1___@angular+core@19.2.1____rxjs@7.8.1____zone.js@0.15.0___rxjs@7.8.1___zone.js@0.15.0__typescript@5.5.4__@angular+core@19.2.1___rxjs@7.8.1___zone.js@0.15.0__rxjs@7.8.1__zone.js@0.15.0_@angular+core@19.2.1__rxjs@7.8.1__zone.js@0.15.0_typescript@5.5.4_rxjs@7.8.1_zone.js@0.15.0": {
       "integrity": "sha512-8j/5EqmFvXh/MkLTKQZMAuTKL9QecOJfern/CUi94VoBWuZq695rbBG51ua3m/r2VWVQ1yB4iiOxa03j+slVOQ==",
       "dependencies": [
-        "@angular/compiler@19.2.1_@angular+core@19.2.1__rxjs@7.8.1__zone.js@0.15.0_rxjs@7.8.1_zone.js@0.15.0",
         "@angular/compiler-cli@19.2.1_@angular+compiler@19.2.1__@angular+core@19.2.1___rxjs@7.8.1___zone.js@0.15.0__rxjs@7.8.1__zone.js@0.15.0_typescript@5.5.4_@angular+core@19.2.1__rxjs@7.8.1__zone.js@0.15.0_rxjs@7.8.1_zone.js@0.15.0",
+        "@angular/compiler@19.2.1_@angular+core@19.2.1__rxjs@7.8.1__zone.js@0.15.0_rxjs@7.8.1_zone.js@0.15.0",
         "@babel/core@7.26.9",
         "@types/babel__core",
         "fast-glob",
@@ -271,8 +272,8 @@
     "@angular/localize@19.2.3_@angular+compiler@19.2.3_@angular+compiler-cli@19.2.3__@angular+compiler@19.2.3__typescript@5.5.4_typescript@5.5.4": {
       "integrity": "sha512-4YUvii9uJCT5D1n3RR5W68UizrwsFr85ucIB9G3rQXL9y1LA2GbeKQkgazpF9nTCBDAfrux7tKvS27owofY5ww==",
       "dependencies": [
-        "@angular/compiler@19.2.3",
         "@angular/compiler-cli@19.2.3_@angular+compiler@19.2.3_typescript@5.5.4",
+        "@angular/compiler@19.2.3",
         "@babel/core@7.26.9",
         "@types/babel__core",
         "fast-glob",
@@ -859,12 +860,12 @@
     "@isaacs/cliui@8.0.2": {
       "integrity": "sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==",
       "dependencies": [
-        "string-width@5.1.2",
         "string-width-cjs@npm:string-width@4.2.3",
-        "strip-ansi@7.1.0",
+        "string-width@5.1.2",
         "strip-ansi-cjs@npm:strip-ansi@6.0.1",
-        "wrap-ansi@8.1.0",
-        "wrap-ansi-cjs@npm:wrap-ansi@7.0.0"
+        "strip-ansi@7.1.0",
+        "wrap-ansi-cjs@npm:wrap-ansi@7.0.0",
+        "wrap-ansi@8.1.0"
       ]
     },
     "@isaacs/fs-minipass@4.0.1": {
@@ -1350,6 +1351,12 @@
         "@tauri-apps/cli-win32-x64-msvc"
       ]
     },
+    "@tauri-apps/plugin-fs@2.2.1": {
+      "integrity": "sha512-KdGzvvA4Eg0Dhw55MwczFbjxLxsTx0FvwwC/0StXlr6IxwPUxh5ziZQoaugkBFs8t+wfebdQrjBEzd8NmmDXNw==",
+      "dependencies": [
+        "@tauri-apps/api@2.3.0"
+      ]
+    },
     "@tauri-apps/plugin-shell@2.2.0": {
       "integrity": "sha512-iC3Ic1hLmasoboG7BO+7p+AriSoqAwKrIk+Hpk+S/bjTQdXqbl2GbdclghI4gM32X0bls7xHzIFqhRdrlvJeaA==",
       "dependencies": [
@@ -1644,10 +1651,10 @@
         "fs-minipass@3.0.3",
         "glob@10.4.5",
         "lru-cache@10.4.3",
-        "minipass@7.1.2",
         "minipass-collect",
         "minipass-flush",
         "minipass-pipeline",
+        "minipass@7.1.2",
         "p-map",
         "ssri",
         "tar@7.4.3",
@@ -2818,10 +2825,10 @@
         "@npmcli/agent",
         "cacache",
         "http-cache-semantics",
-        "minipass@7.1.2",
         "minipass-fetch",
         "minipass-flush",
         "minipass-pipeline",
+        "minipass@7.1.2",
         "negotiator@1.0.0",
         "proc-log",
         "promise-retry",
@@ -2890,8 +2897,8 @@
       "integrity": "sha512-j7U11C5HXigVuutxebFadoYBbd7VSdZWggSe64NVdvWNBqGAiXPL2QVCehjmw7lY1oF9gOllYbORh+hiNgfPgQ==",
       "dependencies": [
         "encoding",
-        "minipass@7.1.2",
         "minipass-sized",
+        "minipass@7.1.2",
         "minizlib@3.0.1"
       ]
     },
@@ -3092,8 +3099,8 @@
         "@npmcli/redact",
         "jsonparse",
         "make-fetch-happen",
-        "minipass@7.1.2",
         "minipass-fetch",
+        "minipass@7.1.2",
         "minizlib@3.0.1",
         "npm-package-arg",
         "proc-log"
@@ -4038,6 +4045,7 @@
         "npm:@popperjs/core@^2.11.8",
         "npm:@tauri-apps/api@^2.3.0",
         "npm:@tauri-apps/cli@^2.3.1",
+        "npm:@tauri-apps/plugin-fs@2",
         "npm:@tauri-apps/plugin-shell@2",
         "npm:@tauri-apps/plugin-updater@~2.6.1",
         "npm:@types/jasmine@^5.1.7",
