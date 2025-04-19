@@ -92,6 +92,16 @@
   opacity: 0.8;
 }
 
+.sentinel {
+  position: absolute;        /* fuera del flujo */
+  left: 0;
+  right: 0;
+  bottom: 50vh;              /* aparece 30 % antes del fondo */
+  height: 1px;               /* píxel mínimo */
+  grid-column: 1 / -1;       /* no rompe la retícula */
+  pointer-events: none;
+}
+
 @include dark-mode {
   .skeleton {
     background: linear-gradient(

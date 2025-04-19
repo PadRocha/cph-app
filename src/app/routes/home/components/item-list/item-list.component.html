@@ -1,4 +1,4 @@
-<section [@listAnim] class="grid">
+<section [@listAnim] class="grid position-relative">
   <!-- 1) Items: se animan al entrar y salir -->
   @for (item of items; track $index) {
     <item [item]="item"></item>
@@ -27,4 +27,5 @@
       </article>
     }
   }
+  <div #sentinel class="sentinel" aria-hidden="true"></div>
 </section>

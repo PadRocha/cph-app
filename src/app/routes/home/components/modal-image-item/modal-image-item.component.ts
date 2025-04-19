@@ -10,7 +10,7 @@ import { ItemService } from '@home/services';
 
 @Component({
   selector: 'app-modal-image-item',
-  imports: [ThemeDirective, ImageEditorComponent],
+  imports: [ImageEditorComponent],
   templateUrl: './modal-image-item.component.html',
   styleUrls: ['./modal-image-item.component.scss'],
   animations: [
@@ -24,7 +24,8 @@ import { ItemService } from '@home/services';
         animate('300ms ease-out', style({ transform: 'translateX(0)', opacity: 1 }))
       ])
     ])
-  ]
+  ],
+  hostDirectives: [ThemeDirective],
 })
 export class ModalImageItemComponent {
   readonly dimensions = signal({ width: 708, height: 500 });

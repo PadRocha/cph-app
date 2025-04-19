@@ -9,9 +9,10 @@ import { NavigationService, UserService } from "@core/services";
 
 @Component({
   selector: "app-root",
-  imports: [CommonModule, RouterOutlet, RouterModule, TitleBarComponent, ToasterComponent, ScrollToTopComponent, ThemeDirective],
+  imports: [CommonModule, RouterOutlet, RouterModule, TitleBarComponent, ToasterComponent, ScrollToTopComponent],
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
+  hostDirectives: [ThemeDirective],
 })
 export class AppComponent {
   private readonly _navigation = inject(NavigationService);

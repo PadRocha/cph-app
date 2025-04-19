@@ -4,7 +4,6 @@
 
 @include iconsCollection($item-icon-collection);
 
-// estilos por defecto
 :host {
   display: block;
   padding: 0.5rem !important;
@@ -104,7 +103,6 @@
   }
 }
 
-// colección de opciones (normal)
 @for $i from 1 through length($option-collection) {
   .form-select option:nth-child(#{$i + 1}),
   .value-#{($i - 1)} {

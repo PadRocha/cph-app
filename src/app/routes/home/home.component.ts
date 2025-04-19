@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnInit } from '@angular/core';
+import { Component, effect, HostListener, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { distinctUntilChanged } from 'rxjs';
@@ -29,7 +29,7 @@ export class HomeComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
-  private searchChange = effect(() => {
+  private readonly _searchChange = effect(() => {
     const { search, status } = this.itemService.searchParams;
     this.router.navigate(
       ['/home'],
@@ -86,5 +86,11 @@ export class HomeComponent implements OnInit {
         error: () => { /* Manejo de error si fuera necesario */ }
       })
       .add(() => this.itemService.loading = false);
+  }
+
+  @HostListener("scroll", ["$event"])
+  onScroll(event: Event & { target: Document }) {
+    console.log(event);
+
   }
 }

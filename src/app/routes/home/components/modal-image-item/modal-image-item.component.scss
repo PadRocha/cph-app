@@ -92,7 +92,6 @@ nav button {
   height: 1.938rem;
 }
 
-// overrides para tema oscuro
 @include dark-mode {
   .modal-header,
   .modal-footer {
@@ -100,3 +99,4 @@ nav button {
     color: $text-color-dark;
   }
 }
+

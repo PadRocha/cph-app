@@ -1,4 +1,4 @@
-<header app-theme class="modal-header">
+<header class="modal-header">
   <h4 class="modal-title">
     @if (isNewImageSlot()) {
       {{ code }} {{ index() + 1 }}
@@ -52,7 +52,7 @@
     }
   </div>
 </div>
-<footer app-theme class="modal-footer justify-content-between">
+<footer class="modal-footer justify-content-between">
   @if (hasAuth) {
     @if (isNewImageSlot()) {
       <button (click)="close('Cancelar')" type="button" class="btn btn-outline-danger btn-sm">Cancelar</button>

@@ -16,8 +16,10 @@ main {
   color: $text-color;
 
   @include scroll;
+}
 
-  &[data-bs-theme=dark] {
+@include dark-mode {
+  main {
     background-color: $background-main-dark;
     color: $text-color-dark;
   }
