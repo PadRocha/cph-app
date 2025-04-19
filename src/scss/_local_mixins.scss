@@ -104,3 +104,8 @@
   }
 }
 
+@mixin dark-mode {
+  @at-root :host-context([data-bs-theme="dark"]) {
+    @content;
+  }
+}

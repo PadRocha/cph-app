@@ -66,7 +66,6 @@
       }
     }
 
-    // Al pasar el cursor sobre el contenedor de la imagen, se muestran los botones
     &:hover {
       .carousel-button {
         opacity: 1;
@@ -93,8 +92,11 @@ nav button {
   height: 1.938rem;
 }
 
-.modal-header[data-bs-theme="dark"],
-.modal-footer[data-bs-theme="dark"] {
-  background-color: $secundary;
-  color: $text-color-dark;
+// overrides para tema oscuro
+@include dark-mode {
+  .modal-header,
+  .modal-footer {
+    background-color: $secundary;
+    color: $text-color-dark;
+  }
 }

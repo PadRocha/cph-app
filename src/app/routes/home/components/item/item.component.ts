@@ -8,7 +8,6 @@ import { environment } from '@environment';
 import { ItemModel, status } from '@home/models';
 import { ItemService } from '@home/services';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
-import { ThemeDirective } from '@shared/directives';
 import { debounceTime, filter, map, Observable, pairwise } from 'rxjs';
 import { ModalImageItemComponent } from '../modal-image-item/modal-image-item.component';
 
@@ -24,7 +23,7 @@ interface StatusChange {
 
 @Component({
   selector: 'item',
-  imports: [ReactiveFormsModule, ThemeDirective],
+  imports: [ReactiveFormsModule],
   templateUrl: './item.component.html',
   styleUrl: './item.component.scss',
   animations: [
@@ -52,7 +51,7 @@ export class ItemComponent implements OnInit, OnDestroy {
     size: "lg",
     animation: true,
     centered: true,
-    backdropClass: "blurred-backdrop"
+    backdropClass: "blurred-backdrop",
   };
 
   private readonly lazyImage = viewChild.required<ElementRef<HTMLImageElement>>('lazyImage');

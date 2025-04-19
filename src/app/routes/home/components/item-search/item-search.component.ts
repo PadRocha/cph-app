@@ -1,9 +1,8 @@
-import { Component, effect, inject, model, OnInit } from '@angular/core';
+import { Component, effect, inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { Search, status } from '@home/models';
 import { DecimalPipe } from '@angular/common';
-import { ThemeDirective } from '@shared/directives';
 import { StatusButtonDirective } from '@home/directives';
 import { ItemService } from '@home/services';
 
@@ -13,7 +12,7 @@ type SearchControls = {
 
 @Component({
   selector: 'item-search',
-  imports: [DecimalPipe, ThemeDirective, StatusButtonDirective, ReactiveFormsModule],
+  imports: [DecimalPipe, StatusButtonDirective, ReactiveFormsModule],
   templateUrl: './item-search.component.html',
   styleUrl: './item-search.component.scss'
 })

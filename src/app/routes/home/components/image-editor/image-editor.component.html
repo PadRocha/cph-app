@@ -5,6 +5,7 @@
     [ngbPopover]
     [style.left.px]="leftX()"
     [style.top.px]="topY()"
+    [popoverContext]="{ form: lineForm }"
     popoverTitle="Editar Selección"
     popoverClass="forms-objects"
     placement="bottom"
@@ -14,9 +15,9 @@
     class="position-absolute"
   ></div>
 </div>
-<ng-template #linePopover>
+<ng-template #linePopover let-form>
   <form
-    [formGroup]="lineForm"
+    [formGroup]="form"
     class="d-flex flex-nowrap gap-1 justify-content-start">
     <div class="input-group input-group-sm w-auto">
       <span class="input-group-text">

@@ -34,11 +34,6 @@
     $color: nth($option-collection, $i);
     @include idn_styles($color);
   }
-
-  [data-bs-theme=dark] .idN#{($i - 1)} {
-    $color: nth($option-collection-dark, $i);
-    @include idn_styles($color);
-  }
 }
 
 .idN0 {
@@ -51,10 +46,18 @@
 form {
   background-color: $background-main;
   color: $text-color;
+}
 
-  &[data-bs-theme=dark] {
+@include dark-mode {
+  @for $i from 1 through length($option-collection-dark) {
+    .idN#{($i - 1)} {
+      $color: nth($option-collection-dark, $i);
+      @include idn_styles($color);
+    }
+  }
+
+  form {
     background-color: $background-main-dark;
     color: $text-color-dark;
   }
 }
-

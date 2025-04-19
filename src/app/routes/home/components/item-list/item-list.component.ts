@@ -1,13 +1,12 @@
 import { Component, inject, input } from '@angular/core';
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
-import { ThemeDirective } from '@shared/directives';
 import { ItemService } from '@home/services';
 import { ItemComponent } from '../item/item.component';
 import { ItemModel } from '@home/models';
 
 @Component({
   selector: 'item-list',
-  imports: [ItemComponent, ThemeDirective],
+  imports: [ItemComponent],
   templateUrl: './item-list.component.html',
   styleUrl: './item-list.component.scss',
     animations: [

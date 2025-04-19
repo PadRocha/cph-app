@@ -1,4 +1,4 @@
-<form [formGroup]="searchForm" app-theme  role="search" class="d-grid sticky-top gap-3 py-3">
+<form [formGroup]="searchForm" role="search" class="d-grid sticky-top gap-3 py-3">
   <input
     formControlName="search"
     id="search"
@@ -18,7 +18,7 @@
         <div>[{{ percentage | number : "1.2-2" }}]%</div>
       </span>
     </div>
-    <div app-theme class="d-inline-flex px-lg-2 gap-2 flex-wrap">
+    <div class="d-inline-flex px-lg-2 gap-2 flex-wrap">
       @for (stat of statusList; track $index) {
         <button
           (click)="setStatus(stat)"

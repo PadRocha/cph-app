@@ -291,7 +291,7 @@ export class ImageEditorComponent implements OnDestroy {
   // 11. Inyección de Servicios y Modales
   // ======================================
   private readonly modalService = inject(NgbModal);
-  private readonly fileModal = viewChild.required<TemplateRef<HTMLDivElement>>('fileModal');
+  private readonly fileModal = viewChild.required<TemplateRef<NgbActiveModal>>('fileModal');
 
   private displayInput(event: Event): void {
     event.preventDefault();
@@ -384,9 +384,9 @@ export class ImageEditorComponent implements OnDestroy {
   // =============================
   // 13. Popovers y Selección de objetos
   // =============================
-  private readonly linePopover = viewChild.required<TemplateRef<unknown>>('linePopover');
-  private readonly textPopover = viewChild.required<TemplateRef<unknown>>('textPopover');
-  private readonly trigger = viewChild.required<NgbPopover>(NgbPopover);
+  private readonly linePopover = viewChild.required<TemplateRef<{ form: FormGroup }>>('linePopover');
+  private readonly textPopover = viewChild.required<TemplateRef<{ form: FormGroup }>>('textPopover');
+  private readonly trigger = viewChild.required(NgbPopover);
   readonly leftX = signal(0);
   readonly topY = signal(0);
 

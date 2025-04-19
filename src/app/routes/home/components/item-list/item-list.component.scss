@@ -1,13 +1,9 @@
 @import "local_variables";
 @import "local_mixins";
 
-// ====================================================
-// Grid para disposición de las tarjetas (y skeleton loader)
-// ====================================================
 .grid {
   display: grid;
   gap: 1rem;
-  // Definición responsive de columnas:
   grid-template-columns: repeat(2, 1fr);
 
   @include media-breakpoint-up(md) {
@@ -24,37 +20,31 @@
   }
 }
 
-// ====================================================
-// Reglas específicas para el skeleton loader
-// ====================================================
 .skeleton {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(100deg, #e9ecef 30%, #f8f9fa 50%, #e9ecef 70%);
+  background: linear-gradient(
+    100deg,
+    #e9ecef 30%,
+    #f8f9fa 50%,
+    #e9ecef 70%
+  );
   background-size: 200% 100%;
   animation: wave 1.5s ease-in-out infinite;
-
-  [data-bs-theme=dark] & {
-    background: linear-gradient(100deg, #444 30%, #666 50%, #444 70%);
-    background-size: 200% 100%;
-  }
 
   &.skeleton-text {
     border-radius: 4px;
     height: 1rem;
   }
-
   &.skeleton-rect {
     border-radius: 0.25rem;
     min-height: 160px;
   }
-
   &.skeleton-select {
     flex: 1 1;
     height: 38px;
     border-radius: 0.25rem;
   }
-
   &.skeleton-button {
     width: 1rem;
     height: 1rem;
@@ -68,11 +58,6 @@
   border-radius: 0.25rem;
   background-color: $primary;
 
-  [data-bs-theme=dark] & {
-    background-color: $secundary;
-    color: $text-color-dark;
-  }
-
   &.input-group {
     display: flex;
     flex-wrap: wrap;
@@ -80,7 +65,6 @@
     align-items: center;
   }
 }
-
 .item-card.loading:nth-child(1) .skeleton {
   animation-delay: 0.1s;
 }
@@ -103,14 +87,28 @@
   }
 }
 
-// ====================================================
-// Estado vacío
-// ====================================================
 .empty-state {
   color: $text-color;
   opacity: 0.8;
+}
 
-  [data-bs-theme=dark] & {
+@include dark-mode {
+  .skeleton {
+    background: linear-gradient(
+      100deg,
+      #444 30%,
+      #666 50%,
+      #444 70%
+    );
+    background-size: 200% 100%;
+  }
+
+  .item-card.loading {
+    background-color: $secundary;
+    color: $text-color-dark;
+  }
+
+  .empty-state {
     color: $text-color-dark;
   }
 }
