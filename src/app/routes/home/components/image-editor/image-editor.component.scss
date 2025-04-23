@@ -2,3 +2,15 @@
 @import "local_mixins";
 
 @include iconsCollection($editor-icon-collection);
+
+input {
+  &[type=text],
+  &[type=color] {
+    min-width: 3rem !important;
+    max-width: 3rem !important;
+  }
+
+  &[type=number] {
+    max-width: 4rem !important;
+  }
+}

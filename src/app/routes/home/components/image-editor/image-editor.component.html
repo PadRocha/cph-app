@@ -2,23 +2,43 @@
   <canvas #canvas class="border-start border-end"></canvas>
   <div
     #trigger
-    [ngbPopover]
+    [ngbPopover]="objectPopover"
     [style.left.px]="leftX()"
     [style.top.px]="topY()"
-    [popoverContext]="{ form: lineForm }"
     popoverTitle="Editar Selección"
     popoverClass="forms-objects"
     placement="bottom"
     container="body"
     triggers="manual"
-    autoClose="outside"
+    [autoClose]="false"
     class="position-absolute"
   ></div>
 </div>
-<ng-template #linePopover let-form>
-  <form
-    [formGroup]="form"
-    class="d-flex flex-nowrap gap-1 justify-content-start">
+<ng-template #objectPopover>
+  @if (popoverType() === 'line') {
+    <ng-container *ngTemplateOutlet="linePopover"></ng-container>
+  } @else {
+    <ng-container *ngTemplateOutlet="textPopover"></ng-container>
+  }
+</ng-template>
+<ng-template #linePopover>
+  <form [formGroup]="lineForm" class="d-flex flex-nowrap gap-1">
+    <div class="input-group input-group-sm w-auto">
+      <span class="input-group-text">
+        <i class="ico-spacing"></i>
+      </span>
+      <input
+        #swInput
+        #swDirective="ngbTypeahead"
+        [ngbTypeahead]="searchStrokeLine"
+        formControlName="strokeWidth"
+        class="form-control form-control-sm"
+        type="text"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        maxlength="2"
+      />
+    </div>
     <div class="input-group input-group-sm w-auto">
       <span class="input-group-text">
         <i class="ico-opacity"></i>
@@ -51,18 +71,21 @@
         type="color"
         class="form-control form-control-sm form-control-color"
       />
-      <button type="button" data-action class="btn btn-sm">
+      @if (!bgIsTransparent()) {
+      <button
+        (click)="setTransparentBg()"
+        type="button"
+        class="btn btn-outline-secondary"
+      >
         <span class="ico-transparent"></span>
       </button>
+      }
     </div>
     <button
-      [openDelay]="1000"
-      popoverTitle="Final de línea (shift+C)"
-      ngbPopover="Curva o Cudrado en final de línea."
-      triggers="mouseenter:mouseleave"
-      popoverClass="popover-custom"
-      class="btn btn-sm btn-outline-dark">
-      <span class="ico-round"></span>
+      (click)="toggleCap()"
+      class="btn btn-sm btn-outline-dark"
+    >
+      <span [class]="icoLineCap()"></span>
     </button>
   </form>
 </ng-template>
@@ -97,7 +120,8 @@
     <button
       (click)="changeBackground(inputFile, modal)"
       type="button"
-      class="btn btn-outline-secondary">
+      class="btn btn-outline-secondary"
+    >
       Cargar imagen
     </button>
   </div>
