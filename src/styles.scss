@@ -65,3 +65,12 @@
   backdrop-filter: blur(10px); // Compatibilidad con Safari
   opacity: 1 !important; // Asegura que el efecto sea visible
 }
+
+.typeahead-auto-width {
+  display: inline-block !important;         /* inline-level box */  
+  min-width: 0 !important;                   /* anula el min-width de Bootstrap */  
+  max-width: none !important;                /* elimina límite superior */  
+  white-space: nowrap;                       /* evita saltos de línea */  
+  /* Sizing intrínseco moderno (alternativo a width: max-content) */
+  inline-size: max-content !important;
+}

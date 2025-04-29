@@ -18,11 +18,11 @@
   @if (popoverType() === 'line') {
     <ng-container *ngTemplateOutlet="linePopover"></ng-container>
   } @else {
-    <ng-container *ngTemplateOutlet="textPopover"></ng-container>
+    <ng-container *ngTemplateOutlet="textboxPopover"></ng-container>
   }
 </ng-template>
 <ng-template #linePopover>
-  <form [formGroup]="lineForm" class="d-flex flex-nowrap gap-1">
+  <form [formGroup]="lineForm" class="d-flex flex-nowrap gap-2">
     <div class="input-group input-group-sm w-auto">
       <span class="input-group-text">
         <i class="ico-spacing"></i>
@@ -32,7 +32,7 @@
         #swDirective="ngbTypeahead"
         [ngbTypeahead]="searchStrokeLine"
         formControlName="strokeWidth"
-        class="form-control form-control-sm"
+        class="form-control form-control-sm form-fixed"
         type="text"
         inputmode="numeric"
         pattern="[0-9]*"
@@ -59,7 +59,7 @@
       <input
         formControlName="stroke"
         type="color"
-        class="form-control form-control-sm form-control-color"
+        class="form-control form-control-sm form-control-color form-fixed"
       />
     </div>
     <div class="input-group input-group-sm w-auto">
@@ -69,16 +69,16 @@
       <input
         formControlName="backgroundColor"
         type="color"
-        class="form-control form-control-sm form-control-color"
+        class="form-control form-control-sm form-control-color form-fixed"
       />
       @if (!bgIsTransparent()) {
-      <button
-        (click)="setTransparentBg()"
-        type="button"
-        class="btn btn-outline-secondary"
-      >
-        <span class="ico-transparent"></span>
-      </button>
+        <button
+          (click)="setTransparentBg()"
+          type="button"
+          class="btn btn-outline-secondary"
+        >
+          <span class="ico-transparent"></span>
+        </button>
       }
     </div>
     <button
@@ -89,8 +89,184 @@
     </button>
   </form>
 </ng-template>
-<ng-template #textPopover>
-  Contenido del popover con información de texto.
+<ng-template #textboxPopover>
+  @if (textboxMode() === 'text') {
+    <form [formGroup]="textForm" class="d-flex flex-column row-gap-2">
+      <div class="d-flex flex-nowrap gap-2">
+        <button
+          (click)="toggleBold()"
+          [class.active]="isBold()"
+          class="btn btn-sm btn-outline-dark"
+          type="button">
+          <i class="ico-bold"></i>
+        </button>
+        <button
+          (click)="toggleItalic()"
+          [class.active]="isItalic()"
+          class="btn btn-sm btn-outline-dark"
+          type="button">
+          <i class="ico-italic"></i>
+        </button>
+        <div class="btn-group">
+          <div
+            ngbDropdown
+            class="btn-group"
+            role="group"
+            aria-label="Button group with nested dropdown">
+            
+            <button
+              (click)="toggleUnderline()"
+              [class.active]="isUnderline()"
+              class="btn btn-sm btn-outline-dark"
+              type="button">
+              <i class="ico-underline"></i>
+            </button>
+            <button
+              ngbDropdownToggle
+              type="button"
+              class="btn btn-sm btn-outline-dark dropdown-toggle-split">
+            </button>
+
+            <div ngbDropdownMenu class="dropdown-menu dropdown-menu-dark narrow">
+              <button
+                (click)="toggleOverline()"
+                [class.active]="isOverline()"
+                ngbDropdownItem
+                type="button">
+                <i class="ico-overline"></i>
+              </button>
+
+              <button
+                (click)="toggleLinethrough()"
+                [class.active]="isLinethrough()"
+                ngbDropdownItem
+                type="button">
+                <i class="ico-linethrough"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <button
+          (click)="setTextAlign('left')"
+          [class.active]="isTextAlign('left')"
+          type="button"
+          class="btn btn-sm btn-outline-dark">
+          <span class="ico-left"></span>
+        </button>
+        <button
+          (click)="setTextAlign('center')"
+          [class.active]="isTextAlign('center')"
+          type="button"
+          class="btn btn-sm btn-outline-dark">
+          <span class="ico-center"></span>
+        </button>
+        <button
+          (click)="setTextAlign('right')"
+          [class.active]="isTextAlign('right')"
+          type="button"
+          class="btn btn-sm btn-outline-dark">
+          <span class="ico-right"></span>
+        </button>
+        <button
+          (click)="setTextAlign('justify')"
+          [class.active]="isTextAlign('justify')"
+          type="button"
+          class="btn btn-sm btn-outline-dark">
+          <span class="ico-justify"></span>
+        </button>
+        <button (click)="textboxMode.set('color')" type="button" class="btn btn-sm btn-outline-secondary btn-color">
+          <i class="ico-color"></i>
+        </button>
+      </div>
+      <div class="d-flex flex-nowrap gap-2 justify-content-center">
+        <div class="input-group input-group-sm w-auto">
+          <span class="input-group-text">
+            <i class="ico-font"></i>
+          </span>
+          <input
+            #fontInput
+            #fontDirective="ngbTypeahead"
+            [ngbTypeahead]="searchFont"
+            [selectOnExact]="true"
+            formControlName="fontFamily"
+            class="form-control form-control-sm"
+            type="text"
+          />
+        </div>
+        <div class="input-group input-group-sm w-auto">
+          <span class="input-group-text">
+            <i class="ico-font-size"></i>
+          </span>
+          <input
+            #fsInput
+            #fsDirective="ngbTypeahead"
+            [ngbTypeahead]="searchSize"
+            formControlName="fontSize"
+            popupClass="typeahead-auto-width"
+            class="form-control form-control-sm form-fixed"
+            type="text"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            maxlength="3"
+          />
+        </div>
+      </div>
+    </form>
+  } @else {
+    <form [formGroup]="textForm" class="d-flex flex-nowrap gap-2">
+      <div class="input-group input-group-sm w-auto">
+        <span class="input-group-text">
+          <i class="ico-stroke"></i>
+        </span>
+        <input
+          formControlName="stroke"
+          type="color"
+          class="form-control form-control-sm form-control-color form-fixed"
+        />
+        @if (!strokeIsTransparent()) {
+          <button
+            (click)="setTransparentStroke()"
+            type="button"
+            class="btn btn-outline-secondary"
+          >
+            <span class="ico-transparent"></span>
+          </button>
+        }
+      </div>
+      <div class="input-group input-group-sm w-auto">
+        <span class="input-group-text">
+          <i class="ico-fill"></i>
+        </span>
+        <input
+          formControlName="fill"
+          type="color"
+          class="form-control form-control-sm form-control-color form-fixed"
+        />
+      </div>
+      <div class="input-group input-group-sm w-auto">
+        <span class="input-group-text">
+          <i class="ico-background"></i>
+        </span>
+        <input
+          formControlName="textBackgroundColor"
+          type="color"
+          class="form-control form-control-sm form-control-color form-fixed"
+        />
+        @if (!bgIsTransparent()) {
+          <button
+            (click)="setTransparentBg()"
+            type="button"
+            class="btn btn-outline-secondary"
+          >
+            <span class="ico-transparent"></span>
+          </button>
+        }
+      </div>
+      <button (click)="textboxMode.set('text')" type="button" class="btn btn-sm btn-outline-secondary btn-color">
+        <i class="ico-color"></i>
+      </button>
+    </form>
+  }
 </ng-template>
 <ng-template #fileModal let-modal>
   <div class="modal-header">
@@ -120,7 +296,7 @@
     <button
       (click)="changeBackground(inputFile, modal)"
       type="button"
-      class="btn btn-outline-secondary"
+      class="btn btn-sm btn-outline-secondary"
     >
       Cargar imagen
     </button>

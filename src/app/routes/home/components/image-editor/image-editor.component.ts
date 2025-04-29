@@ -4,13 +4,13 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { environment } from '@environment';
 import { ItemModel } from '@home/models';
-import { NgbActiveModal, NgbModal, NgbPopover, NgbPopoverModule, NgbTypeahead, NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbDropdown, NgbDropdownModule, NgbModal, NgbPopover, NgbPopoverModule, NgbTypeahead, NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 import { listen, TauriEvent, UnlistenFn } from '@tauri-apps/api/event';
 import { extname } from '@tauri-apps/api/path';
 import { readFile } from '@tauri-apps/plugin-fs';
 import { ActiveSelection, Canvas, FabricImage, FabricObject, Line, Textbox, XY } from 'fabric';
 import { makeBoundingBoxFromPoints } from 'node_modules/fabric/dist/src/util';
-import { debounceTime, distinctUntilChanged, filter, fromEvent, map, mergeWith, Observable, OperatorFunction, pairwise, startWith } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, fromEvent, map, mergeWith, Observable, pairwise, startWith } from 'rxjs';
 
 interface FormText {
   fontSize: number;
@@ -32,6 +32,8 @@ interface History {
   objects: FabricObject[];
 }
 
+type TextAlign = CanvasTextAlign | 'justify';
+
 const NEXT_CAP: Record<CanvasLineCap, CanvasLineCap> = {
   butt: 'round',
   round: 'square',
@@ -40,7 +42,7 @@ const NEXT_CAP: Record<CanvasLineCap, CanvasLineCap> = {
 
 @Component({
   selector: 'image-editor',
-  imports: [ReactiveFormsModule, NgbPopoverModule, NgbTypeaheadModule, NgTemplateOutlet],
+  imports: [ReactiveFormsModule, NgbPopoverModule, NgbTypeaheadModule, NgbDropdownModule, NgTemplateOutlet],
   templateUrl: './image-editor.component.html',
   styleUrl: './image-editor.component.scss'
 })
@@ -49,11 +51,17 @@ export class ImageEditorComponent implements OnDestroy {
   private readonly url = environment.httpUrl;
   private readonly location = environment.location;
 
+  private readonly modalService = inject(NgbModal);
+  private readonly destroyRef = inject(DestroyRef);
+
   public readonly item = model.required<ItemModel>();
   public readonly index = input.required<number>();
   public readonly dimensions = input.required<{ width: number; height: number }>();
 
   private readonly canvasElement = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
+  private readonly trigger = viewChild.required(NgbPopover);
+  private readonly fileModal = viewChild.required<TemplateRef<NgbActiveModal>>('fileModal');
+
   private readonly canvas = computed(() =>
     new Canvas(this.canvasElement().nativeElement, {
       backgroundColor: '#ffffff',
@@ -62,11 +70,12 @@ export class ImageEditorComponent implements OnDestroy {
       backgroundVpt: true,
     })
   );
-
-  private unlistenDragDrop: UnlistenFn | null = null;
   private readonly backgroundURL = signal<string | null>(null);
   public readonly isBackgroundSet = computed(() => !!this.backgroundURL());
   public readonly bgIsTransparent = signal(true);
+  public readonly strokeIsTransparent = signal(true);
+
+  private unlistenDragDrop: UnlistenFn | null = null;
 
   readonly effectCanvas = effect(async () => {
     const canvas = this.canvas();
@@ -144,6 +153,13 @@ export class ImageEditorComponent implements OnDestroy {
       },
       'selection:created': () => this.objectSelected(canvas.getActiveObjects()),
       'selection:updated': () => this.objectSelected(canvas.getActiveObjects()),
+      'text:changed': () => this.objectSelected(canvas.getActiveObjects()),
+      'text:editing:exited': ({ target }) => {
+        if (!target.text.trim()) {
+          canvas.remove(target);
+          canvas.requestRenderAll();
+        }
+      },
       'selection:cleared': () => this.selectionCleared(),
       'object:moving': () => this.followSelection(),
     });
@@ -157,63 +173,28 @@ export class ImageEditorComponent implements OnDestroy {
     canvas.renderAll();
   });
 
-  private currentLine = signal<Line | null>(null);
-  private canvasLineOn = signal(false);
   private undo: History[] = [];
   private redo: History[] = [];
   private present: History | null = null;
   private activeHistory = false;
 
-  public menuLineOn = false;
-  public menuTextOn = false;
-  public menuColorOn = false;
-
-  private bootSelection<T extends FabricObject>(actives: T[]): void {
-    const canvas = this.canvas();
-    canvas.discardActiveObject();
-    const selection = new ActiveSelection(actives, { canvas });
-    canvas.setActiveObject(selection);
+  private get timeLine() {
+    return this.canvas().toDatalessJSON(['selectable', 'editable']);
   }
 
-  public textForm: FormGroup<{ [K in keyof FormText]: FormControl<FormText[K]> }> = new FormGroup({
-    fontSize: new FormControl(40, { validators: Validators.min(1), nonNullable: true }),
-    fontFamily: new FormControl('Times New Roman', { nonNullable: true }),
-    textBackgroundColor: new FormControl('', { nonNullable: true }),
-    stroke: new FormControl('', { nonNullable: true }),
-    fill: new FormControl('rgb(0,0,0)', { nonNullable: true }),
-  });
+  private historySaveAction(): void {
+    if (this.activeHistory || !this.present) return;
+    this.undo.push(this.present);
+    this.present = this.timeLine;
+  }
 
-  private readonly eventText = toSignal(
-    this.textForm.valueChanges.pipe(
-      startWith(this.textForm.getRawValue()),
-      pairwise(),
-      map(([prev, curr]) => {
-        const keys = Object.keys(curr) as (keyof FormText)[];
-        const changedKey = keys.find(key => prev[key] !== curr[key]);
-        if (!changedKey) return undefined;
-        let newValue = curr[changedKey];
-        if (changedKey === 'fontSize') newValue = Number(newValue);
-        return { key: changedKey, value: newValue };
-      })
-    ),
-  );
+  public readonly popoverType = signal<'line' | 'textbox' | null>(null);
+  readonly leftX = signal(0);
+  readonly topY = signal(0);
 
-  readonly effectText = effect(() => {
-    this.activeHistory = true;
-
-    const changed = this.eventText();
-    if (!changed) return;
-    if (!this.textForm.valid) return;
-
-    const canvas = this.canvas();
-    const actives = canvas.getActiveObjects();
-    for (const object of actives) object.set(changed);
-
-    this.bootSelection(actives);
-    this.activeHistory = false;
-    this.historySaveAction();
-    canvas.renderAll();
-  });
+  private startPoint: XY = { x: 0, y: 0 };
+  private currentLine = signal<Line | null>(null);
+  private canvasLineOn = signal(false);
 
   public lineForm: FormGroup<{ [K in keyof FormLine]: FormControl<FormLine[K]> }> = new FormGroup({
     strokeWidth: new FormControl(5, { validators: Validators.min(1), nonNullable: true }),
@@ -221,7 +202,6 @@ export class ImageEditorComponent implements OnDestroy {
     stroke: new FormControl('#000000', { nonNullable: true }),
     backgroundColor: new FormControl('#000000', { nonNullable: true }),
   });
-
   private readonly eventLine = toSignal(
     this.lineForm.valueChanges.pipe(
       startWith(this.lineForm.getRawValue()),
@@ -237,7 +217,6 @@ export class ImageEditorComponent implements OnDestroy {
       })
     ),
   );
-
   readonly effectLine = effect(() => {
     const changed = this.eventLine();
     if (!changed || !this.lineForm.valid) return;
@@ -246,70 +225,267 @@ export class ImageEditorComponent implements OnDestroy {
     const canvas = this.canvas();
     const actives = canvas.getActiveObjects();
 
-    if (key === 'backgroundColor') {
-      this.bgIsTransparent.set(false);
-    }
+    if (key === 'backgroundColor') this.bgIsTransparent.set(false);
 
-    for (const obj of actives) {  
+    for (const obj of actives) {
       obj.set({ [key]: value });
-      if (key === 'strokeWidth') obj.setCoords();
+      if (key === 'strokeWidth') {
+        obj.setCoords();
+        this.followSelection();
+      }
     }
 
+    canvas.requestRenderAll();
+    // this.historySaveAction();
+  });
+
+  private readonly STROKE_WIDTHS = Array.from({ length: 20 }, (_, i) => i + 1);
+  private readonly strokeWidthInput = viewChild.required<ElementRef<HTMLInputElement>>('swInput');
+  private readonly strokeWidthDirective = viewChild.required<NgbTypeahead>('swDirective');
+  public readonly searchStrokeLine = (text$: Observable<string>) => {
+    const debounced$ = text$.pipe(debounceTime(200), distinctUntilChanged());
+    const { nativeElement: el } = this.strokeWidthInput();
+    const focus$ = fromEvent(el, 'focus').pipe(map(() => el.value));
+    const click$ = fromEvent(el, 'click').pipe(
+      filter(() => !this.strokeWidthDirective().isPopupOpen()),
+      map(() => el.value),
+    );
+    return debounced$.pipe(
+      mergeWith(focus$, click$),
+      map((term) => {
+        const n = parseInt(term, 10);
+        if (isNaN(n) || n < 1) return this.STROKE_WIDTHS.slice(0, 10).map(String);
+        const divisors = this.STROKE_WIDTHS.filter(w => n % w === 0);
+        const multiples = this.STROKE_WIDTHS.filter(w => w % n === 0);
+        return [...new Set([...divisors, ...multiples])].slice(0, 10).map(String);
+      }),
+      takeUntilDestroyed(this.destroyRef),
+    );
+  };
+
+  readonly lineCap = signal<CanvasLineCap>('butt');
+  readonly icoLineCap = computed(() => `ico-${this.lineCap()}`);
+  private readonly effectLineCap = effect(() => {
+    const strokeLineCap = this.lineCap();
+    const canvas = this.canvas();
+    for (const obj of canvas.getActiveObjects()) {
+      obj.set({ strokeLineCap });
+    }
+    canvas.requestRenderAll();
+  });
+  public toggleCap() {
+    this.lineCap.set(NEXT_CAP[this.lineCap()]);
+  }
+
+  public readonly textboxMode = signal<'text' | 'color'>('text');
+  public textForm: FormGroup<{ [K in keyof FormText]: FormControl<FormText[K]> }> = new FormGroup({
+    fontSize: new FormControl(40, { validators: Validators.min(1), nonNullable: true }),
+    fontFamily: new FormControl('Times New Roman', { nonNullable: true }),
+    textBackgroundColor: new FormControl('#000000', { nonNullable: true }),
+    stroke: new FormControl('#000000', { nonNullable: true }),
+    fill: new FormControl('#000000', { nonNullable: true }),
+  });
+  private readonly eventText = toSignal(
+    this.textForm.valueChanges.pipe(
+      startWith(this.textForm.getRawValue()),
+      pairwise(),
+      map(([prev, curr]) => {
+        const keys = Object.keys(curr) as (keyof FormText)[];
+        const changedKey = keys.find(key => prev[key] !== curr[key]);
+        if (!changedKey) return undefined;
+        let newValue = curr[changedKey];
+        if (changedKey === 'fontSize') newValue = Number(newValue);
+        return { key: changedKey, value: newValue };
+      })
+    ),
+  );
+  readonly effectText = effect(() => {
+    const change = this.eventText();
+
+    if (!change || !this.textForm.valid) return;
+
+    const { key, value } = change;
+    const canvas = this.canvas();
+    const actives = canvas.getActiveObjects();
+
+    if (key === "textBackgroundColor") this.bgIsTransparent.set(false);
+    if (key === "stroke") this.strokeIsTransparent.set(false);
+
+    for (const obj of actives) {
+      obj.set({ [key]: value });
+      if (key === 'fontSize' || key === "fontFamily") {
+        obj.setCoords();
+        this.followSelection();
+      }
+    }
+
+    canvas.requestRenderAll();
+    // this.historySaveAction();
+  });
+
+  private readonly fontInput = viewChild.required<ElementRef<HTMLInputElement>>('fontInput');
+  private readonly fontDirective = viewChild.required<NgbTypeahead>('fontDirective');
+  private readonly fontNames = [
+    'Times New Roman',
+    'Arial',
+    'Helvetica',
+    'Myriad Pro',
+    'Delicious',
+    'Verdana',
+    'Georgia',
+    'Courier',
+    'Comic Sans Ms',
+    'Impact',
+    'Monaco',
+    'Optima',
+    'Hoefler Text',
+    'Plaster',
+    'Engagement',
+  ];
+  public readonly searchFont = (text$: Observable<string>) => {
+    const debounced$ = text$.pipe(debounceTime(200), distinctUntilChanged());
+    const { nativeElement: el } = this.fontInput();
+    const focus$ = fromEvent(el, 'focus').pipe(map(() => el.value));
+    const click$ = fromEvent(el, 'click').pipe(
+      filter(() => !this.fontDirective().isPopupOpen()),
+      map(() => el.value),
+    );
+    return debounced$.pipe(
+      mergeWith(focus$, click$),
+      map((term) => {
+        if (term === '') {
+          return this.fontNames.slice(0, 10);
+        }
+        const lower = term.toLowerCase();
+        return this.fontNames
+          .filter((name) => name.toLowerCase().includes(lower))
+          .slice(0, 10);
+      }),
+      takeUntilDestroyed(this.destroyRef),
+    );
+  }
+
+  private readonly fontSizeInput = viewChild.required<ElementRef<HTMLInputElement>>('fsInput');
+  private readonly fontSizeDirective = viewChild.required<NgbTypeahead>('fsDirective');
+  private readonly SIZE_WIDTHS = Array.from({ length: 160 }, (_, i) => i + 1);
+  public readonly searchSize = (text$: Observable<string>) => {
+    const debounced$ = text$.pipe(debounceTime(200), distinctUntilChanged());
+    const { nativeElement: el } = this.fontSizeInput();
+    const focus$ = fromEvent(el, 'focus').pipe(map(() => el.value));
+    const click$ = fromEvent(el, 'click').pipe(
+      filter(() => !this.fontSizeDirective().isPopupOpen()),
+      map(() => el.value),
+    );
+    return debounced$.pipe(
+      mergeWith(focus$, click$),
+      map((term) => {
+        const n = parseInt(term, 10);
+        if (isNaN(n) || n < 1) return this.SIZE_WIDTHS.slice(0, 10).map(String);
+        const divisors = this.SIZE_WIDTHS.filter(w => n % w === 0);
+        const multiples = this.SIZE_WIDTHS.filter(w => w % n === 0);
+        return [...new Set([...divisors, ...multiples])].slice(0, 10).map(String);
+      }),
+      takeUntilDestroyed(this.destroyRef),
+    );
+  }
+
+  public readonly isBold = signal(false);
+  public readonly isItalic = signal(false);
+  public readonly isUnderline = signal(false);
+  public readonly isOverline = signal(false);
+  public readonly isLinethrough = signal(false);
+
+  @HostListener('window:keydown.shift.n', ['$event'])
+  public toggleBold(event?: KeyboardEvent): void {
+    if (this.popoverType() !== 'textbox') return;
+    if (event?.preventDefault) event.preventDefault();
+    this.isBold.update(v => !v);
+  }
+  @HostListener('window:keydown.shift.k', ['$event'])
+  public toggleItalic(event?: KeyboardEvent): void {
+    if (this.popoverType() !== 'textbox') return;
+    if (event?.preventDefault) event.preventDefault();
+    this.isItalic.update(v => !v);
+  }
+  @HostListener('window:keydown.shift.s', ['$event'])
+  public toggleUnderline(event?: KeyboardEvent): void {
+    if (this.popoverType() !== 'textbox') return;
+    if (event?.preventDefault) event.preventDefault();
+    this.isUnderline.update(v => !v);
+  }
+  @HostListener('window:keydown.shift.alt.s', ['$event'])
+  public toggleOverline(event?: KeyboardEvent): void {
+    if (this.popoverType() !== 'textbox') return;
+    if (event?.preventDefault) event.preventDefault();
+    this.isOverline.update(v => !v);
+  }
+  @HostListener('window:keydown.shift.l', ['$event'])
+  public toggleLinethrough(event?: KeyboardEvent): void {
+    if (this.popoverType() !== 'textbox') return;
+    if (event?.preventDefault) event.preventDefault();
+    this.isLinethrough.update(v => !v);
+  }
+
+  private readonly effectBold = effect(() => {
+    const isBold = this.isBold();
+    const canvas = this.canvas();
+    for (const obj of canvas.getActiveObjects()) {
+      obj.set({ fontWeight: isBold ? 'bold' : 'normal' });
+    }
+    canvas.requestRenderAll();
+  });
+  private readonly effectItalic = effect(() => {
+    const isItalic = this.isItalic();
+    const canvas = this.canvas();
+    for (const obj of canvas.getActiveObjects()) {
+      obj.set({ fontStyle: isItalic ? 'italic' : 'normal' });
+    }
+    canvas.requestRenderAll();
+  });
+  private readonly effectUnderline = effect(() => {
+    const underline = this.isUnderline();
+    const canvas = this.canvas();
+    for (const obj of canvas.getActiveObjects()) {
+      obj.set({ underline });
+    }
+    canvas.requestRenderAll();
+  });
+  private readonly effectOverline = effect(() => {
+    const overline = this.isOverline();
+    const canvas = this.canvas();
+    for (const obj of canvas.getActiveObjects()) {
+      obj.set({ overline });
+    }
+    canvas.requestRenderAll();
+  });
+  private readonly effectLinethrough = effect(() => {
+    const linethrough = this.isLinethrough();
+    const canvas = this.canvas();
+    for (const obj of canvas.getActiveObjects()) {
+      obj.set({ linethrough });
+    }
     canvas.requestRenderAll();
   });
 
-  public setTransparentBg(): void {
+  public readonly textAlign = signal<TextAlign>('left');
+
+  public setTextAlign(align: TextAlign): void {
+    if (this.textAlign() !== align) {
+      this.textAlign.set(align);
+    }
+  }
+  public isTextAlign(align: TextAlign): boolean {
+    return this.textAlign() === align;
+  }
+
+  private readonly effectTextAlign = effect(() => {
+    const textAlign = this.textAlign();
     const canvas = this.canvas();
     for (const obj of canvas.getActiveObjects()) {
-      obj.set({ backgroundColor: '' });
+      obj.set({ textAlign: textAlign });
     }
-    const control = this.lineForm.get('backgroundColor')!;
-    control.reset('#000000', { emitEvent: false });
     canvas.requestRenderAll();
-    this.bgIsTransparent.set(true);
-  }
-
-
-  private get timeLine() {
-    return this.canvas().toDatalessJSON(['selectable', 'editable']);
-  }
-
-  private historySaveAction(): void {
-    if (this.activeHistory || !this.present) return;
-    this.undo.push(this.present);
-    this.present = this.timeLine;
-  }
-
-  private readonly modalService = inject(NgbModal);
-  private readonly fileModal = viewChild.required<TemplateRef<NgbActiveModal>>('fileModal');
-
-  private displayInput(event: Event): void {
-    event.preventDefault();
-    event.stopPropagation();
-    const actives = this.canvas().getActiveObjects();
-    if (actives.length >= 1) return;
-    this.modalService.open(this.fileModal(), { centered: true });
-  }
-
-  public async changeBackground({ files }: HTMLInputElement, modal: NgbActiveModal): Promise<void> {
-    if (!files) return;
-    const file = files.item(0);
-    if (!file) return;
-
-    const background = this.backgroundURL();
-    if (background) URL.revokeObjectURL(background);
-    this.backgroundURL.set(URL.createObjectURL(file));
-
-    const canvas = this.canvas();
-    const newImage = await FabricImage.fromURL(this.backgroundURL()!);
-    newImage.scaleToWidth(this.defaultWidth);
-    newImage.canvas = canvas;
-    canvas.backgroundImage = newImage;
-    canvas.renderAll();
-    modal.close();
-  }
-
-  private startPoint: XY = { x: 0, y: 0 };
+  });
 
   private startGesture({ button, ctrlKey, altKey, clientX, clientY }: MouseEvent): void {
     if (this.isBackgroundSet()) return;
@@ -392,15 +568,17 @@ export class ImageEditorComponent implements OnDestroy {
     this.historySaveAction();
   }
 
-  public readonly popoverType = signal<'line' | 'textbox' | null>(null);
-  private readonly trigger = viewChild.required(NgbPopover);
-  readonly leftX = signal(0);
-  readonly topY = signal(0);
+  private followSelection(): void {
+    const actives = this.canvas().getActiveObjects();
+    if (actives.length) {
+      this.objectSelected(actives);
+    }
+  }
 
   private objectSelected(selected: FabricObject[]): void {
     const trigger = this.trigger();
     const puntos: XY[] = [];
-    
+
     for (const obj of selected) {
       const rect = obj.getBoundingRect();
       puntos.push({ x: rect.left, y: rect.top });
@@ -411,10 +589,10 @@ export class ImageEditorComponent implements OnDestroy {
     const { left, top, width, height } = makeBoundingBoxFromPoints(puntos);
     this.leftX.set(left + width / 2);
     this.topY.set(top + height + 8);
-    
+
     if (selected.every(({ type }) => type === 'line')) {
       this.popoverType.set('line');
-      
+
       if (selected.length > 1) {
         this.lineForm.reset({
           strokeWidth: 5,
@@ -437,7 +615,46 @@ export class ImageEditorComponent implements OnDestroy {
       }
     } else if (selected.every(({ type }) => type === 'textbox')) {
       this.popoverType.set('textbox');
-      
+      this.textboxMode.set('text');
+      if (selected.length > 1) {
+        this.textForm.reset({
+          fontSize: 40,
+          fontFamily: 'Times New Roman',
+          textBackgroundColor: '#000000',
+          stroke: '#000000',
+          fill: '#000000',
+        }, { emitEvent: false });
+
+        this.bgIsTransparent.set(true);
+        this.strokeIsTransparent.set(true);
+
+        this.isBold.set(false);
+        this.isItalic.set(false);
+        this.isUnderline.set(false);
+        this.isOverline.set(false);
+        this.isLinethrough.set(false);
+        this.textAlign.set('left');
+      } else {
+        const textbox = selected.at(0)! as Textbox;
+
+        this.textForm.patchValue({
+          fontSize: textbox.fontSize,
+          fontFamily: textbox.fontFamily,
+          textBackgroundColor: textbox.textBackgroundColor || '#000000',
+          stroke: textbox.stroke as string || '#000000',
+          fill: textbox.fill as string,
+        }, { emitEvent: false });
+
+        this.bgIsTransparent.set(!textbox.textBackgroundColor);
+        this.strokeIsTransparent.set(!textbox.stroke);
+
+        this.isBold.set(textbox.fontWeight === 'bold');
+        this.isItalic.set(textbox.fontStyle === 'italic');
+        this.isUnderline.set(!!textbox.underline);
+        this.isOverline.set(!!textbox.overline);
+        this.isLinethrough.set(!!textbox.linethrough);
+        this.textAlign.set(textbox.textAlign as any ?? 'left');
+      }
     } else {
       this.popoverType.set(null);
     }
@@ -449,56 +666,58 @@ export class ImageEditorComponent implements OnDestroy {
     }
   }
 
-  private followSelection(): void {
-    const actives = this.canvas().getActiveObjects();
-    if (actives.length) {
-      this.objectSelected(actives);
-    }
-  }
-
   private selectionCleared(): void {
     const trigger = this.trigger();
     if (trigger.isOpen()) trigger.close();
+    this.popoverType.set(null);
   }
 
-  private readonly strokeWidthInput = viewChild.required<ElementRef<HTMLInputElement>>('swInput');
-  private readonly strokeWidthDirective = viewChild.required<NgbTypeahead>('swDirective');
-  private readonly STROKE_WIDTHS = Array.from({ length: 20 }, (_, i) => i + 1);
-  private readonly destroyRef = inject(DestroyRef);
-  public readonly searchStrokeLine = (text$: Observable<string>) => {
-    const debounced$ = text$.pipe(debounceTime(200), distinctUntilChanged());
-    const { nativeElement: el } = this.strokeWidthInput();
-    const focus$ = fromEvent(el, 'focus').pipe(map(() => el.value));
-    const click$ = fromEvent(el, 'click').pipe(
-      filter(() => !this.strokeWidthDirective().isPopupOpen()),
-      map(() => el.value),
-    );
-    return debounced$.pipe(
-      mergeWith(focus$, click$),
-      map((term) => {
-        const n = parseInt(term, 10);
-        if (isNaN(n) || n < 1) return this.STROKE_WIDTHS.slice(0, 10).map(String);
-        const divisors = this.STROKE_WIDTHS.filter(w => n % w === 0);
-        const multiples = this.STROKE_WIDTHS.filter(w => w % n === 0);
-        return [...new Set([...divisors, ...multiples])].slice(0, 10).map(String);
-      }),
-      takeUntilDestroyed(this.destroyRef),
-    );
-  };
-
-  readonly lineCap = signal<CanvasLineCap>('butt');
-  readonly icoLineCap = computed(() => `ico-${this.lineCap()}`);
-  private readonly effectLineCap = effect(() => {
-    const strokeLineCap = this.lineCap();
+  public setTransparentBg(): void {
     const canvas = this.canvas();
     for (const obj of canvas.getActiveObjects()) {
-      obj.set({ strokeLineCap });
+      obj.set({ backgroundColor: '' });
     }
+    const control = this.lineForm.get('backgroundColor')!;
+    control.reset('#000000', { emitEvent: false });
     canvas.requestRenderAll();
-  });
+    this.bgIsTransparent.set(true);
+  }
 
-  toggleCap() {
-    this.lineCap.set(NEXT_CAP[this.lineCap()]);
+  public setTransparentStroke(): void {
+    const canvas = this.canvas();
+    for (const obj of canvas.getActiveObjects()) {
+      obj.set({ stroke: '' });
+    }
+    const control = this.textForm.get('stroke')!;
+    control.reset('#000000', { emitEvent: false });
+    canvas.requestRenderAll();
+    this.strokeIsTransparent.set(true);
+  }
+
+  private displayInput(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    const actives = this.canvas().getActiveObjects();
+    if (actives.length >= 1) return;
+    this.modalService.open(this.fileModal(), { centered: true });
+  }
+
+  public async changeBackground({ files }: HTMLInputElement, modal: NgbActiveModal): Promise<void> {
+    if (!files) return;
+    const file = files.item(0);
+    if (!file) return;
+
+    const background = this.backgroundURL();
+    if (background) URL.revokeObjectURL(background);
+    this.backgroundURL.set(URL.createObjectURL(file));
+
+    const canvas = this.canvas();
+    const newImage = await FabricImage.fromURL(this.backgroundURL()!);
+    newImage.scaleToWidth(this.defaultWidth);
+    newImage.canvas = canvas;
+    canvas.backgroundImage = newImage;
+    canvas.renderAll();
+    modal.close();
   }
 
   ngOnDestroy(): void {

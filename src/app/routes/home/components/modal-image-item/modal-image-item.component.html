@@ -79,16 +79,16 @@
     </nav>
   }
   @if (hasAuth) {
-    <div class="btn-group" role="group" aria-label="Edition Section">
+    <div class="btn-group btn-group-sm" role="group" aria-label="Edition Section">
       @if (isNewImageSlot() && editionMode()) {
-        <button class="btn btn-sm btn-outline-success" [disabled]="loading()">Subir Imagen</button>
+        <button class="btn btn-outline-success" [disabled]="loading()">Subir Imagen</button>
       } @else if (editionMode()) {
-        <button (click)="toogleEdition(false)" [disabled]="loading()" class="btn btn-sm btn-outline-secondary active">
+        <button (click)="toogleEdition(false)" [disabled]="loading()" class="btn btn-outline-secondary active">
           <span class="ico-back"></span>
         </button>
-        <button [disabled]="loading()" class="btn btn-sm btn-outline-success">Actualizar</button>
+        <button [disabled]="loading()" class="btn btn-outline-success">Actualizar</button>
       } @else {
-        <button (click)="toogleEdition(true)" class="btn btn-sm btn-outline-secondary">
+        <button (click)="toogleEdition(true)" class="btn btn-outline-secondary">
           Editar
         </button>
       }

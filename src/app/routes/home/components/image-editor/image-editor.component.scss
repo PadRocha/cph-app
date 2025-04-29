@@ -4,13 +4,24 @@
 @include iconsCollection($editor-icon-collection);
 
 input {
-  &[type=text],
-  &[type=color] {
-    min-width: 3rem !important;
-    max-width: 3rem !important;
+  &.form-fixed {
+    width: 3rem !important;
+  }
+
+  &.form-s4 {
+    width: 3.5rem !important;
   }
 
   &[type=number] {
     max-width: 4rem !important;
   }
+}
+
+.btn-color {
+  @include button-outline-variant($purple-500)
+}
+
+.dropdown-menu.narrow {
+  min-width: 0;
+  width: 48px;
 }
