@@ -462,6 +462,16 @@ export class ImageEditorComponent implements OnDestroy {
     this.isLinethrough.update(v => !v);
   }
 
+  @HostListener('window:keydown.escape', ['$event'])
+  clearSelectionOnEsc(event: KeyboardEvent): void {
+    event.preventDefault();
+    const canvas = this.canvas();
+    if (!!canvas.getActiveObjects().length) {
+      canvas.discardActiveObject();
+      canvas.requestRenderAll();
+    }
+  }
+
   private readonly effectBold = effect(() => {
     const isBold = this.isBold();
     const canvas = this.canvas();

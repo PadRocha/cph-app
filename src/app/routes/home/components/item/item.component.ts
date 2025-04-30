@@ -48,7 +48,8 @@ export class ItemComponent implements OnInit, OnDestroy {
   private readonly location = environment.location;
   public readonly options: status[] = [0, 1, 2, 3, 4, 5];
   private readonly modalOptions: NgbModalOptions = {
-    size: "lg",
+    size: "lg", 
+    keyboard: false,
     animation: true,
     centered: true,
     backdropClass: "blurred-backdrop",
