@@ -32,6 +32,8 @@ interface History {
   objects: FabricObject[];
 }
 
+type FormGroupOf<T> = FormGroup<{ [K in keyof T]: FormControl<T[K]>; }>;
+
 type TextAlign = CanvasTextAlign | 'justify';
 
 const NEXT_CAP: Record<CanvasLineCap, CanvasLineCap> = {
@@ -121,7 +123,7 @@ export class ImageEditorComponent implements OnDestroy {
         const bytes = await readFile(filePath);
         const ext = await extname(filePath);
         if (!['jpg', 'jpeg', 'png'].includes(ext.toLowerCase())) return;
-        const mimeTypes: { [key: string]: string } = {
+        const mimeTypes: Record<string, string> = {
           'jpg': 'image/jpeg',
           'jpeg': 'image/jpeg',
           'png': 'image/png',
@@ -143,7 +145,21 @@ export class ImageEditorComponent implements OnDestroy {
       'object:removed': () => this.historySaveAction(),
       'object:modified': () => this.historySaveAction(),
       'object:skewing': () => this.historySaveAction(),
-      'contextmenu': ({ e }) => this.displayInput(e),
+      'contextmenu': ({ e }) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!canvas.getActiveObjects().length) {
+          this.displayInput(e);            // no hay selección → input
+          return;
+        }
+
+        if (this.popoverType() === 'zorder') {
+          this.backToPrevOrClose();        // está abierto → volver / cerrar
+        } else {
+          this.openZOrderMenu();           // no está → abrir
+        }
+      },
       'mouse:down': ({ e }) => e instanceof MouseEvent && this.startGesture(e),
       'mouse:move': ({ e }) => e instanceof MouseEvent && this.updateGesture(e),
       'mouse:up': () => {
@@ -188,15 +204,35 @@ export class ImageEditorComponent implements OnDestroy {
     this.present = this.timeLine;
   }
 
-  public readonly popoverType = signal<'line' | 'textbox' | null>(null);
+  public readonly popoverType = signal<'line' | 'textbox' | 'zorder' | null>(null);
+  private prevPopoverType: 'line' | 'textbox' | null = null;
   readonly leftX = signal(0);
   readonly topY = signal(0);
+
+  private openZOrderMenu(): void {
+    const popover = this.popoverType();
+    if (popover === 'zorder') return;
+    this.prevPopoverType = popover;
+    this.popoverType.set('zorder');
+    const trig = this.trigger();
+    if (!trig.isOpen()) { trig.open(); }
+  }
+
+  private backToPrevOrClose(): void {
+    if (this.prevPopoverType) {
+      this.popoverType.set(this.prevPopoverType);
+    } else {
+      this.trigger().close();
+      this.popoverType.set(null);
+    }
+    this.prevPopoverType = null;
+  }
 
   private startPoint: XY = { x: 0, y: 0 };
   private currentLine = signal<Line | null>(null);
   private canvasLineOn = signal(false);
 
-  public lineForm: FormGroup<{ [K in keyof FormLine]: FormControl<FormLine[K]> }> = new FormGroup({
+  public lineForm: FormGroupOf<FormLine> = new FormGroup({
     strokeWidth: new FormControl(5, { validators: Validators.min(1), nonNullable: true }),
     opacity: new FormControl(1, { nonNullable: true }),
     stroke: new FormControl('#000000', { nonNullable: true }),
@@ -278,7 +314,7 @@ export class ImageEditorComponent implements OnDestroy {
   }
 
   public readonly textboxMode = signal<'text' | 'color'>('text');
-  public textForm: FormGroup<{ [K in keyof FormText]: FormControl<FormText[K]> }> = new FormGroup({
+  public textForm: FormGroupOf<FormText> = new FormGroup({
     fontSize: new FormControl(40, { validators: Validators.min(1), nonNullable: true }),
     fontFamily: new FormControl('Times New Roman', { nonNullable: true }),
     textBackgroundColor: new FormControl('#000000', { nonNullable: true }),
@@ -363,7 +399,7 @@ export class ImageEditorComponent implements OnDestroy {
       }),
       takeUntilDestroyed(this.destroyRef),
     );
-  }
+  };
 
   private readonly fontSizeInput = viewChild.required<ElementRef<HTMLInputElement>>('fsInput');
   private readonly fontSizeDirective = viewChild.required<NgbTypeahead>('fsDirective');
@@ -387,7 +423,7 @@ export class ImageEditorComponent implements OnDestroy {
       }),
       takeUntilDestroyed(this.destroyRef),
     );
-  }
+  };
 
   public readonly isBold = signal(false);
   public readonly isItalic = signal(false);
@@ -664,12 +700,52 @@ export class ImageEditorComponent implements OnDestroy {
     } else {
       if (trigger.isOpen()) trigger.close();
     }
+
+    this.prevPopoverType = null;
   }
 
   private selectionCleared(): void {
     const trigger = this.trigger();
     if (trigger.isOpen()) trigger.close();
     this.popoverType.set(null);
+    this.prevPopoverType = null;
+  }
+
+  public sendToBack(): void {
+    const canvas = this.canvas();
+    for (const obj of canvas.getActiveObjects()) {
+      canvas.sendObjectToBack(obj);
+    }
+    canvas.requestRenderAll();
+    this.historySaveAction();
+  }
+
+  public sendBackwards(): void {
+    const canvas = this.canvas();
+    for (const obj of canvas.getActiveObjects()) {
+      canvas.sendObjectBackwards(obj);
+    }
+    canvas.requestRenderAll();
+    canvas.discardActiveObject();
+    this.historySaveAction();
+  }
+
+  public bringForward(): void {
+    const canvas = this.canvas();
+    for (const obj of canvas.getActiveObjects()) {
+      canvas.bringObjectForward(obj);
+    }
+    canvas.requestRenderAll();
+    this.historySaveAction();
+  }
+
+  public bringToFront(): void {
+    const canvas = this.canvas();
+    for (const obj of canvas.getActiveObjects()) {
+      canvas.bringObjectToFront(obj);
+    }
+    canvas.requestRenderAll();
+    this.historySaveAction();
   }
 
   public setTransparentBg(): void {
@@ -695,8 +771,6 @@ export class ImageEditorComponent implements OnDestroy {
   }
 
   private displayInput(event: Event): void {
-    event.preventDefault();
-    event.stopPropagation();
     const actives = this.canvas().getActiveObjects();
     if (actives.length >= 1) return;
     this.modalService.open(this.fileModal(), { centered: true });

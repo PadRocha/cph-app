@@ -15,10 +15,16 @@
   ></div>
 </div>
 <ng-template #objectPopover>
-  @if (popoverType() === 'line') {
-    <ng-container *ngTemplateOutlet="linePopover"></ng-container>
-  } @else {
-    <ng-container *ngTemplateOutlet="textboxPopover"></ng-container>
+  @switch (popoverType()) {
+    @case ('line') {
+      <ng-container *ngTemplateOutlet="linePopover"></ng-container>
+    }
+    @case ('textbox') {
+      <ng-container *ngTemplateOutlet="textboxPopover"></ng-container>
+    }
+    @case ('zorder') {
+      <ng-container *ngTemplateOutlet="zorderPopover"></ng-container>
+    }
   }
 </ng-template>
 <ng-template #linePopover>
@@ -268,6 +274,22 @@
     </form>
   }
 </ng-template>
+<ng-template #zorderPopover>
+  <div role="group" aria-label="Orden Z" class="d-flex gap-2">
+    <button (click)="sendToBack()" type="button" class="btn btn-sm btn-outline-dark">
+      <i class="ico-send-back"></i>
+    </button>
+    <button (click)="sendBackwards()" type="button" class="btn btn-sm btn-outline-dark">
+      <i class="ico-send-backward"></i>
+    </button>
+    <button (click)="bringForward()" type="button" class="btn btn-sm btn-outline-dark">
+      <i class="ico-bring-forward"></i>
+    </button>
+    <button (click)="bringToFront()" type="button" class="btn btn-sm btn-outline-dark">
+      <i class="ico-bring-front"></i>
+    </button>
+  </div>
+</ng-template>
 <ng-template #fileModal let-modal>
   <div class="modal-header">
     <label class="modal-title h4" id="modal-basic-title" for="file_canvas">
@@ -296,8 +318,7 @@
     <button
       (click)="changeBackground(inputFile, modal)"
       type="button"
-      class="btn btn-sm btn-outline-secondary"
-    >
+      class="btn btn-sm btn-outline-secondary">
       Cargar imagen
     </button>
   </div>
