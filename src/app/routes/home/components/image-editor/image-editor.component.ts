@@ -4,11 +4,11 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { environment } from '@environment';
 import { ItemModel } from '@home/models';
-import { NgbActiveModal, NgbDropdown, NgbDropdownModule, NgbModal, NgbPopover, NgbPopoverModule, NgbTypeahead, NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbDropdownModule, NgbModal, NgbPopover, NgbPopoverModule, NgbTypeahead, NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 import { listen, TauriEvent, UnlistenFn } from '@tauri-apps/api/event';
 import { extname } from '@tauri-apps/api/path';
 import { readFile } from '@tauri-apps/plugin-fs';
-import { ActiveSelection, Canvas, FabricImage, FabricObject, Line, Textbox, XY } from 'fabric';
+import { Canvas, FabricImage, FabricObject, Line, Textbox, XY } from 'fabric';
 import { makeBoundingBoxFromPoints } from 'node_modules/fabric/dist/src/util';
 import { debounceTime, distinctUntilChanged, filter, fromEvent, map, mergeWith, Observable, pairwise, startWith } from 'rxjs';
 
@@ -112,7 +112,7 @@ export class ImageEditorComponent implements OnDestroy {
     canvas.backgroundImage = image;
     canvas.renderAll();
     // Configuraciones adicionales del canvas
-    this.present = this.timeLine;
+    this.present = this.snapshot;
     canvas.skipTargetFind = false;
     canvas.selection = true;
     canvas.selectionKey = 'altKey';
@@ -141,10 +141,10 @@ export class ImageEditorComponent implements OnDestroy {
     });
 
     canvas.on({
-      'object:added': () => this.historySaveAction(),
-      'object:removed': () => this.historySaveAction(),
-      'object:modified': () => this.historySaveAction(),
-      'object:skewing': () => this.historySaveAction(),
+      'object:added': () => this.historySave(),
+      'object:removed': () => this.historySave(),
+      'object:modified': () => this.historySave(),
+      'object:skewing': () => this.historySave(),
       'contextmenu': ({ e }) => {
         e.preventDefault();
         e.stopPropagation();
@@ -192,16 +192,16 @@ export class ImageEditorComponent implements OnDestroy {
   private undo: History[] = [];
   private redo: History[] = [];
   private present: History | null = null;
-  private activeHistory = false;
+  private historyBusy = false;
 
-  private get timeLine() {
-    return this.canvas().toDatalessJSON(['selectable', 'editable']);
+  private get snapshot() {
+    return this.canvas().toDatalessJSON(['selectable', 'editable']) as History;
   }
 
-  private historySaveAction(): void {
-    if (this.activeHistory || !this.present) return;
+  private historySave(): void {
+    if (this.historyBusy || !this.present) return;
     this.undo.push(this.present);
-    this.present = this.timeLine;
+    this.present = this.snapshot;
   }
 
   public readonly popoverType = signal<'line' | 'textbox' | 'zorder' | null>(null);
@@ -272,7 +272,7 @@ export class ImageEditorComponent implements OnDestroy {
     }
 
     canvas.requestRenderAll();
-    // this.historySaveAction();
+    // this.historySave();
   });
 
   private readonly STROKE_WIDTHS = Array.from({ length: 20 }, (_, i) => i + 1);
@@ -299,17 +299,19 @@ export class ImageEditorComponent implements OnDestroy {
     );
   };
 
+  private withActives(fn: (o: FabricObject) => void): void {
+    const canvas = this.canvas();
+    for (const obj of canvas.getActiveObjects()) fn(obj);
+    canvas.requestRenderAll();
+  }
+
   readonly lineCap = signal<CanvasLineCap>('butt');
   readonly icoLineCap = computed(() => `ico-${this.lineCap()}`);
   private readonly effectLineCap = effect(() => {
     const strokeLineCap = this.lineCap();
-    const canvas = this.canvas();
-    for (const obj of canvas.getActiveObjects()) {
-      obj.set({ strokeLineCap });
-    }
-    canvas.requestRenderAll();
+    this.withActives((o) => o.set({ strokeLineCap }));
   });
-  public toggleCap() {
+  public toggleCap(): void {
     this.lineCap.set(NEXT_CAP[this.lineCap()]);
   }
 
@@ -356,7 +358,7 @@ export class ImageEditorComponent implements OnDestroy {
     }
 
     canvas.requestRenderAll();
-    // this.historySaveAction();
+    // this.historySave();
   });
 
   private readonly fontInput = viewChild.required<ElementRef<HTMLInputElement>>('fontInput');
@@ -463,7 +465,7 @@ export class ImageEditorComponent implements OnDestroy {
   }
 
   @HostListener('window:keydown.escape', ['$event'])
-  clearSelectionOnEsc(event: KeyboardEvent): void {
+  public clearSelection(event: KeyboardEvent): void {
     event.preventDefault();
     const canvas = this.canvas();
     if (!!canvas.getActiveObjects().length) {
@@ -471,48 +473,6 @@ export class ImageEditorComponent implements OnDestroy {
       canvas.requestRenderAll();
     }
   }
-
-  private readonly effectBold = effect(() => {
-    const isBold = this.isBold();
-    const canvas = this.canvas();
-    for (const obj of canvas.getActiveObjects()) {
-      obj.set({ fontWeight: isBold ? 'bold' : 'normal' });
-    }
-    canvas.requestRenderAll();
-  });
-  private readonly effectItalic = effect(() => {
-    const isItalic = this.isItalic();
-    const canvas = this.canvas();
-    for (const obj of canvas.getActiveObjects()) {
-      obj.set({ fontStyle: isItalic ? 'italic' : 'normal' });
-    }
-    canvas.requestRenderAll();
-  });
-  private readonly effectUnderline = effect(() => {
-    const underline = this.isUnderline();
-    const canvas = this.canvas();
-    for (const obj of canvas.getActiveObjects()) {
-      obj.set({ underline });
-    }
-    canvas.requestRenderAll();
-  });
-  private readonly effectOverline = effect(() => {
-    const overline = this.isOverline();
-    const canvas = this.canvas();
-    for (const obj of canvas.getActiveObjects()) {
-      obj.set({ overline });
-    }
-    canvas.requestRenderAll();
-  });
-  private readonly effectLinethrough = effect(() => {
-    const linethrough = this.isLinethrough();
-    const canvas = this.canvas();
-    for (const obj of canvas.getActiveObjects()) {
-      obj.set({ linethrough });
-    }
-    canvas.requestRenderAll();
-  });
-
   public readonly textAlign = signal<TextAlign>('left');
 
   public setTextAlign(align: TextAlign): void {
@@ -524,13 +484,16 @@ export class ImageEditorComponent implements OnDestroy {
     return this.textAlign() === align;
   }
 
-  private readonly effectTextAlign = effect(() => {
-    const textAlign = this.textAlign();
-    const canvas = this.canvas();
-    for (const obj of canvas.getActiveObjects()) {
-      obj.set({ textAlign: textAlign });
-    }
-    canvas.requestRenderAll();
+  readonly effectTextStyles = effect(() => {
+    const styles = {
+      fontWeight: this.isBold() ? 'bold' : 'normal',
+      fontStyle: this.isItalic() ? 'italic' : 'normal',
+      underline: this.isUnderline(),
+      overline: this.isOverline(),
+      linethrough: this.isLinethrough(),
+      textAlign: this.textAlign(),
+    };
+    this.withActives(o => o.set(styles));
   });
 
   private startGesture({ button, ctrlKey, altKey, clientX, clientY }: MouseEvent): void {
@@ -540,7 +503,7 @@ export class ImageEditorComponent implements OnDestroy {
     if (canvas.getActiveObjects().length >= 1) return;
 
     if (button === 0 && ctrlKey) {
-      this.activeHistory = true;
+      this.historyBusy = true;
       this.canvasLineOn.set(true);
       const line = new Line();
       const { top, left } = canvas.calcOffset();
@@ -603,7 +566,7 @@ export class ImageEditorComponent implements OnDestroy {
     const canvas = this.canvas();
     canvas.selection = true;
     this.canvasLineOn.set(false);
-    this.activeHistory = false;
+    this.historyBusy = false;
     const line = this.currentLine();
     if (!line) return;
     const { x1, y1, x2, y2 } = line.calcLinePoints();
@@ -611,7 +574,7 @@ export class ImageEditorComponent implements OnDestroy {
     const length = Math.hypot(dx, dy);
     canvas[length < 1 ? 'remove' : 'setActiveObject'](line);
     canvas.renderAll();
-    this.historySaveAction();
+    this.historySave();
   }
 
   private followSelection(): void {
@@ -727,7 +690,7 @@ export class ImageEditorComponent implements OnDestroy {
       canvas.sendObjectToBack(obj);
     }
     canvas.requestRenderAll();
-    this.historySaveAction();
+    this.historySave();
   }
 
   public sendBackwards(): void {
@@ -737,7 +700,7 @@ export class ImageEditorComponent implements OnDestroy {
     }
     canvas.requestRenderAll();
     canvas.discardActiveObject();
-    this.historySaveAction();
+    this.historySave();
   }
 
   public bringForward(): void {
@@ -746,7 +709,7 @@ export class ImageEditorComponent implements OnDestroy {
       canvas.bringObjectForward(obj);
     }
     canvas.requestRenderAll();
-    this.historySaveAction();
+    this.historySave();
   }
 
   public bringToFront(): void {
@@ -755,7 +718,7 @@ export class ImageEditorComponent implements OnDestroy {
       canvas.bringObjectToFront(obj);
     }
     canvas.requestRenderAll();
-    this.historySaveAction();
+    this.historySave();
   }
 
   public setTransparentBg(): void {
