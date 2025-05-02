@@ -584,6 +584,75 @@ export class ImageEditorComponent implements OnDestroy {
     }
   }
 
+  private selectLines(lines: Line[]): void {
+    this.popoverType.set('line');
+
+    if (selected.length > 1) {
+      this.lineForm.reset({
+        strokeWidth: 5,
+        opacity: 1,
+        stroke: '#000000',
+        backgroundColor: '#000000'
+      }, { emitEvent: false });
+      this.bgIsTransparent.set(true);
+      this.lineCap.set('butt');
+    } else {
+      const line = selected.at(0)!;
+      this.lineForm.patchValue({
+        strokeWidth: line.strokeWidth,
+        opacity: line.opacity,
+        stroke: line.stroke as string,
+        backgroundColor: line.backgroundColor || '#000000'
+      }, { emitEvent: false });
+      this.bgIsTransparent.set(!line.backgroundColor);
+      this.lineCap.set(line.strokeLineCap);
+    }
+  }
+
+  private selectTextboxes(boxes: Textbox[]): void {
+    this.popoverType.set('textbox');
+    this.textboxMode.set('text');
+    if (selected.length > 1) {
+      this.textForm.reset({
+        fontSize: 40,
+        fontFamily: 'Times New Roman',
+        textBackgroundColor: '#000000',
+        stroke: '#000000',
+        fill: '#000000',
+      }, { emitEvent: false });
+
+      this.bgIsTransparent.set(true);
+      this.strokeIsTransparent.set(true);
+
+      this.isBold.set(false);
+      this.isItalic.set(false);
+      this.isUnderline.set(false);
+      this.isOverline.set(false);
+      this.isLinethrough.set(false);
+      this.textAlign.set('left');
+    } else {
+      const textbox = selected.at(0)! as Textbox;
+
+      this.textForm.patchValue({
+        fontSize: textbox.fontSize,
+        fontFamily: textbox.fontFamily,
+        textBackgroundColor: textbox.textBackgroundColor || '#000000',
+        stroke: textbox.stroke as string || '#000000',
+        fill: textbox.fill as string,
+      }, { emitEvent: false });
+
+      this.bgIsTransparent.set(!textbox.textBackgroundColor);
+      this.strokeIsTransparent.set(!textbox.stroke);
+
+      this.isBold.set(textbox.fontWeight === 'bold');
+      this.isItalic.set(textbox.fontStyle === 'italic');
+      this.isUnderline.set(!!textbox.underline);
+      this.isOverline.set(!!textbox.overline);
+      this.isLinethrough.set(!!textbox.linethrough);
+      this.textAlign.set(textbox.textAlign as any ?? 'left');
+    }
+  }
+
   private objectSelected(selected: FabricObject[]): void {
     const trigger = this.trigger();
     const puntos: XY[] = [];
@@ -600,70 +669,9 @@ export class ImageEditorComponent implements OnDestroy {
     this.topY.set(top + height + 8);
 
     if (selected.every(({ type }) => type === 'line')) {
-      this.popoverType.set('line');
-
-      if (selected.length > 1) {
-        this.lineForm.reset({
-          strokeWidth: 5,
-          opacity: 1,
-          stroke: '#000000',
-          backgroundColor: '#000000'
-        }, { emitEvent: false });
-        this.bgIsTransparent.set(true);
-        this.lineCap.set('butt');
-      } else {
-        const line = selected.at(0)!;
-        this.lineForm.patchValue({
-          strokeWidth: line.strokeWidth,
-          opacity: line.opacity,
-          stroke: line.stroke as string,
-          backgroundColor: line.backgroundColor || '#000000'
-        }, { emitEvent: false });
-        this.bgIsTransparent.set(!line.backgroundColor);
-        this.lineCap.set(line.strokeLineCap);
-      }
+      this.selectLines(sel as Line[]);
     } else if (selected.every(({ type }) => type === 'textbox')) {
-      this.popoverType.set('textbox');
-      this.textboxMode.set('text');
-      if (selected.length > 1) {
-        this.textForm.reset({
-          fontSize: 40,
-          fontFamily: 'Times New Roman',
-          textBackgroundColor: '#000000',
-          stroke: '#000000',
-          fill: '#000000',
-        }, { emitEvent: false });
-
-        this.bgIsTransparent.set(true);
-        this.strokeIsTransparent.set(true);
-
-        this.isBold.set(false);
-        this.isItalic.set(false);
-        this.isUnderline.set(false);
-        this.isOverline.set(false);
-        this.isLinethrough.set(false);
-        this.textAlign.set('left');
-      } else {
-        const textbox = selected.at(0)! as Textbox;
-
-        this.textForm.patchValue({
-          fontSize: textbox.fontSize,
-          fontFamily: textbox.fontFamily,
-          textBackgroundColor: textbox.textBackgroundColor || '#000000',
-          stroke: textbox.stroke as string || '#000000',
-          fill: textbox.fill as string,
-        }, { emitEvent: false });
-
-        this.bgIsTransparent.set(!textbox.textBackgroundColor);
-        this.strokeIsTransparent.set(!textbox.stroke);
-
-        this.isBold.set(textbox.fontWeight === 'bold');
-        this.isItalic.set(textbox.fontStyle === 'italic');
-        this.isUnderline.set(!!textbox.underline);
-        this.isOverline.set(!!textbox.overline);
-        this.isLinethrough.set(!!textbox.linethrough);
-        this.textAlign.set(textbox.textAlign as any ?? 'left');
-      }
+      this.selectTextboxes(sel as Textbox[]);
     } else {
       this.popoverType.set(null);
     }
