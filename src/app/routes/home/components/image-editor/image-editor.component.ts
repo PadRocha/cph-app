@@ -42,6 +42,8 @@ const NEXT_CAP: Record<CanvasLineCap, CanvasLineCap> = {
   square: 'butt'
 };
 
+const range = (length: number) => Array.from({ length }, (_, i) => i + 1);
+
 @Component({
   selector: 'image-editor',
   imports: [ReactiveFormsModule, NgbPopoverModule, NgbTypeaheadModule, NgbDropdownModule, NgTemplateOutlet],
@@ -73,7 +75,6 @@ export class ImageEditorComponent implements OnDestroy {
     })
   );
   private readonly backgroundURL = signal<string | null>(null);
-  public readonly isBackgroundSet = computed(() => !!this.backgroundURL());
   public readonly bgIsTransparent = signal(true);
   public readonly strokeIsTransparent = signal(true);
 
@@ -275,29 +276,38 @@ export class ImageEditorComponent implements OnDestroy {
     // this.historySave();
   });
 
-  private readonly STROKE_WIDTHS = Array.from({ length: 20 }, (_, i) => i + 1);
-  private readonly strokeWidthInput = viewChild.required<ElementRef<HTMLInputElement>>('swInput');
-  private readonly strokeWidthDirective = viewChild.required<NgbTypeahead>('swDirective');
-  public readonly searchStrokeLine = (text$: Observable<string>) => {
-    const debounced$ = text$.pipe(debounceTime(200), distinctUntilChanged());
-    const { nativeElement: el } = this.strokeWidthInput();
+  private typeahead(
+    { nativeElement: el }: ElementRef<HTMLInputElement>,
+    dir: NgbTypeahead,
+    text$: Observable<string>,
+    callback: (v: string) => any
+  ) {
     const focus$ = fromEvent(el, 'focus').pipe(map(() => el.value));
-    const click$ = fromEvent(el, 'click').pipe(
-      filter(() => !this.strokeWidthDirective().isPopupOpen()),
-      map(() => el.value),
-    );
-    return debounced$.pipe(
+    const click$ = fromEvent(el, 'click').pipe(filter(() => !dir.isPopupOpen()), map(() => el.value));
+    return text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
       mergeWith(focus$, click$),
-      map((term) => {
-        const n = parseInt(term, 10);
-        if (isNaN(n) || n < 1) return this.STROKE_WIDTHS.slice(0, 10).map(String);
-        const divisors = this.STROKE_WIDTHS.filter(w => n % w === 0);
-        const multiples = this.STROKE_WIDTHS.filter(w => w % n === 0);
-        return [...new Set([...divisors, ...multiples])].slice(0, 10).map(String);
-      }),
+      map(callback),
       takeUntilDestroyed(this.destroyRef),
     );
-  };
+  }
+
+  private readonly STROKE_WIDTHS = range(20);
+  private readonly strokeWidthInput = viewChild.required<ElementRef<HTMLInputElement>>('swInput');
+  private readonly strokeWidthDirective = viewChild.required<NgbTypeahead>('swDirective');
+  public readonly searchStrokeLine = (text$: Observable<string>) => this.typeahead(
+    this.strokeWidthInput(),
+    this.strokeWidthDirective(),
+    text$,
+    (term) => {
+      const n = parseInt(term, 10);
+      if (isNaN(n) || n < 1) return this.STROKE_WIDTHS.slice(0, 10).map(String);
+      const divisors = this.STROKE_WIDTHS.filter(w => n % w === 0);
+      const multiples = this.STROKE_WIDTHS.filter(w => w % n === 0);
+      return [...new Set([...divisors, ...multiples])].slice(0, 10).map(String);
+    }
+  );
 
   private withActives(fn: (o: FabricObject) => void): void {
     const canvas = this.canvas();
@@ -380,52 +390,36 @@ export class ImageEditorComponent implements OnDestroy {
     'Plaster',
     'Engagement',
   ];
-  public readonly searchFont = (text$: Observable<string>) => {
-    const debounced$ = text$.pipe(debounceTime(200), distinctUntilChanged());
-    const { nativeElement: el } = this.fontInput();
-    const focus$ = fromEvent(el, 'focus').pipe(map(() => el.value));
-    const click$ = fromEvent(el, 'click').pipe(
-      filter(() => !this.fontDirective().isPopupOpen()),
-      map(() => el.value),
-    );
-    return debounced$.pipe(
-      mergeWith(focus$, click$),
-      map((term) => {
-        if (term === '') {
-          return this.fontNames.slice(0, 10);
-        }
-        const lower = term.toLowerCase();
-        return this.fontNames
-          .filter((name) => name.toLowerCase().includes(lower))
-          .slice(0, 10);
-      }),
-      takeUntilDestroyed(this.destroyRef),
-    );
-  };
+  public readonly searchFont = (text$: Observable<string>) => this.typeahead(
+    this.fontInput(),
+    this.fontDirective(),
+    text$,
+    (term) => {
+      if (term === '') {
+        return this.fontNames.slice(0, 10);
+      }
+      const lower = term.toLowerCase();
+      return this.fontNames
+        .filter((name) => name.toLowerCase().includes(lower))
+        .slice(0, 10);
+    }
+  );
 
   private readonly fontSizeInput = viewChild.required<ElementRef<HTMLInputElement>>('fsInput');
   private readonly fontSizeDirective = viewChild.required<NgbTypeahead>('fsDirective');
-  private readonly SIZE_WIDTHS = Array.from({ length: 160 }, (_, i) => i + 1);
-  public readonly searchSize = (text$: Observable<string>) => {
-    const debounced$ = text$.pipe(debounceTime(200), distinctUntilChanged());
-    const { nativeElement: el } = this.fontSizeInput();
-    const focus$ = fromEvent(el, 'focus').pipe(map(() => el.value));
-    const click$ = fromEvent(el, 'click').pipe(
-      filter(() => !this.fontSizeDirective().isPopupOpen()),
-      map(() => el.value),
-    );
-    return debounced$.pipe(
-      mergeWith(focus$, click$),
-      map((term) => {
-        const n = parseInt(term, 10);
-        if (isNaN(n) || n < 1) return this.SIZE_WIDTHS.slice(0, 10).map(String);
-        const divisors = this.SIZE_WIDTHS.filter(w => n % w === 0);
-        const multiples = this.SIZE_WIDTHS.filter(w => w % n === 0);
-        return [...new Set([...divisors, ...multiples])].slice(0, 10).map(String);
-      }),
-      takeUntilDestroyed(this.destroyRef),
-    );
-  };
+  private readonly SIZE_WIDTHS = range(160);
+  public readonly searchSize = (text$: Observable<string>) => this.typeahead(
+    this.fontSizeInput(),
+    this.fontSizeDirective(),
+    text$,
+    (term) => {
+      const n = parseInt(term, 10);
+      if (isNaN(n) || n < 1) return this.SIZE_WIDTHS.slice(0, 10).map(String);
+      const divisors = this.SIZE_WIDTHS.filter(w => n % w === 0);
+      const multiples = this.SIZE_WIDTHS.filter(w => w % n === 0);
+      return [...new Set([...divisors, ...multiples])].slice(0, 10).map(String);
+    }
+  );
 
   public readonly isBold = signal(false);
   public readonly isItalic = signal(false);
@@ -497,7 +491,7 @@ export class ImageEditorComponent implements OnDestroy {
   });
 
   private startGesture({ button, ctrlKey, altKey, clientX, clientY }: MouseEvent): void {
-    if (this.isBackgroundSet()) return;
+    if (this.backgroundURL()) return;
 
     const canvas = this.canvas();
     if (canvas.getActiveObjects().length >= 1) return;
@@ -587,7 +581,7 @@ export class ImageEditorComponent implements OnDestroy {
   private selectLines(lines: Line[]): void {
     this.popoverType.set('line');
 
-    if (selected.length > 1) {
+    if (lines.length > 1) {
       this.lineForm.reset({
         strokeWidth: 5,
         opacity: 1,
@@ -597,7 +591,7 @@ export class ImageEditorComponent implements OnDestroy {
       this.bgIsTransparent.set(true);
       this.lineCap.set('butt');
     } else {
-      const line = selected.at(0)!;
+      const line = lines.at(0)!;
       this.lineForm.patchValue({
         strokeWidth: line.strokeWidth,
         opacity: line.opacity,
@@ -612,7 +606,7 @@ export class ImageEditorComponent implements OnDestroy {
   private selectTextboxes(boxes: Textbox[]): void {
     this.popoverType.set('textbox');
     this.textboxMode.set('text');
-    if (selected.length > 1) {
+    if (boxes.length > 1) {
       this.textForm.reset({
         fontSize: 40,
         fontFamily: 'Times New Roman',
@@ -631,7 +625,7 @@ export class ImageEditorComponent implements OnDestroy {
       this.isLinethrough.set(false);
       this.textAlign.set('left');
     } else {
-      const textbox = selected.at(0)! as Textbox;
+      const textbox = boxes.at(0)! as Textbox;
 
       this.textForm.patchValue({
         fontSize: textbox.fontSize,
@@ -669,9 +663,9 @@ export class ImageEditorComponent implements OnDestroy {
     this.topY.set(top + height + 8);
 
     if (selected.every(({ type }) => type === 'line')) {
-      this.selectLines(sel as Line[]);
+      this.selectLines(selected as Line[]);
     } else if (selected.every(({ type }) => type === 'textbox')) {
-      this.selectTextboxes(sel as Textbox[]);
+      this.selectTextboxes(selected as Textbox[]);
     } else {
       this.popoverType.set(null);
     }
