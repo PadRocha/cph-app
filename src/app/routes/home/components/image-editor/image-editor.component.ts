@@ -28,6 +28,8 @@ interface FormLine {
 interface History {
   version: string;
   objects: FabricObject[];
+  background: string;
+  backgroundImage: FabricImage;
 }
 
 type FormGroupOf<T> = FormGroup<{ [K in keyof T]: FormControl<T[K]>; }>;
