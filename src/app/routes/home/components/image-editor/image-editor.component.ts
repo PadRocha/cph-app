@@ -19,21 +19,18 @@ interface FormText {
   stroke: string;
   fill: string;
 }
-
 interface FormLine {
   strokeWidth: number;
   opacity: number;
   stroke: string;
   backgroundColor: string;
 }
-
 interface History {
   version: string;
   objects: FabricObject[];
 }
 
 type FormGroupOf<T> = FormGroup<{ [K in keyof T]: FormControl<T[K]>; }>;
-
 type TextAlign = CanvasTextAlign | 'justify';
 
 const NEXT_CAP: Record<CanvasLineCap, CanvasLineCap> = {
@@ -41,7 +38,23 @@ const NEXT_CAP: Record<CanvasLineCap, CanvasLineCap> = {
   round: 'square',
   square: 'butt'
 };
-
+const FONT_NAMES = [
+  'Times New Roman',
+  'Arial',
+  'Helvetica',
+  'Myriad Pro',
+  'Delicious',
+  'Verdana',
+  'Georgia',
+  'Courier',
+  'Comic Sans Ms',
+  'Impact',
+  'Monaco',
+  'Optima',
+  'Hoefler Text',
+  'Plaster',
+  'Engagement',
+];
 const range = (length: number) => Array.from({ length }, (_, i) => i + 1);
 
 @Component({
@@ -198,11 +211,20 @@ export class ImageEditorComponent implements OnDestroy {
   private get snapshot() {
     return this.canvas().toDatalessJSON(['selectable', 'editable']) as History;
   }
-
   private historySave(): void {
     if (this.historyBusy || !this.present) return;
     this.undo.push(this.present);
     this.present = this.snapshot;
+    this.redo.length = 0;
+  }
+
+  private applyHistory(snapshot: History): void {
+    const canvas = this.canvas();
+    this.historyBusy = true;
+    canvas.loadFromJSON(snapshot, () => {
+      canvas.requestRenderAll();
+      this.historyBusy = false;
+    });
   }
 
   public readonly popoverType = signal<'line' | 'textbox' | 'zorder' | null>(null);
@@ -218,7 +240,6 @@ export class ImageEditorComponent implements OnDestroy {
     const trig = this.trigger();
     if (!trig.isOpen()) { trig.open(); }
   }
-
   private backToPrevOrClose(): void {
     if (this.prevPopoverType) {
       this.popoverType.set(this.prevPopoverType);
@@ -227,6 +248,12 @@ export class ImageEditorComponent implements OnDestroy {
       this.popoverType.set(null);
     }
     this.prevPopoverType = null;
+  }
+
+  private withActives(fn: (o: FabricObject) => void): void {
+    const canvas = this.canvas();
+    for (const obj of canvas.getActiveObjects()) fn(obj);
+    canvas.requestRenderAll();
   }
 
   private startPoint: XY = { x: 0, y: 0 };
@@ -259,20 +286,15 @@ export class ImageEditorComponent implements OnDestroy {
     if (!changed || !this.lineForm.valid) return;
 
     const { key, value } = changed;
-    const canvas = this.canvas();
-    const actives = canvas.getActiveObjects();
-
     if (key === 'backgroundColor') this.bgIsTransparent.set(false);
 
-    for (const obj of actives) {
-      obj.set({ [key]: value });
+    this.withActives((o) => {
+      o.set({ [key]: value });
       if (key === 'strokeWidth') {
-        obj.setCoords();
+        o.setCoords();
         this.followSelection();
       }
-    }
-
-    canvas.requestRenderAll();
+    });
     // this.historySave();
   });
 
@@ -293,7 +315,7 @@ export class ImageEditorComponent implements OnDestroy {
     );
   }
 
-  private readonly STROKE_WIDTHS = range(20);
+  private readonly strokeWidths = range(20);
   private readonly strokeWidthInput = viewChild.required<ElementRef<HTMLInputElement>>('swInput');
   private readonly strokeWidthDirective = viewChild.required<NgbTypeahead>('swDirective');
   public readonly searchStrokeLine = (text$: Observable<string>) => this.typeahead(
@@ -302,18 +324,12 @@ export class ImageEditorComponent implements OnDestroy {
     text$,
     (term) => {
       const n = parseInt(term, 10);
-      if (isNaN(n) || n < 1) return this.STROKE_WIDTHS.slice(0, 10).map(String);
-      const divisors = this.STROKE_WIDTHS.filter(w => n % w === 0);
-      const multiples = this.STROKE_WIDTHS.filter(w => w % n === 0);
+      if (isNaN(n) || n < 1) return this.strokeWidths.slice(0, 10).map(String);
+      const divisors = this.strokeWidths.filter(w => n % w === 0);
+      const multiples = this.strokeWidths.filter(w => w % n === 0);
       return [...new Set([...divisors, ...multiples])].slice(0, 10).map(String);
     }
   );
-
-  private withActives(fn: (o: FabricObject) => void): void {
-    const canvas = this.canvas();
-    for (const obj of canvas.getActiveObjects()) fn(obj);
-    canvas.requestRenderAll();
-  }
 
   readonly lineCap = signal<CanvasLineCap>('butt');
   readonly icoLineCap = computed(() => `ico-${this.lineCap()}`);
@@ -353,70 +369,45 @@ export class ImageEditorComponent implements OnDestroy {
     if (!change || !this.textForm.valid) return;
 
     const { key, value } = change;
-    const canvas = this.canvas();
-    const actives = canvas.getActiveObjects();
-
     if (key === "textBackgroundColor") this.bgIsTransparent.set(false);
     if (key === "stroke") this.strokeIsTransparent.set(false);
 
-    for (const obj of actives) {
-      obj.set({ [key]: value });
+    this.withActives((o)=> {
+      o.set({ [key]: value });
       if (key === 'fontSize' || key === "fontFamily") {
-        obj.setCoords();
+        o.setCoords();
         this.followSelection();
       }
-    }
-
-    canvas.requestRenderAll();
+    });
     // this.historySave();
   });
 
   private readonly fontInput = viewChild.required<ElementRef<HTMLInputElement>>('fontInput');
   private readonly fontDirective = viewChild.required<NgbTypeahead>('fontDirective');
-  private readonly fontNames = [
-    'Times New Roman',
-    'Arial',
-    'Helvetica',
-    'Myriad Pro',
-    'Delicious',
-    'Verdana',
-    'Georgia',
-    'Courier',
-    'Comic Sans Ms',
-    'Impact',
-    'Monaco',
-    'Optima',
-    'Hoefler Text',
-    'Plaster',
-    'Engagement',
-  ];
   public readonly searchFont = (text$: Observable<string>) => this.typeahead(
     this.fontInput(),
     this.fontDirective(),
     text$,
     (term) => {
-      if (term === '') {
-        return this.fontNames.slice(0, 10);
-      }
-      const lower = term.toLowerCase();
-      return this.fontNames
-        .filter((name) => name.toLowerCase().includes(lower))
+      if (term === '') return FONT_NAMES.slice(0, 10);
+      return FONT_NAMES
+        .filter((name) => name.toLowerCase().includes(term.toLowerCase()))
         .slice(0, 10);
     }
   );
 
   private readonly fontSizeInput = viewChild.required<ElementRef<HTMLInputElement>>('fsInput');
   private readonly fontSizeDirective = viewChild.required<NgbTypeahead>('fsDirective');
-  private readonly SIZE_WIDTHS = range(160);
+  private readonly widthSizes = range(160);
   public readonly searchSize = (text$: Observable<string>) => this.typeahead(
     this.fontSizeInput(),
     this.fontSizeDirective(),
     text$,
     (term) => {
       const n = parseInt(term, 10);
-      if (isNaN(n) || n < 1) return this.SIZE_WIDTHS.slice(0, 10).map(String);
-      const divisors = this.SIZE_WIDTHS.filter(w => n % w === 0);
-      const multiples = this.SIZE_WIDTHS.filter(w => w % n === 0);
+      if (isNaN(n) || n < 1) return this.widthSizes.slice(0, 10).map(String);
+      const divisors = this.widthSizes.filter(w => n % w === 0);
+      const multiples = this.widthSizes.filter(w => w % n === 0);
       return [...new Set([...divisors, ...multiples])].slice(0, 10).map(String);
     }
   );
@@ -457,7 +448,6 @@ export class ImageEditorComponent implements OnDestroy {
     if (event?.preventDefault) event.preventDefault();
     this.isLinethrough.update(v => !v);
   }
-
   @HostListener('window:keydown.escape', ['$event'])
   public clearSelection(event: KeyboardEvent): void {
     event.preventDefault();
@@ -467,6 +457,37 @@ export class ImageEditorComponent implements OnDestroy {
       canvas.requestRenderAll();
     }
   }
+  @HostListener('window:keydown.control.z', ['$event'])
+  public undoCanvas(event: KeyboardEvent) {
+    // event.preventDefault();
+    // this.history_off = true;
+    // const timeLine = this.history_undo.pop();
+    // if (!!timeLine) {
+    //   this.history_redo.push(this.timeLine);
+    //   this.history_present = timeLine;
+    //   this.canvas.loadFromJSON(timeLine, () => {
+    //     this.canvas.requestRenderAll();
+    //     this.history_off = false;
+    //   });
+    // } else
+    //   this.history_off = false;
+  }
+  @HostListener('window:keydown.control.y', ['$event'])
+  public redoCanvas(event: KeyboardEvent) {
+    // event.preventDefault();
+    // this.history_off = true;
+    // const timeLine = this.history_redo.pop();
+    // if (!!timeLine) {
+    //   this.history_undo.push(this.timeLine);
+    //   this.history_present = timeLine;
+    //   this.canvas.loadFromJSON(timeLine, () => {
+    //     this.canvas.requestRenderAll();
+    //     this.history_off = false;
+    //   });
+    // } else
+    //   this.history_off = false;
+  }
+
   public readonly textAlign = signal<TextAlign>('left');
 
   public setTextAlign(align: TextAlign): void {
@@ -487,7 +508,7 @@ export class ImageEditorComponent implements OnDestroy {
       linethrough: this.isLinethrough(),
       textAlign: this.textAlign(),
     };
-    this.withActives(o => o.set(styles));
+    this.withActives((o) => o.set(styles));
   });
 
   private startGesture({ button, ctrlKey, altKey, clientX, clientY }: MouseEvent): void {
