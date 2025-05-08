@@ -3,8 +3,8 @@
   <div
     #trigger
     [ngbPopover]="objectPopover"
-    [style.left.px]="leftX()"
-    [style.top.px]="topY()"
+    [style.left.px]="popoverLeft()"
+    [style.top.px]="popoverTop()"
     popoverTitle="Editar Selección"
     popoverClass="forms-objects"
     placement="bottom"
@@ -15,7 +15,7 @@
   ></div>
 </div>
 <ng-template #objectPopover>
-  @switch (popoverType()) {
+  @switch (activePopover()) {
     @case ('line') {
       <ng-container *ngTemplateOutlet="linePopover"></ng-container>
     }
@@ -36,7 +36,7 @@
       <input
         #swInput
         #swDirective="ngbTypeahead"
-        [ngbTypeahead]="searchStrokeLine"
+        [ngbTypeahead]="searchStrokeWidths"
         formControlName="strokeWidth"
         class="form-control form-control-sm form-fixed"
         type="text"
@@ -79,7 +79,7 @@
       />
       @if (!bgIsTransparent()) {
         <button
-          (click)="setTransparentBg()"
+          (click)="makeBackgroundTransparent()"
           type="button"
           class="btn btn-outline-secondary"
         >
@@ -192,7 +192,7 @@
           <input
             #fontInput
             #fontDirective="ngbTypeahead"
-            [ngbTypeahead]="searchFont"
+            [ngbTypeahead]="searchFontFamilies"
             [selectOnExact]="true"
             formControlName="fontFamily"
             class="form-control form-control-sm"
@@ -206,7 +206,7 @@
           <input
             #fsInput
             #fsDirective="ngbTypeahead"
-            [ngbTypeahead]="searchSize"
+            [ngbTypeahead]="searchFontSizes"
             formControlName="fontSize"
             popupClass="typeahead-auto-width"
             class="form-control form-control-sm form-fixed"
@@ -231,7 +231,7 @@
         />
         @if (!strokeIsTransparent()) {
           <button
-            (click)="setTransparentStroke()"
+            (click)="makeStrokeTransparent()"
             type="button"
             class="btn btn-outline-secondary"
           >
@@ -260,7 +260,7 @@
         />
         @if (!bgIsTransparent()) {
           <button
-            (click)="setTransparentBg()"
+            (click)="makeBackgroundTransparent()"
             type="button"
             class="btn btn-outline-secondary"
           >
@@ -276,16 +276,16 @@
 </ng-template>
 <ng-template #zorderPopover>
   <div role="group" aria-label="Orden Z" class="d-flex gap-2">
-    <button (click)="sendToBack()" type="button" class="btn btn-outline-dark">
+    <button (click)="sendObjectsToBack()" type="button" class="btn btn-outline-dark">
       <i class="ico-send-back"></i>
     </button>
-    <button (click)="sendBackwards()" type="button" class="btn btn-outline-dark">
+    <button (click)="sendObjectsBackwards()" type="button" class="btn btn-outline-dark">
       <i class="ico-send-backward"></i>
     </button>
-    <button (click)="bringForward()" type="button" class="btn btn-outline-dark">
+    <button (click)="bringObjectsForward()" type="button" class="btn btn-outline-dark">
       <i class="ico-bring-forward"></i>
     </button>
-    <button (click)="bringToFront()" type="button" class="btn btn-outline-dark">
+    <button (click)="bringObjectsToFront()" type="button" class="btn btn-outline-dark">
       <i class="ico-bring-front"></i>
     </button>
   </div>
@@ -316,7 +316,7 @@
   </div>
   <div class="modal-footer">
     <button
-      (click)="changeBackground(inputFile, modal)"
+      (click)="updateBackgroundImage(inputFile, modal)"
       type="button"
       class="btn btn-sm btn-outline-secondary">
       Cargar imagen
