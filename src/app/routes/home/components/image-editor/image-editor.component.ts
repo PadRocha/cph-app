@@ -57,6 +57,7 @@ const FONT_NAMES = [
   'Plaster',
   'Engagement',
 ];
+const CANVAS_WIDTH = 708;
 const range = (length: number) => Array.from({ length }, (_, i) => i + 1);
 
 @Component({
@@ -66,7 +67,6 @@ const range = (length: number) => Array.from({ length }, (_, i) => i + 1);
   styleUrl: './image-editor.component.scss'
 })
 export class ImageEditorComponent implements OnDestroy {
-  private readonly defaultWidth = 708;
   private readonly url = environment.httpUrl;
   private readonly location = environment.location;
 
@@ -99,7 +99,7 @@ export class ImageEditorComponent implements OnDestroy {
     const canvas = this.canvas();
     canvas.skipTargetFind = true;
     canvas.selection = false;
-    // Carga y configuración de background
+
     let url = '/init.png';
     const { key, code, allIDN } = this.item();
     const idN = this.index() + 1;
@@ -117,18 +117,19 @@ export class ImageEditorComponent implements OnDestroy {
         `${baseUrl}?${queryPlaceholder}`,
         { crossOrigin: 'anonymous' }
       );
-      placeholder.scaleToWidth(this.defaultWidth);
+      placeholder.scaleToWidth(CANVAS_WIDTH);
       canvas.backgroundImage = placeholder;
       canvas.renderAll();
       url = `${baseUrl}?${queryHigh}`;
     }
     const image = await FabricImage.fromURL(url, { crossOrigin: "anonymous" });
-    image.scaleToWidth(this.defaultWidth);
+    image.scaleToWidth(CANVAS_WIDTH);
     image.canvas = canvas;
     canvas.backgroundImage = image;
     canvas.renderAll();
-    // Configuraciones adicionales del canvas
+
     this.present = this.snapshot;
+    this.lastHash = JSON.stringify(this.present)
     canvas.skipTargetFind = false;
     canvas.selection = true;
     canvas.selectionKey = 'altKey';
@@ -149,18 +150,21 @@ export class ImageEditorComponent implements OnDestroy {
         if (background) URL.revokeObjectURL(background);
         this.backgroundURL.set(URL.createObjectURL(new Blob([bytes], { type })));
         const newImage = await FabricImage.fromURL(this.backgroundURL()!);
-        newImage.scaleToWidth(this.defaultWidth);
+        newImage.scaleToWidth(CANVAS_WIDTH);
         newImage.canvas = canvas;
         canvas.backgroundImage = newImage;
         canvas.renderAll();
       }
     });
 
+    const record = () => !this.historyBusy && this.historySave();
     canvas.on({
-      'object:added': () => this.historySave(),
-      'object:removed': () => this.historySave(),
-      'object:modified': () => this.historySave(),
-      'object:skewing': () => this.historySave(),
+      'object:added': record,
+      'object:removed': record,
+      'object:modified': record,
+      'object:scaling': record,
+      'object:rotating': record,
+      'object:skewing': record,
       'contextmenu': ({ e }) => {
         e.preventDefault();
         e.stopPropagation();
@@ -201,7 +205,7 @@ export class ImageEditorComponent implements OnDestroy {
     const canvas = this.canvas();
     const { width, height } = this.dimensions();
     canvas.setDimensions({ width, height });
-    canvas.setZoom(width <= 0 ? 1 : width / this.defaultWidth);
+    canvas.setZoom(width <= 0 ? 1 : width / CANVAS_WIDTH);
     canvas.renderAll();
   });
 
@@ -209,30 +213,56 @@ export class ImageEditorComponent implements OnDestroy {
   private redo: History[] = [];
   private present: History | null = null;
   private historyBusy = false;
+  private lastHash = '';
 
   private get snapshot() {
     return this.canvas().toDatalessJSON(['selectable', 'editable']) as History;
   }
   private historySave(): void {
-    if (this.historyBusy || !this.present) return;
+    if (!this.present) return;          // primera llamada viene del efectoCanvas
+    const snap = this.snapshot;
+    const hash = JSON.stringify(snap);
+
+    if (hash === this.lastHash) return; // ←  nada cambió realmente, salimos
     this.undo.push(this.present);
-    this.present = this.snapshot;
+    this.present = snap;
+    this.lastHash = hash;               //  nuevo estado registrado
     this.redo.length = 0;
   }
-
-  private applyHistory(snapshot: History): void {
-    const canvas = this.canvas();
+  private async applyHistory(snap: History): Promise<void> {
     this.historyBusy = true;
-    canvas.loadFromJSON(snapshot, () => {
-      canvas.requestRenderAll();
-      this.historyBusy = false;
-    });
+    const canvas = this.canvas();
+    await canvas.loadFromJSON(snap);
+    canvas.backgroundImage?.scaleToWidth(CANVAS_WIDTH);
+    canvas.requestRenderAll();
+    this.lastHash = JSON.stringify(snap);   // ←  mantenemos el hash sincronizado
+    this.historyBusy = false;
+  }
+  @HostListener('window:keydown.control.z', ['$event'])
+  async undoCanvas(event: KeyboardEvent) {
+    event.preventDefault();
+    if (this.historyBusy || !this.undo.length) return;
+
+    const prev = this.undo.pop()!;
+    if (this.present) this.redo.push(this.present);
+    this.present = prev;
+    await this.applyHistory(prev);
+  }
+  @HostListener('window:keydown.control.y', ['$event'])
+  async redoCanvas(event: KeyboardEvent) {
+    event.preventDefault();
+    if (this.historyBusy || !this.redo.length) return;
+
+    const next = this.redo.pop()!;
+    if (this.present) this.undo.push(this.present);
+    this.present = next;
+    await this.applyHistory(next);
   }
 
   public readonly popoverType = signal<'line' | 'textbox' | 'zorder' | null>(null);
   private prevPopoverType: 'line' | 'textbox' | null = null;
-  readonly leftX = signal(0);
-  readonly topY = signal(0);
+  public readonly leftX = signal(0);
+  public readonly topY = signal(0);
 
   private openZOrderMenu(): void {
     const popover = this.popoverType();
@@ -251,18 +281,34 @@ export class ImageEditorComponent implements OnDestroy {
     }
     this.prevPopoverType = null;
   }
-
   private withActives(fn: (o: FabricObject) => void): void {
     const canvas = this.canvas();
     for (const obj of canvas.getActiveObjects()) fn(obj);
     canvas.requestRenderAll();
   }
 
-  private startPoint: XY = { x: 0, y: 0 };
-  private currentLine = signal<Line | null>(null);
-  private canvasLineOn = signal(false);
+  private typeahead(
+    { nativeElement: el }: ElementRef<HTMLInputElement>,
+    dir: NgbTypeahead,
+    text$: Observable<string>,
+    callback: (v: string) => any
+  ) {
+    const focus$ = fromEvent(el, 'focus').pipe(map(() => el.value));
+    const click$ = fromEvent(el, 'click').pipe(filter(() => !dir.isPopupOpen()), map(() => el.value));
+    return text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      mergeWith(focus$, click$),
+      map(callback),
+      takeUntilDestroyed(this.destroyRef),
+    );
+  }
 
-  public lineForm: FormGroupOf<FormLine> = new FormGroup({
+  private startPoint: XY = { x: 0, y: 0 };
+  private readonly currentLine = signal<Line | null>(null);
+  private readonly canvasLineOn = signal(false);
+
+  public readonly lineForm: FormGroupOf<FormLine> = new FormGroup({
     strokeWidth: new FormControl(5, { validators: Validators.min(1), nonNullable: true }),
     opacity: new FormControl(1, { nonNullable: true }),
     stroke: new FormControl('#000000', { nonNullable: true }),
@@ -270,6 +316,7 @@ export class ImageEditorComponent implements OnDestroy {
   });
   private readonly eventLine = toSignal(
     this.lineForm.valueChanges.pipe(
+      debounceTime(500),
       startWith(this.lineForm.getRawValue()),
       pairwise(),
       map(([prev, curr]) => {
@@ -297,25 +344,8 @@ export class ImageEditorComponent implements OnDestroy {
         this.followSelection();
       }
     });
-    // this.historySave();
+    this.historySave();
   });
-
-  private typeahead(
-    { nativeElement: el }: ElementRef<HTMLInputElement>,
-    dir: NgbTypeahead,
-    text$: Observable<string>,
-    callback: (v: string) => any
-  ) {
-    const focus$ = fromEvent(el, 'focus').pipe(map(() => el.value));
-    const click$ = fromEvent(el, 'click').pipe(filter(() => !dir.isPopupOpen()), map(() => el.value));
-    return text$.pipe(
-      debounceTime(200),
-      distinctUntilChanged(),
-      mergeWith(focus$, click$),
-      map(callback),
-      takeUntilDestroyed(this.destroyRef),
-    );
-  }
 
   private readonly strokeWidths = range(20);
   private readonly strokeWidthInput = viewChild.required<ElementRef<HTMLInputElement>>('swInput');
@@ -335,7 +365,7 @@ export class ImageEditorComponent implements OnDestroy {
 
   readonly lineCap = signal<CanvasLineCap>('butt');
   readonly icoLineCap = computed(() => `ico-${this.lineCap()}`);
-  private readonly effectLineCap = effect(() => {
+  readonly effectLineCap = effect(() => {
     const strokeLineCap = this.lineCap();
     this.withActives((o) => o.set({ strokeLineCap }));
   });
@@ -353,6 +383,7 @@ export class ImageEditorComponent implements OnDestroy {
   });
   private readonly eventText = toSignal(
     this.textForm.valueChanges.pipe(
+      debounceTime(500),
       startWith(this.textForm.getRawValue()),
       pairwise(),
       map(([prev, curr]) => {
@@ -381,7 +412,7 @@ export class ImageEditorComponent implements OnDestroy {
         this.followSelection();
       }
     });
-    // this.historySave();
+    this.historySave();
   });
 
   private readonly fontInput = viewChild.required<ElementRef<HTMLInputElement>>('fontInput');
@@ -450,45 +481,6 @@ export class ImageEditorComponent implements OnDestroy {
     if (event?.preventDefault) event.preventDefault();
     this.isLinethrough.update(v => !v);
   }
-  @HostListener('window:keydown.escape', ['$event'])
-  public clearSelection(event: KeyboardEvent): void {
-    event.preventDefault();
-    const canvas = this.canvas();
-    if (!!canvas.getActiveObjects().length) {
-      canvas.discardActiveObject();
-      canvas.requestRenderAll();
-    }
-  }
-  @HostListener('window:keydown.control.z', ['$event'])
-  public undoCanvas(event: KeyboardEvent) {
-    // event.preventDefault();
-    // this.history_off = true;
-    // const timeLine = this.history_undo.pop();
-    // if (!!timeLine) {
-    //   this.history_redo.push(this.timeLine);
-    //   this.history_present = timeLine;
-    //   this.canvas.loadFromJSON(timeLine, () => {
-    //     this.canvas.requestRenderAll();
-    //     this.history_off = false;
-    //   });
-    // } else
-    //   this.history_off = false;
-  }
-  @HostListener('window:keydown.control.y', ['$event'])
-  public redoCanvas(event: KeyboardEvent) {
-    // event.preventDefault();
-    // this.history_off = true;
-    // const timeLine = this.history_redo.pop();
-    // if (!!timeLine) {
-    //   this.history_undo.push(this.timeLine);
-    //   this.history_present = timeLine;
-    //   this.canvas.loadFromJSON(timeLine, () => {
-    //     this.canvas.requestRenderAll();
-    //     this.history_off = false;
-    //   });
-    // } else
-    //   this.history_off = false;
-  }
 
   public readonly textAlign = signal<TextAlign>('left');
 
@@ -500,7 +492,6 @@ export class ImageEditorComponent implements OnDestroy {
   public isTextAlign(align: TextAlign): boolean {
     return this.textAlign() === align;
   }
-
   readonly effectTextStyles = effect(() => {
     const styles = {
       fontWeight: this.isBold() ? 'bold' : 'normal',
@@ -511,6 +502,7 @@ export class ImageEditorComponent implements OnDestroy {
       textAlign: this.textAlign(),
     };
     this.withActives((o) => o.set(styles));
+    this.historySave();
   });
 
   private startGesture({ button, ctrlKey, altKey, clientX, clientY }: MouseEvent): void {
@@ -544,7 +536,6 @@ export class ImageEditorComponent implements OnDestroy {
       canvas.setActiveObject(text);
     }
   }
-
   private updateGesture({ clientX, clientY, shiftKey }: MouseEvent): void {
     if (!this.canvasLineOn()) return;
     const canvas = this.canvas();
@@ -577,7 +568,6 @@ export class ImageEditorComponent implements OnDestroy {
 
     canvas.renderAll();
   }
-
   private endGesture(): void {
     if (!this.canvasLineOn()) return;
     const canvas = this.canvas();
@@ -593,14 +583,12 @@ export class ImageEditorComponent implements OnDestroy {
     canvas.renderAll();
     this.historySave();
   }
-
   private followSelection(): void {
     const actives = this.canvas().getActiveObjects();
     if (actives.length) {
       this.objectSelected(actives);
     }
   }
-
   private selectLines(lines: Line[]): void {
     this.popoverType.set('line');
 
@@ -625,7 +613,6 @@ export class ImageEditorComponent implements OnDestroy {
       this.lineCap.set(line.strokeLineCap);
     }
   }
-
   private selectTextboxes(boxes: Textbox[]): void {
     this.popoverType.set('textbox');
     this.textboxMode.set('text');
@@ -669,7 +656,6 @@ export class ImageEditorComponent implements OnDestroy {
       this.textAlign.set(textbox.textAlign as any ?? 'left');
     }
   }
-
   private objectSelected(selected: FabricObject[]): void {
     const trigger = this.trigger();
     const puntos: XY[] = [];
@@ -701,12 +687,20 @@ export class ImageEditorComponent implements OnDestroy {
 
     this.prevPopoverType = null;
   }
-
   private selectionCleared(): void {
     const trigger = this.trigger();
     if (trigger.isOpen()) trigger.close();
     this.popoverType.set(null);
     this.prevPopoverType = null;
+  }
+  @HostListener('window:keydown.escape', ['$event'])
+  public clearSelection(event: KeyboardEvent): void {
+    event.preventDefault();
+    const canvas = this.canvas();
+    if (!!canvas.getActiveObjects().length) {
+      canvas.discardActiveObject();
+      canvas.requestRenderAll();
+    }
   }
 
   public sendToBack(): void {
@@ -717,7 +711,6 @@ export class ImageEditorComponent implements OnDestroy {
     canvas.requestRenderAll();
     this.historySave();
   }
-
   public sendBackwards(): void {
     const canvas = this.canvas();
     for (const obj of canvas.getActiveObjects()) {
@@ -727,7 +720,6 @@ export class ImageEditorComponent implements OnDestroy {
     canvas.discardActiveObject();
     this.historySave();
   }
-
   public bringForward(): void {
     const canvas = this.canvas();
     for (const obj of canvas.getActiveObjects()) {
@@ -736,7 +728,6 @@ export class ImageEditorComponent implements OnDestroy {
     canvas.requestRenderAll();
     this.historySave();
   }
-
   public bringToFront(): void {
     const canvas = this.canvas();
     for (const obj of canvas.getActiveObjects()) {
@@ -745,7 +736,6 @@ export class ImageEditorComponent implements OnDestroy {
     canvas.requestRenderAll();
     this.historySave();
   }
-
   public setTransparentBg(): void {
     const canvas = this.canvas();
     for (const obj of canvas.getActiveObjects()) {
@@ -756,7 +746,6 @@ export class ImageEditorComponent implements OnDestroy {
     canvas.requestRenderAll();
     this.bgIsTransparent.set(true);
   }
-
   public setTransparentStroke(): void {
     const canvas = this.canvas();
     for (const obj of canvas.getActiveObjects()) {
@@ -773,7 +762,6 @@ export class ImageEditorComponent implements OnDestroy {
     if (actives.length >= 1) return;
     this.modalService.open(this.fileModal(), { centered: true });
   }
-
   public async changeBackground({ files }: HTMLInputElement, modal: NgbActiveModal): Promise<void> {
     if (!files) return;
     const file = files.item(0);
@@ -785,7 +773,7 @@ export class ImageEditorComponent implements OnDestroy {
 
     const canvas = this.canvas();
     const newImage = await FabricImage.fromURL(this.backgroundURL()!);
-    newImage.scaleToWidth(this.defaultWidth);
+    newImage.scaleToWidth(CANVAS_WIDTH);
     newImage.canvas = canvas;
     canvas.backgroundImage = newImage;
     canvas.renderAll();
