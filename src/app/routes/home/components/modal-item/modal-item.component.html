@@ -1,0 +1,51 @@
+<div class="modal-header">
+  <h4 class="modal-title">Editar Item</h4>
+  <button (click)="close('Cross click')" class="btn-close" type="button" aria-label="Close"></button>
+</div>
+<form [formGroup]="itemForm" (ngSubmit)="onSubmit()" class="modal-body hstack gap-3">
+  <div class="vstack gap-3">
+    <div class="form-floating">
+      <input [value]="itemRef().key" class="form-control" id="key" type="text" disabled>
+      <label for="key">Clave</label>
+    </div>
+    <div class="form-floating">
+      <input [value]="itemRef().code" class="form-control" id="code" type="text" disabled>
+      <label for="code">Código</label>
+    </div>
+    <div class="form-floating">
+      <textarea [value]="itemRef().desc" class="form-control" id="desc" disabled></textarea>
+      <label for="desc">Descripción</label>
+    </div>
+  </div>
+  <div class="vstack gap-3">
+    <div class="form-floating">
+      <input formControlName="key" class="form-control" id="key" type="text" placeholder="Clave" maxlength="6">
+      <label for="key">Clave</label>
+    </div>
+    <div class="form-floating">
+      <input formControlName="code" class="form-control" id="code" type="text" placeholder="Código" maxlength="4">
+      <label for="code">Código</label>
+    </div>
+    <div class="form-floating">
+      <textarea formControlName="desc" class="form-control" id="desc" placeholder="Descripción"></textarea>
+      <label for="desc">Descripción</label>
+    </div>
+  </div>
+</form>
+<div class="modal-footer">
+  <div class="input-group input-group-sm w-auto">
+    <select [formControl]="statusForm" [class]="selectClass()" class="form-select">
+      <option value="-1"></option>
+      @for (opt of options; track $index) {
+        @if (notReseted(opt)) {
+          <option [value]="opt">{{ statusChar(opt) }}</option>
+        }
+      }
+    </select>
+    <button (click)="onReset()" class="btn btn-outline-secondary" type="button">
+      Resetear
+    </button>
+  </div>
+  <button (click)="onDelete()" class="btn btn-sm btn-outline-danger" type="button">Eliminar</button>
+  <button (click)="onSubmit()" class="btn btn-sm btn-outline-dark" type="submit">Actualizar</button>
+</div>

@@ -1,12 +1,12 @@
-import { trigger, transition, style, animate } from '@angular/animations';
-import { Component, computed, effect, ElementRef, HostListener, inject, model, OnInit, signal, viewChild } from '@angular/core';
+import { animate, style, transition, trigger } from '@angular/animations';
+import { Component, computed, effect, ElementRef, HostListener, inject, model, signal, viewChild } from '@angular/core';
 import { ConfirmService, UserService } from '@core/services';
 import { environment } from '@environment';
 import { ItemModel } from '@home/models';
+import { ItemService } from '@home/services';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ThemeDirective } from '@shared/directives';
 import { ImageEditorComponent } from '../image-editor/image-editor.component';
-import { ItemService } from '@home/services';
 
 @Component({
   selector: 'app-modal-image-item',

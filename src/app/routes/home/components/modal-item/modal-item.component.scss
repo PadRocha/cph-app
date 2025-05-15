@@ -1,0 +1,9 @@
+@import "local_functions";
+@import "local_variables";
+
+@for $i from 1 through length($option-collection) {
+  .form-select option:nth-child(#{$i + 1}),
+  .value-#{($i - 1)} {
+    background-color: nth($option-collection, $i);
+  }
+}

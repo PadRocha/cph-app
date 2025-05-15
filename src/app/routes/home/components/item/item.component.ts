@@ -5,11 +5,11 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ToastService } from '@core/services/toast/toast.service';
 import { environment } from '@environment';
+import { ModalImageItemComponent, ModalItemComponent } from '@home/components';
 import { ItemModel, status } from '@home/models';
 import { ItemService } from '@home/services';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { debounceTime, filter, map, Observable, pairwise } from 'rxjs';
-import { ModalImageItemComponent } from '../modal-image-item/modal-image-item.component';
 
 interface StatusControl {
   images: FormArray<FormControl<number>>
@@ -37,7 +37,7 @@ interface StatusChange {
       ])
     ])
   ],
-  host: { '[@fadeSlide]': '' }
+  host: { '[@fadeSlide]': '' },
 })
 export class ItemComponent implements OnInit, OnDestroy {
   private readonly http = inject(HttpClient);
@@ -208,7 +208,13 @@ export class ItemComponent implements OnInit, OnDestroy {
     }
   }
 
-  public open() {
+  public openEditModal() {
+    const modalRef = this.modal.open(ModalItemComponent, this.modalOptions);
+    const instancia = modalRef.componentInstance as ModalImageItemComponent;
+    instancia.item = this.item;
+  }
+
+  public openImageModal(): void {
     const modalRef = this.modal.open(ModalImageItemComponent, this.modalOptions);
     const instancia = modalRef.componentInstance as ModalImageItemComponent;
     instancia.item = this.item;

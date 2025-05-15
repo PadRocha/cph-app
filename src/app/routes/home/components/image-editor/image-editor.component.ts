@@ -30,6 +30,7 @@ interface History {
   objects: FabricObject[];
   background: string;
   backgroundImage: FabricImage;
+  hasCustomBackground: boolean;
 }
 
 type FormGroupOf<T> = FormGroup<{ [K in keyof T]: FormControl<T[K]>; }>;
@@ -108,12 +109,10 @@ export class ImageEditorComponent implements OnDestroy {
    */
   private readonly canvasRef = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
 
-
   /** Instancia de NgbPopover que muestra herramientas contextuales.
    * @category Referencias
    */
   private readonly popoverTrigger = viewChild.required(NgbPopover);
-
 
   /** Plantilla HTML para seleccionar una imagen desde disco.
    * @category Referencias
@@ -130,6 +129,7 @@ export class ImageEditorComponent implements OnDestroy {
       fireRightClick: true,
       stopContextMenu: true,
       backgroundVpt: true,
+      selectionKey: 'altKey',
     })
   );
 
@@ -183,6 +183,7 @@ export class ImageEditorComponent implements OnDestroy {
       canvas.backgroundImage = placeholder;
       canvas.renderAll();
       url = `${baseUrl}?${queryHigh}`;
+      this.backgroundUrl.set(url);
     }
     const image = await FabricImage.fromURL(url, { crossOrigin: "anonymous" });
     image.scaleToWidth(CANVAS_WIDTH);
@@ -194,7 +195,6 @@ export class ImageEditorComponent implements OnDestroy {
     this.lastSnapshotHash = JSON.stringify(this.currentHistory)
     canvas.skipTargetFind = false;
     canvas.selection = true;
-    canvas.selectionKey = 'altKey';
 
     this.unlistenDragDrop = await listen<{ paths: string[] }>(TauriEvent.DRAG_DROP, async (event) => {
       if (Array.isArray(event.payload?.paths) && event.payload.paths.length > 0) {
@@ -215,6 +215,7 @@ export class ImageEditorComponent implements OnDestroy {
         newImage.scaleToWidth(CANVAS_WIDTH);
         newImage.canvas = canvas;
         canvas.backgroundImage = newImage;
+        this.saveHistory();
         canvas.renderAll();
       }
     });
@@ -304,7 +305,10 @@ export class ImageEditorComponent implements OnDestroy {
    * @returns Objeto JSON listo para {@linkcode Canvas.loadFromJSON}
    */
   private get snapshot() {
-    return this.canvas().toDatalessJSON(['selectable', 'editable']) as History;
+    return {
+      ...this.canvas().toDatalessJSON(['selectable', 'editable']) as History,
+      hasCustomBackground: this.backgroundUrl() != null,
+    }
   }
 
   /** Guarda snapshot actual en pila undo y limpia redo
@@ -314,7 +318,6 @@ export class ImageEditorComponent implements OnDestroy {
     if (!this.currentHistory) return;
     const snap = this.snapshot;
     const hash = JSON.stringify(snap);
-
     if (hash === this.lastSnapshotHash) return;
     this.undo.push(this.currentHistory);
     this.currentHistory = snap;
@@ -327,6 +330,12 @@ export class ImageEditorComponent implements OnDestroy {
    * @param snap  Snapshot a cargar en el canvas
    */
   private async loadHistory(snap: History): Promise<void> {
+    const old = this.backgroundUrl();
+    if (old && !snap.hasCustomBackground) {
+      URL.revokeObjectURL(old);
+      this.backgroundUrl.set(null);
+    }
+
     this.historyBusy = true;
     const canvas = this.canvas();
     await canvas.loadFromJSON(snap);
@@ -344,7 +353,7 @@ export class ImageEditorComponent implements OnDestroy {
   async undoLastAction(event: KeyboardEvent) {
     event.preventDefault();
     if (this.historyBusy || !this.undo.length) return;
-
+    
     const prev = this.undo.pop()!;
     if (this.currentHistory) this.redo.push(this.currentHistory);
     this.currentHistory = prev;
@@ -370,7 +379,7 @@ export class ImageEditorComponent implements OnDestroy {
    * @category UI
    */
   public readonly activePopover = signal<'line' | 'textbox' | 'zorder' | null>(null);
-  
+
   /** Popover previo para alternar entre menú de orden y edición
    * @category UI
    */
@@ -415,9 +424,12 @@ export class ImageEditorComponent implements OnDestroy {
    * @category Utilidades
    * @param fn  Callback que recibe {@linkcode FabricObject}
    */
-  private applyToActiveObjects(fn: (o: FabricObject) => void): void {
+  private applyToActiveObjects(fn: (o: FabricObject, canvas: Canvas) => void): void {
     const canvas = this.canvas();
-    for (const obj of canvas.getActiveObjects()) fn(obj);
+    for (const obj of canvas.getActiveObjects()) {
+      fn(obj, canvas)
+      obj.dirty = true;
+    };
     canvas.requestRenderAll();
   }
 
@@ -466,7 +478,7 @@ export class ImageEditorComponent implements OnDestroy {
    */
   private readonly eventLine = toSignal(
     this.lineForm.valueChanges.pipe(
-      debounceTime(500),
+      debounceTime(200),
       startWith(this.lineForm.getRawValue()),
       pairwise(),
       map(([prev, curr]) => {
@@ -557,7 +569,7 @@ export class ImageEditorComponent implements OnDestroy {
    */
   private readonly eventText = toSignal(
     this.textForm.valueChanges.pipe(
-      debounceTime(500),
+      debounceTime(200),
       startWith(this.textForm.getRawValue()),
       pairwise(),
       map(([prev, curr]) => {
@@ -734,7 +746,7 @@ export class ImageEditorComponent implements OnDestroy {
    * @param MouseEvent  Evento ratón fuente
    */
   private handleGestureStart({ button, ctrlKey, altKey, clientX, clientY }: MouseEvent): void {
-    if (this.backgroundUrl()) return;
+    if (this.backgroundUrl() == null) return;
 
     const canvas = this.canvas();
     if (canvas.getActiveObjects().length >= 1) return;
@@ -968,11 +980,7 @@ export class ImageEditorComponent implements OnDestroy {
    * @category OrdenZ
    */
   public sendObjectsToBack(): void {
-    const canvas = this.canvas();
-    for (const obj of canvas.getActiveObjects()) {
-      canvas.sendObjectToBack(obj);
-    }
-    canvas.requestRenderAll();
+    this.applyToActiveObjects((o, canvas) => canvas.sendObjectToBack(o));
     this.saveHistory();
   }
 
@@ -980,12 +988,7 @@ export class ImageEditorComponent implements OnDestroy {
    * @category OrdenZ
    */
   public sendObjectsBackwards(): void {
-    const canvas = this.canvas();
-    for (const obj of canvas.getActiveObjects()) {
-      canvas.sendObjectBackwards(obj);
-    }
-    canvas.requestRenderAll();
-    canvas.discardActiveObject();
+    this.applyToActiveObjects((o, canvas) => canvas.sendObjectBackwards(o));
     this.saveHistory();
   }
 
@@ -993,11 +996,7 @@ export class ImageEditorComponent implements OnDestroy {
    * @category OrdenZ
    */
   public bringObjectsForward(): void {
-    const canvas = this.canvas();
-    for (const obj of canvas.getActiveObjects()) {
-      canvas.bringObjectForward(obj);
-    }
-    canvas.requestRenderAll();
+    this.applyToActiveObjects((o, canvas) => canvas.bringObjectForward(o));
     this.saveHistory();
   }
 
@@ -1005,11 +1004,7 @@ export class ImageEditorComponent implements OnDestroy {
    * @category OrdenZ
    */
   public bringObjectsToFront(): void {
-    const canvas = this.canvas();
-    for (const obj of canvas.getActiveObjects()) {
-      canvas.bringObjectToFront(obj);
-    }
-    canvas.requestRenderAll();
+    this.applyToActiveObjects((o, canvas) => canvas.bringObjectToFront(o));
     this.saveHistory();
   }
 
@@ -1017,28 +1012,26 @@ export class ImageEditorComponent implements OnDestroy {
    * @category Herramientas
    */
   public makeBackgroundTransparent(): void {
-    const canvas = this.canvas();
-    for (const obj of canvas.getActiveObjects()) {
-      obj.set({ backgroundColor: '' });
+    if (this.activePopover() === 'line') {
+      this.applyToActiveObjects(o => o.set({ backgroundColor: '' }));
+      this.lineForm.get('backgroundColor')!.reset('#000000', { emitEvent: false });
+    } else {
+      this.applyToActiveObjects(o => o.set({ textBackgroundColor: '' }));
+      this.textForm.get('textBackgroundColor')!.reset('#000000', { emitEvent: false });
     }
-    const control = this.lineForm.get('backgroundColor')!;
-    control.reset('#000000', { emitEvent: false });
-    canvas.requestRenderAll();
     this.bgIsTransparent.set(true);
+    this.saveHistory();
   }
 
   /** Elimina contorno de texto seleccionado
    * @category Herramientas
    */
   public makeStrokeTransparent(): void {
-    const canvas = this.canvas();
-    for (const obj of canvas.getActiveObjects()) {
-      obj.set({ stroke: '' });
-    }
+    this.applyToActiveObjects((o) => o.set({ stroke: ''}));
     const control = this.textForm.get('stroke')!;
     control.reset('#000000', { emitEvent: false });
-    canvas.requestRenderAll();
     this.strokeIsTransparent.set(true);
+    this.saveHistory();
   }
 
   /** Abre modal para cargar imagen cuando no hay selección
@@ -1070,6 +1063,7 @@ export class ImageEditorComponent implements OnDestroy {
     newImage.scaleToWidth(CANVAS_WIDTH);
     newImage.canvas = canvas;
     canvas.backgroundImage = newImage;
+    this.saveHistory();
     canvas.renderAll();
     modal.close();
   }
