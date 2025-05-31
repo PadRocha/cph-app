@@ -2,5 +2,7 @@
 
 :host {
     z-index: $toaster-zindex;
-    padding-top: $title-bar-height + 0.5rem;
+    padding-top: $title-bar-height + 1rem;
+    max-width: 90vw;
+    min-width: 350px;
 }

@@ -1,4 +1,5 @@
 <header class="d-flex justify-content-between align-items-center mb-2">
+  <input type="hidden" id="id" name="id" [value]="id">
   <h5>{{ code }}</h5>
   <button
     (click)="openEditModal()"
@@ -15,11 +16,11 @@
     (click)="openImageModal()"
     src="default.png"
     sizes="
-      (min-width: 1400px) 226px,
-      (min-width: 1200px) 230px,
-      (min-width: 992px) 281px,
-      (min-width: 768px) 247px,
-      320px"
+    (min-width: 1400px) 226px,
+    (min-width: 1200px) 230px,
+    (min-width: 992px) 281px,
+    (min-width: 768px) 247px,
+    320px"
     loading="lazy"
     draggable="false"
     alt="Imagen representativa de {{ code }}"

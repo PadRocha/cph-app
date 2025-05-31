@@ -2,7 +2,7 @@
   <h4 class="modal-title">Editar Item</h4>
   <button (click)="close('Cross click')" class="btn-close" type="button" aria-label="Close"></button>
 </div>
-<form [formGroup]="itemForm" (ngSubmit)="onSubmit()" class="modal-body hstack gap-3">
+<form [formGroup]="itemForm" (ngSubmit)="onSubmit()" class="modal-body grid-columns gap-3">
   <div class="vstack gap-3">
     <div class="form-floating">
       <input [value]="itemRef().key" class="form-control" id="key" type="text" disabled>
@@ -16,6 +16,13 @@
       <textarea [value]="itemRef().desc" class="form-control" id="desc" disabled></textarea>
       <label for="desc">Descripción</label>
     </div>
+    @if (hasImages) {
+      <div class="hstack flex-nowrap overflow-auto justify-content-evenly gap-3">
+        @for (img of images; track $index) {
+          <img [src]="src(img)" alt="Vista 1" class="gallery-thumb">
+        }
+      </div>
+    }
   </div>
   <div class="vstack gap-3">
     <div class="form-floating">
@@ -32,7 +39,7 @@
     </div>
   </div>
 </form>
-<div class="modal-footer">
+<div class="modal-footer gap-1">
   <div class="input-group input-group-sm w-auto">
     <select [formControl]="statusForm" [class]="selectClass()" class="form-select">
       <option value="-1"></option>
@@ -47,5 +54,5 @@
     </button>
   </div>
   <button (click)="onDelete()" class="btn btn-sm btn-outline-danger" type="button">Eliminar</button>
-  <button (click)="onSubmit()" class="btn btn-sm btn-outline-dark" type="submit">Actualizar</button>
+  <button (click)="onSubmit()" class="btn btn-sm btn-outline-secondary" type="submit">Actualizar</button>
 </div>

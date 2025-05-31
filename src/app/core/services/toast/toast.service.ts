@@ -1,23 +1,33 @@
-import { isPlatformBrowser } from '@angular/common';
-import { inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { Injectable } from '@angular/core';
+
+export interface ToastAction {
+  label: string;
+  handler: () => void;
+}
+
+interface ToastOptions { 
+  /** Duración (en milisegundos) que se mostrará el toast. */
+  delay?: number; 
+  autohide?: boolean; 
+  action?: ToastAction 
+}
 
 /**
  * Interfaz que define la información de un toast.
  */
-export interface ToastInfo {
+export interface ToastInfo extends ToastOptions {
   /** Encabezado o título del toast. */
   header: string;
+  body: string;
   /** Tipo de toast, que define el estilo: 'success', 'warning' o 'danger'. */
   type: 'success' | 'warning' | 'danger';
-  /** Duración (en milisegundos) que se mostrará el toast. */
-  delay: number;
+  createdAt: Date;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ToastService {
-  private readonly platformId = inject(PLATFORM_ID);
   private toasts: ToastInfo[] = [];
 
   /**
@@ -34,26 +44,26 @@ export class ToastService {
    */
   public show(
     header: string,
-    type: 'success' | 'warning' | 'danger',
+    body: string,
+    type: ToastInfo['type'] = 'success',
+    delay?: number,
+    options: ToastOptions = {},
   ): void {
-    if (isPlatformBrowser(this.platformId)) {
-      let delay: number;
-      switch (type) {
-        case 'success':
-          delay = 5_000;
-          break;
-        case 'warning':
-          delay = 10_000;
-          break;
-        case 'danger':
-          delay = 20_000;
-          break;
-        default:
-          delay = 0;
-          break;
-      }
-      this.toasts.push({ header, type, delay });
-    }
+    const defaults: Record<ToastInfo['type'], number> = {
+      success: 5_000,
+      warning: 10_000,
+      danger: 20_000,
+    };
+
+    this.toasts.unshift({
+      header,
+      body,
+      type,
+      delay: delay ?? defaults[type],
+      autohide: options.autohide ?? true,
+      action: options.action,
+      createdAt: new Date(),
+    });
   }
 
   /**

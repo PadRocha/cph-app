@@ -1,6 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, computed, effect, ElementRef, HostListener, inject, model, signal, viewChild } from '@angular/core';
-import { ConfirmService, UserService } from '@core/services';
+import { ConfirmService, ToastService, UserService } from '@core/services';
 import { environment } from '@environment';
 import { ItemModel } from '@home/models';
 import { ItemService } from '@home/services';
@@ -60,6 +60,7 @@ export class ModalImageItemComponent {
   private readonly user = inject(UserService);
   private readonly confirm = inject(ConfirmService);
   private readonly itemService = inject(ItemService);
+  private readonly toast = inject(ToastService);
   private readonly url = environment.httpUrl;
   private readonly location = environment.location;
   public item = model.required<ItemModel>();
@@ -172,5 +173,61 @@ export class ModalImageItemComponent {
 
   public toogleEdition(value: boolean): void {
     this.editionMode.set(value);
+  }
+
+  readonly editor = viewChild(ImageEditorComponent);
+
+  async onUpdate(): Promise<void> {
+    const editor = this.editor();
+    if (!editor) return;
+    this.loading.set(true);
+    try {
+      const blob = await editor.export();
+      if (!blob) return;
+      const fd = new FormData();
+      const { _id, code } = this.item();
+      const index = this.index();
+      fd.append('file', blob, `${code}-${index}.jpg`);
+      this.itemService.uploadImage(_id, index, fd).subscribe({
+        next: () => {
+          this.item().upsertStatus(index, 5);
+        }
+      });
+    } catch {
+      
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  async onLoad(): Promise<void> {
+    const editor = this.editor();
+    if (!editor) return;
+    this.loading.set(true);
+    try {
+      const blob = await editor.export();
+      if (!blob) return;
+      const fd = new FormData();
+      const { _id, code } = this.item();
+      const index = this.index();
+      fd.append('image', blob, `${code} ${index}.jpg`);
+      this.itemService.uploadImage(_id, index, fd).subscribe({
+        next: () => {
+          this.item.update((val) => {
+            val.upsertStatus(index, 5);
+            return val;
+          })
+          this.toast.show("Imagen cargada", "La imagen se ha cargado correctamente");
+          this.activeModal.close(this.item());
+        }, 
+        error: () => {
+          this.toast.show("Error de carga", "No se ha podido cargar la imagen", "danger");
+        }
+      });
+    } catch {
+      
+    } finally {
+      this.loading.set(false);
+    }
   }
 }

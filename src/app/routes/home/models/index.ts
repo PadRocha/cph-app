@@ -155,7 +155,7 @@ class ItemModel {
   }
 
   public get images(): Image[] {
-    return this.item.images;
+    return this.item.images.sort((a, b) => a.idN - b.idN);
   }
 
   public get total(): number {
@@ -278,6 +278,24 @@ class ItemModel {
     const i = this.findImageIndex(_idN);
     if (i === -1) return;
     this.item.images[i].status = status;
+  }
+
+  /**
+   * Actualiza o crea el estado de la imagen indicada
+   *
+   * @param idN            identificador base (0-based) de la imagen
+   * @param status         nuevo estado; por defecto 5
+   */
+  public upsertStatus(idN: number, status: status = 5): void {
+    if (status < -1 || status > 5) {
+      throw new TypeError('status fuera de rango');
+    }
+    const i = this.findImageIndex(idN);
+    if (i === -1) {
+      this.setStatus(idN, status);
+    } else {
+      this.updateStatus(idN, status);
+    }
   }
 
   /**

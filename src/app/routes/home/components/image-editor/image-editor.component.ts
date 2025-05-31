@@ -353,7 +353,7 @@ export class ImageEditorComponent implements OnDestroy {
   async undoLastAction(event: KeyboardEvent) {
     event.preventDefault();
     if (this.historyBusy || !this.undo.length) return;
-    
+
     const prev = this.undo.pop()!;
     if (this.currentHistory) this.redo.push(this.currentHistory);
     this.currentHistory = prev;
@@ -1027,7 +1027,7 @@ export class ImageEditorComponent implements OnDestroy {
    * @category Herramientas
    */
   public makeStrokeTransparent(): void {
-    this.applyToActiveObjects((o) => o.set({ stroke: ''}));
+    this.applyToActiveObjects((o) => o.set({ stroke: '' }));
     const control = this.textForm.get('stroke')!;
     control.reset('#000000', { emitEvent: false });
     this.strokeIsTransparent.set(true);
@@ -1077,5 +1077,9 @@ export class ImageEditorComponent implements OnDestroy {
     }
     const background = this.backgroundUrl();
     if (background) URL.revokeObjectURL(background);
+  }
+
+  async export() {
+    return await this.canvas().toBlob({ format: 'jpeg', quality: 1, multiplier: 1, enableRetinaScaling: true });
   }
 }

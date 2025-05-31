@@ -1,9 +1,48 @@
 @import "local_functions";
 @import "local_variables";
+@import "local_mixins";
 
 @for $i from 1 through length($option-collection) {
   .form-select option:nth-child(#{$i + 1}),
   .value-#{($i - 1)} {
     background-color: nth($option-collection, $i);
+  }
+}
+
+.gallery-thumb {
+  width: 100px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.grid-columns {
+  display: grid;
+  grid-template-columns: 1fr;
+
+  > :nth-child(1) {
+    order: 2;
+  }
+
+  > :nth-child(2) {
+    order: 1;
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  .grid-columns {
+    grid-template-columns: repeat(2, 1fr);
+
+    > :nth-child(n) {
+      order: initial;
+    }
+  }
+}
+
+@include dark-mode {
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    background-color: $secundary;
+    color: $text-color-dark;
   }
 }

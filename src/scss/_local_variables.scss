@@ -26,6 +26,7 @@ $option-collection-dark: (
   rgb(228, 137, 228),
   rgb(108, 226, 108)
 );
+$form-floating-label-disabled-color: $gray-500;
 
 //*------------------------------------------------------------------*/
 // * Login
@@ -35,7 +36,7 @@ $login-btn-color: $secundary;
 // * Title bar
 //*------------------------------------------------------------------*/
 $title-bar-height: 2.313rem;
-$title-bar-zindex: 1060;
+$title-bar-zindex: 1100;
 $title-bar-icon-size: 1rem;
 $title-bar-bg: $secundary;
 $title-bar-text: $primary;
@@ -67,7 +68,7 @@ $login-color-section: $secundary;
 //*------------------------------------------------------------------*/
 // * Toaster
 //*------------------------------------------------------------------*/
-$toaster-zindex: 1030;
+$toaster-zindex: 1080;
 //*------------------------------------------------------------------*/
 // * Scroll To Top
 //*------------------------------------------------------------------*/

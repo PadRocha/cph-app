@@ -39,7 +39,7 @@ export class ModalConfirmComponent {
     const text = this.context().token;
     if (text !== undefined && text !== null) {
       navigator.clipboard.writeText(text)
-        .then(() => this.toast.show('Copiado', 'success'))
+        .then(() => this.toast.show('Token copiado', 'El token ha sido copiado al portapapeles', 'success'))
         .catch(err => console.error('Error copiando el token: ', err));
     }
   }

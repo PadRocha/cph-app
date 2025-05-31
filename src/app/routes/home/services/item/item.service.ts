@@ -234,7 +234,7 @@ export class ItemService {
    * @returns Un observable que emite la respuesta con el archivo de archivo.
    */
   public uploadImage(id: string, idN: number, form: FormData) {
-    return this.http.put<{ data: Archive }>(`${this.url}/image`, form, { params: { id, idN } })
+    return this.http.put<{ data: Archive }>(`${this.url}/image`, form, { params: { id, idN: idN + 1 } })
       .pipe(tap((): void => {
         const currentDocs = this.docs();
         const index = currentDocs.findIndex(({ _id }) => _id === id);

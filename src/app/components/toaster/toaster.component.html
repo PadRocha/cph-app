@@ -1,5 +1,36 @@
-@for (toast of toasts; track $index) {
-<ngb-toast [class]="className(toast)" [autohide]="true" [delay]="toast.delay" (hidden)="remove(toast)" class="text-light">
-  {{ toast.header }} [{{ toast.type }}]
-</ngb-toast>
-}
+<div class="toast-container vstack gap-1" aria-live="polite" aria-atomic="true">
+  @for (t of toasts; track t) {
+    <ngb-toast
+      [class]="className(t) + ' text-light border-0'"
+      [autohide]="t.autohide ?? true"
+      [delay]="t.delay ?? 5000"
+      (hidden)="remove(t)"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+      <!-- Encabezado -->
+      <ng-template ngbToastHeader>
+        <strong class="me-auto">{{ t.header }}</strong>
+        <small class="text-body-secondary">
+          {{ t.createdAt | date : "mediumTime" }}
+        </small>
+      </ng-template>
+
+      <!-- Cuerpo con acción opcional -->
+      <div class="hstack gap-2 align-items-center">
+        <span>{{ t.body }}</span>
+
+        @if (t.action) {
+          <button
+            type="button"
+            class="btn btn-link text-decoration-none text-reset fw-bold p-0"
+            (click)="t.action.handler(); remove(t)"
+          >
+            {{ t.action.label }}
+          </button>
+        }
+      </div>
+    </ngb-toast>
+  }
+</div>

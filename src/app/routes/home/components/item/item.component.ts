@@ -1,6 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { HttpClient } from '@angular/common/http';
-import { Component, effect, ElementRef, inject, model, OnDestroy, OnInit, viewChild } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, model, OnDestroy, OnInit, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ToastService } from '@core/services/toast/toast.service';
@@ -48,7 +48,7 @@ export class ItemComponent implements OnInit, OnDestroy {
   private readonly location = environment.location;
   public readonly options: status[] = [0, 1, 2, 3, 4, 5];
   private readonly modalOptions: NgbModalOptions = {
-    size: "lg", 
+    size: "lg",
     keyboard: false,
     animation: true,
     centered: true,
@@ -109,22 +109,23 @@ export class ItemComponent implements OnInit, OnDestroy {
     if (form && form.length > 0) {
       const { index, status, prev } = form.at(0)!;
       const image = this.forms.at(index);
+      const { _id } = this.item();
       image.disable({ emitEvent: false });
 
       this.itemService
-        .updateStatus(this.item()._id, index + 1, status)
+        .updateStatus(_id, index + 1, status)
         .subscribe({
           next: () => {
-            //
+            this.toast.show('Estado actualizado', 'El estado de la imagen ha sido actualizado.', 'success');
           },
-          error: (err) => {
+          error: () => {
             image.setValue(prev, { emitEvent: false });
+            this.toast.show('Error al actualizar el estado', 'No se pudo actualizar el estado de la imagen.', 'danger');
           }
         })
         .add(() => image.enable({ emitEvent: false }));
     }
   });
-
 
   private placeholderURL: string | null = null;
   private lazyObserver = new IntersectionObserver((entries, observer) => {
@@ -169,6 +170,10 @@ export class ItemComponent implements OnInit, OnDestroy {
   }
 
   // Getters usados en la plantilla
+  public get id(): string {
+    return this.item()._id;
+  }
+
   public get code(): string {
     return this.item().code;
   }
@@ -218,6 +223,23 @@ export class ItemComponent implements OnInit, OnDestroy {
     const modalRef = this.modal.open(ModalImageItemComponent, this.modalOptions);
     const instancia = modalRef.componentInstance as ModalImageItemComponent;
     instancia.item = this.item;
+    modalRef.closed.subscribe({
+      next: (item: ItemModel) => {
+        console.log('Hola mundo', this.noImages);
+        
+        const images = Array.from({ length: 3 }, (_, i) => item.getStatus(i));
+        this.statusForm.patchValue({ images }, { emitEvent: false });
+        if (!this.noImages) {
+          const img = this.lazyImage().nativeElement;
+          console.log(img);
+          
+          img.removeAttribute('src'); 
+          img.srcset = this.srcset(true);
+          console.log(img);
+        }
+      },
+      error: () => console.log('Modal cerrado')
+    });
   }
 
   // Métodos privados de ayuda
