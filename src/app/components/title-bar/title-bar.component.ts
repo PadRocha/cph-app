@@ -1,4 +1,4 @@
-import { CommonModule } from "@angular/common";
+
 import { Component, computed, HostListener, inject, resource, signal } from "@angular/core";
 import { NgbDropdownModule } from "@ng-bootstrap/ng-bootstrap";
 import { NavigationService, Historian, UserService, StorageService } from "@core/services";
@@ -13,7 +13,7 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
  */
 @Component({
   selector: "app-title-bar",
-  imports: [CommonModule, RouterLink, RouterLinkActive, NgbDropdownModule],
+  imports: [RouterLink, RouterLinkActive, NgbDropdownModule],
   templateUrl: "./title-bar.component.html",
   styleUrl: "./title-bar.component.scss",
   host: {

@@ -12,15 +12,15 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^19.2.11",
-    "@angular/common": "^19.2.11",
-    "@angular/compiler": "^19.2.11",
-    "@angular/core": "^19.2.11",
-    "@angular/forms": "^19.2.11",
-    "@angular/localize": "^19.2.11",
-    "@angular/platform-browser": "^19.2.11",
-    "@angular/platform-browser-dynamic": "^19.2.11",
-    "@angular/router": "^19.2.11",
+    "@angular/animations": "^20.0.0",
+    "@angular/common": "^20.0.0",
+    "@angular/compiler": "^20.0.0",
+    "@angular/core": "^20.0.0",
+    "@angular/forms": "^20.0.0",
+    "@angular/localize": "^20.0.0",
+    "@angular/platform-browser": "^20.0.0",
+    "@angular/platform-browser-dynamic": "^20.0.0",
+    "@angular/router": "^20.0.0",
     "@ng-bootstrap/ng-bootstrap": "^18.0.0",
     "@popperjs/core": "^2.11.8",
     "@tauri-apps/api": "^2.5.0",
@@ -28,15 +28,15 @@
     "@tauri-apps/plugin-updater": "~2.7.1",
     "@tauri-apps/plugin-fs": "^2.2.1",
     "bootstrap": "^5.3.6",
-    "fabric": "^6.6.5",
+    "fabric": "^6.6.7",
     "rxjs": "7.8.1",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
-    "@angular/build": "^19.2.12",
-    "@angular/cli": "^19.2.12",
-    "@angular/compiler-cli": "^19.2.11",
+    "@angular/build": "^20.0.0",
+    "@angular/cli": "^20.0.0",
+    "@angular/compiler-cli": "^20.0.0",
     "@tauri-apps/cli": "^2.5.0",
     "@types/jasmine": "^5.1.7",
     "jasmine-core": "~5.1.0",
@@ -45,6 +45,6 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.5.4"
+    "typescript": "~5.8.3"
   }
 }

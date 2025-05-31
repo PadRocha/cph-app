@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from "@angular/core";
 import { RouterModule, RouterOutlet } from "@angular/router";
-import { CommonModule } from "@angular/common";
+
 import { TitleBarComponent } from "@components";
 import { ToasterComponent } from "./components/toaster/toaster.component";
 import { ScrollToTopComponent } from "./components/scroll-to-top/scroll-to-top.component";
@@ -9,7 +9,7 @@ import { NavigationService, UserService } from "@core/services";
 
 @Component({
   selector: "app-root",
-  imports: [CommonModule, RouterOutlet, RouterModule, TitleBarComponent, ToasterComponent, ScrollToTopComponent],
+  imports: [RouterOutlet, RouterModule, TitleBarComponent, ToasterComponent, ScrollToTopComponent],
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
   hostDirectives: [ThemeDirective],
