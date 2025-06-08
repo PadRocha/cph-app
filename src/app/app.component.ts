@@ -16,8 +16,9 @@ import { NavigationService, UserService } from "@core/services";
 })
 export class AppComponent {
   private readonly _navigation = inject(NavigationService);
+  private readonly user = inject(UserService);
 
-  constructor(private user: UserService) {
+  constructor() {
     //TODO: Remover cuando esté en producción, solo para pruebas
     this.user.update.subscribe({
       next: (info) => {

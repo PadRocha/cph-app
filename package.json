@@ -21,7 +21,7 @@
     "@angular/platform-browser": "^20.0.0",
     "@angular/platform-browser-dynamic": "^20.0.0",
     "@angular/router": "^20.0.0",
-    "@ng-bootstrap/ng-bootstrap": "^18.0.0",
+    "@ng-bootstrap/ng-bootstrap": "^19.0.0-rc.0",
     "@popperjs/core": "^2.11.8",
     "@tauri-apps/api": "^2.5.0",
     "@tauri-apps/plugin-shell": "^2",
