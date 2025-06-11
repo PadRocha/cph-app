@@ -164,7 +164,8 @@ export class ModalImageItemComponent {
         .deleteImage(this.item()._id, this.index() + 1)
         .subscribe({
           next: () => {
-            //
+            this.item().upsertStatus(this.index(), 0);
+            this.toast.show("Imagen eliminada", "La imagen se ha eliminado correctamente");
           }
         })
         .add(() => this.itemService.loading = false);
