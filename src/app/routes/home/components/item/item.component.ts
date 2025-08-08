@@ -1,6 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { HttpClient } from '@angular/common/http';
-import { Component, computed, effect, ElementRef, inject, model, OnDestroy, OnInit, viewChild } from '@angular/core';
+import { Component, effect, ElementRef, inject, model, OnDestroy, OnInit, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ToastService } from '@core/services/toast/toast.service';
@@ -18,6 +18,7 @@ interface StatusControl {
 interface StatusChange {
   index: number;
   status: status;
+  
   prev: number;
 }
 
@@ -226,14 +227,14 @@ export class ItemComponent implements OnInit, OnDestroy {
     modalRef.closed.subscribe({
       next: (item: ItemModel) => {
         console.log('Hola mundo', this.noImages);
-        
+
         const images = Array.from({ length: 3 }, (_, i) => item.getStatus(i));
         this.statusForm.patchValue({ images }, { emitEvent: false });
         if (!this.noImages) {
           const img = this.lazyImage().nativeElement;
           console.log(img);
-          
-          img.removeAttribute('src'); 
+
+          img.removeAttribute('src');
           img.srcset = this.srcset(true);
           console.log(img);
         }

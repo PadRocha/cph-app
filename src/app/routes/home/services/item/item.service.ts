@@ -80,8 +80,10 @@ export class ItemService {
    * 
    * @param params - An object containing the new search parameters to be set.
    */
-  public set searchParams(params: Search) {
-    this.params.set({ ...this.params(), ...params });
+  public set searchParams(p: Search) {
+    const curr = this.params();
+    if (curr.search === p.search && curr.status === p.status) return; // nada cambió
+    this.params.set(p);
   }
 
   /**

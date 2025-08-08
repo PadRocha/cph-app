@@ -14,12 +14,15 @@
     "npm:@angular/platform-browser@^20.0.2": "20.0.2_@angular+animations@20.0.2__@angular+common@20.0.2___@angular+core@20.0.2____@angular+compiler@20.0.2____rxjs@7.8.1____zone.js@0.15.1___rxjs@7.8.1___@angular+compiler@20.0.2___zone.js@0.15.1__@angular+core@20.0.2___@angular+compiler@20.0.2___rxjs@7.8.1___zone.js@0.15.1__rxjs@7.8.1__@angular+compiler@20.0.2__zone.js@0.15.1_@angular+common@20.0.2__@angular+core@20.0.2___@angular+compiler@20.0.2___rxjs@7.8.1___zone.js@0.15.1__rxjs@7.8.1__@angular+compiler@20.0.2__zone.js@0.15.1_@angular+core@20.0.2__@angular+compiler@20.0.2__rxjs@7.8.1__zone.js@0.15.1_rxjs@7.8.1_@angular+compiler@20.0.2_zone.js@0.15.1",
     "npm:@angular/router@^20.0.2": "20.0.2_@angular+common@20.0.2__@angular+core@20.0.2___@angular+compiler@20.0.2___rxjs@7.8.1___zone.js@0.15.1__rxjs@7.8.1__@angular+compiler@20.0.2__zone.js@0.15.1_@angular+core@20.0.2__@angular+compiler@20.0.2__rxjs@7.8.1__zone.js@0.15.1_@angular+platform-browser@20.0.2__@angular+animations@20.0.2___@angular+common@20.0.2____@angular+core@20.0.2_____@angular+compiler@20.0.2_____rxjs@7.8.1_____zone.js@0.15.1____rxjs@7.8.1____@angular+compiler@20.0.2____zone.js@0.15.1___@angular+core@20.0.2____@angular+compiler@20.0.2____rxjs@7.8.1____zone.js@0.15.1___rxjs@7.8.1___@angular+compiler@20.0.2___zone.js@0.15.1__@angular+common@20.0.2___@angular+core@20.0.2____@angular+compiler@20.0.2____rxjs@7.8.1____zone.js@0.15.1___rxjs@7.8.1___@angular+compiler@20.0.2___zone.js@0.15.1__@angular+core@20.0.2___@angular+compiler@20.0.2___rxjs@7.8.1___zone.js@0.15.1__rxjs@7.8.1__@angular+compiler@20.0.2__zone.js@0.15.1_rxjs@7.8.1_@angular+compiler@20.0.2_zone.js@0.15.1_@angular+animations@20.0.2__@angular+common@20.0.2___@angular+core@20.0.2____@angular+compiler@20.0.2____rxjs@7.8.1____zone.js@0.15.1___rxjs@7.8.1___@angular+compiler@20.0.2___zone.js@0.15.1__@angular+core@20.0.2___@angular+compiler@20.0.2___rxjs@7.8.1___zone.js@0.15.1__rxjs@7.8.1__@angular+compiler@20.0.2__zone.js@0.15.1",
     "npm:@ng-bootstrap/ng-bootstrap@^19.0.0-rc.0": "19.0.0-rc.0_@angular+common@20.0.2__@angular+core@20.0.2___@angular+compiler@20.0.2___rxjs@7.8.1___zone.js@0.15.1__rxjs@7.8.1__@angular+compiler@20.0.2__zone.js@0.15.1_@angular+core@20.0.2__@angular+compiler@20.0.2__rxjs@7.8.1__zone.js@0.15.1_@angular+forms@20.0.2__@angular+common@20.0.2___@angular+core@20.0.2____@angular+compiler@20.0.2____rxjs@7.8.1____zone.js@0.15.1___rxjs@7.8.1___@angular+compiler@20.0.2___zone.js@0.15.1__@angular+core@20.0.2___@angular+compiler@20.0.2___rxjs@7.8.1___zone.js@0.15.1__@angular+platform-browser@20.0.2___@angular+animations@20.0.2____@angular+common@20.0.2_____@angular+core@20.0.2______@angular+compiler@20.0.2______rxjs@7.8.1______zone.js@0.15.1_____rxjs@7.8.1_____@angular+compiler@20.0.2_____zone.js@0.15.1____@angular+core@20.0.2_____@angular+compiler@20.0.2_____rxjs@7.8.1_____zone.js@0.15.1____rxjs@7.8.1____@angular+compiler@20.0.2____zone.js@0.15.1___@angular+common@20.0.2____@angular+core@20.0.2_____@angular+compiler@20.0.2_____rxjs@7.8.1_____zone.js@0.15.1____rxjs@7.8.1____@angular+compiler@20.0.2____zone.js@0.15.1___@angular+core@20.0.2____@angular+compiler@20.0.2____rxjs@7.8.1____zone.js@0.15.1___rxjs@7.8.1___@angular+compiler@20.0.2___zone.js@0.15.1__rxjs@7.8.1__@angular+compiler@20.0.2__zone.js@0.15.1__@angular+animations@20.0.2___@angular+common@20.0.2____@angular+core@20.0.2_____@angular+compiler@20.0.2_____rxjs@7.8.1_____zone.js@0.15.1____rxjs@7.8.1____@angular+compiler@20.0.2____zone.js@0.15.1___@angular+core@20.0.2____@angular+compiler@20.0.2____rxjs@7.8.1____zone.js@0.15.1___rxjs@7.8.1___@angular+compiler@20.0.2___zone.js@0.15.1_@angular+localize@20.0.2__@angular+compiler@20.0.2__@angular+compiler-cli@20.0.2___@angular+compiler@20.0.2___typescript@5.8.3__typescript@5.8.3_@popperjs+core@2.11.8_rxjs@7.8.1_@angular+compiler@20.0.2_zone.js@0.15.1_@angular+platform-browser@20.0.2__@angular+animations@20.0.2___@angular+common@20.0.2____@angular+core@20.0.2_____@angular+compiler@20.0.2_____rxjs@7.8.1_____zone.js@0.15.1____rxjs@7.8.1____@angular+compiler@20.0.2____zone.js@0.15.1___@angular+core@20.0.2____@angular+compiler@20.0.2____rxjs@7.8.1____zone.js@0.15.1___rxjs@7.8.1___@angular+compiler@20.0.2___zone.js@0.15.1__@angular+common@20.0.2___@angular+core@20.0.2____@angular+compiler@20.0.2____rxjs@7.8.1____zone.js@0.15.1___rxjs@7.8.1___@angular+compiler@20.0.2___zone.js@0.15.1__@angular+core@20.0.2___@angular+compiler@20.0.2___rxjs@7.8.1___zone.js@0.15.1__rxjs@7.8.1__@angular+compiler@20.0.2__zone.js@0.15.1_@angular+compiler-cli@20.0.2__@angular+compiler@20.0.2__typescript@5.8.3_@angular+animations@20.0.2__@angular+common@20.0.2___@angular+core@20.0.2____@angular+compiler@20.0.2____rxjs@7.8.1____zone.js@0.15.1___rxjs@7.8.1___@angular+compiler@20.0.2___zone.js@0.15.1__@angular+core@20.0.2___@angular+compiler@20.0.2___rxjs@7.8.1___zone.js@0.15.1__rxjs@7.8.1__@angular+compiler@20.0.2__zone.js@0.15.1_typescript@5.8.3",
+    "npm:@ng-web-apis/common@^4.12.0": "4.12.0_@angular+common@20.0.2__@angular+core@20.0.2___@angular+compiler@20.0.2___rxjs@7.8.1___zone.js@0.15.1__rxjs@7.8.1__@angular+compiler@20.0.2__zone.js@0.15.1_@angular+core@20.0.2__@angular+compiler@20.0.2__rxjs@7.8.1__zone.js@0.15.1_rxjs@7.8.1_@angular+compiler@20.0.2_zone.js@0.15.1",
+    "npm:@ng-web-apis/speech@^4.12.0": "4.12.0_@angular+core@20.0.2__@angular+compiler@20.0.2__rxjs@7.8.1__zone.js@0.15.1_@ng-web-apis+common@4.12.0__@angular+common@20.0.2___@angular+core@20.0.2____@angular+compiler@20.0.2____rxjs@7.8.1____zone.js@0.15.1___rxjs@7.8.1___@angular+compiler@20.0.2___zone.js@0.15.1__@angular+core@20.0.2___@angular+compiler@20.0.2___rxjs@7.8.1___zone.js@0.15.1__rxjs@7.8.1__@angular+compiler@20.0.2__zone.js@0.15.1_@types+dom-speech-recognition@0.0.6_@angular+compiler@20.0.2_rxjs@7.8.1_zone.js@0.15.1_@angular+common@20.0.2__@angular+core@20.0.2___@angular+compiler@20.0.2___rxjs@7.8.1___zone.js@0.15.1__rxjs@7.8.1__@angular+compiler@20.0.2__zone.js@0.15.1",
     "npm:@popperjs/core@^2.11.8": "2.11.8",
     "npm:@tauri-apps/api@^2.5.0": "2.5.0",
     "npm:@tauri-apps/cli@^2.5.0": "2.5.0",
     "npm:@tauri-apps/plugin-fs@^2.2.1": "2.3.0",
     "npm:@tauri-apps/plugin-shell@2": "2.2.1",
     "npm:@tauri-apps/plugin-updater@~2.7.1": "2.7.1",
+    "npm:@types/dom-speech-recognition@^0.0.6": "0.0.6",
     "npm:@types/jasmine@^5.1.7": "5.1.8",
     "npm:bootstrap@^5.3.6": "5.3.6_@popperjs+core@2.11.8",
     "npm:fabric@^6.6.7": "6.7.0_canvas@2.11.2",
@@ -900,6 +903,24 @@
         "tslib"
       ]
     },
+    "@ng-web-apis/common@4.12.0_@angular+common@20.0.2__@angular+core@20.0.2___@angular+compiler@20.0.2___rxjs@7.8.1___zone.js@0.15.1__rxjs@7.8.1__@angular+compiler@20.0.2__zone.js@0.15.1_@angular+core@20.0.2__@angular+compiler@20.0.2__rxjs@7.8.1__zone.js@0.15.1_rxjs@7.8.1_@angular+compiler@20.0.2_zone.js@0.15.1": {
+      "integrity": "sha512-OG4ChsEWQ0IbGJ+WrJAiOY5X4jF8f5YUCss961taPeiyhvwtUo4zAuX3UvtV/iJSt8XZ41jaOYFTyMIBGubv4Q==",
+      "dependencies": [
+        "@angular/common",
+        "@angular/core",
+        "rxjs@7.8.1",
+        "tslib"
+      ]
+    },
+    "@ng-web-apis/speech@4.12.0_@angular+core@20.0.2__@angular+compiler@20.0.2__rxjs@7.8.1__zone.js@0.15.1_@ng-web-apis+common@4.12.0__@angular+common@20.0.2___@angular+core@20.0.2____@angular+compiler@20.0.2____rxjs@7.8.1____zone.js@0.15.1___rxjs@7.8.1___@angular+compiler@20.0.2___zone.js@0.15.1__@angular+core@20.0.2___@angular+compiler@20.0.2___rxjs@7.8.1___zone.js@0.15.1__rxjs@7.8.1__@angular+compiler@20.0.2__zone.js@0.15.1_@types+dom-speech-recognition@0.0.6_@angular+compiler@20.0.2_rxjs@7.8.1_zone.js@0.15.1_@angular+common@20.0.2__@angular+core@20.0.2___@angular+compiler@20.0.2___rxjs@7.8.1___zone.js@0.15.1__rxjs@7.8.1__@angular+compiler@20.0.2__zone.js@0.15.1": {
+      "integrity": "sha512-AjZ5CA5T7VTBo8q2DgIru82XRKSQeScJ5Pb3EUgo5/VzqAcenWt7fw0Opo0h4C83JM/lGkaR+vfwBURam9+t9w==",
+      "dependencies": [
+        "@angular/core",
+        "@ng-web-apis/common",
+        "@types/dom-speech-recognition",
+        "tslib"
+      ]
+    },
     "@npmcli/agent@3.0.0": {
       "integrity": "sha512-S79NdEgDQd/NGCay6TCoVzXSj74skRZIKJcpJjC5lOq34SZzyI6MqtiiWoiVWoVrTcGjNeC4ipbh1VIHlpfF5Q==",
       "dependencies": [
@@ -1357,6 +1378,9 @@
       "dependencies": [
         "@types/node@22.15.15"
       ]
+    },
+    "@types/dom-speech-recognition@0.0.6": {
+      "integrity": "sha512-o7pAVq9UQPJL5RDjO1f/fcpfFHdgiMnR4PoIU2N/ZQrYOS3C5rzdOJMsrpqeBCbii2EE9mERXgqspQqPDdPahw=="
     },
     "@types/estree@1.0.7": {
       "integrity": "sha512-w28IoSUCJpidD/TGviZwwMJckNESJZXFu7NBZ5YJ4mEUnNraUn9Pm8HSZm/jDF1pDWYKspWE7oVphigUPRakIQ=="
@@ -4004,12 +4028,15 @@
         "npm:@angular/platform-browser@^20.0.2",
         "npm:@angular/router@^20.0.2",
         "npm:@ng-bootstrap/ng-bootstrap@^19.0.0-rc.0",
+        "npm:@ng-web-apis/common@^4.12.0",
+        "npm:@ng-web-apis/speech@^4.12.0",
         "npm:@popperjs/core@^2.11.8",
         "npm:@tauri-apps/api@^2.5.0",
         "npm:@tauri-apps/cli@^2.5.0",
         "npm:@tauri-apps/plugin-fs@^2.2.1",
         "npm:@tauri-apps/plugin-shell@2",
         "npm:@tauri-apps/plugin-updater@~2.7.1",
+        "npm:@types/dom-speech-recognition@^0.0.6",
         "npm:@types/jasmine@^5.1.7",
         "npm:bootstrap@^5.3.6",
         "npm:fabric@^6.6.7",

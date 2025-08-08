@@ -1,1 +1,1 @@
-export { StatusButtonDirective  } from './status-button/status-button.directive'
+export { StatusButtonDirective  } from './status-button/status-button.directive';

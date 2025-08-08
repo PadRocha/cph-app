@@ -1,10 +1,12 @@
-import { Component, computed, inject, model, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, effect, ElementRef, inject, model, signal, viewChild } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { environment } from '@environment';
 import { ItemModel, status } from '@home/models';
-import { ItemService } from '@home/services';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { KeyService } from '@home/services';
+import { NgbActiveModal, NgbTypeahead, NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 import { ThemeDirective } from '@shared/directives';
+import { debounceTime, distinctUntilChanged, filter, fromEvent, map, mergeWith, Observable } from 'rxjs';
 
 interface ItemForm {
   readonly key: string;
@@ -14,7 +16,7 @@ interface ItemForm {
 
 @Component({
   selector: 'app-modal-item',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, NgbTypeaheadModule],
   templateUrl: './modal-item.component.html',
   styleUrl: './modal-item.component.scss',
   hostDirectives: [ThemeDirective],
@@ -22,8 +24,10 @@ interface ItemForm {
 export class ModalItemComponent {
   private readonly url = environment.httpUrl;
   private readonly location = environment.location;
-  private readonly itemService = inject(ItemService);
+  // private readonly itemService = inject(ItemService);
+  private readonly keyService = inject(KeyService);
   private readonly activeModal = inject(NgbActiveModal);
+  private readonly destroyRef = inject(DestroyRef);
   public readonly item = model.required<ItemModel>();
   public readonly itemRef = computed(() => this.item().raw);
   public size = 0;
@@ -39,8 +43,66 @@ export class ModalItemComponent {
     }),
     desc: new FormControl('', { validators: Validators.required, nonNullable: true }),
   });
+  private readonly _fillForm = effect(() => {
+    const raw = this.itemRef();
+    if (!raw) return;
+
+    this.itemForm.patchValue(
+      { key: raw.key, code: raw.code, desc: raw.desc },
+      { emitEvent: false }
+    );
+  });
+
+  public get keyForm(): FormControl<string> {
+    return this.itemForm.get('key') as FormControl<string>;
+  }
+
+  public readonly eventKey = toSignal(
+    this.keyForm.valueChanges.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+    )
+  );
+  private readonly keyInput = viewChild.required<ElementRef<HTMLInputElement>>('keyInput');
+  private readonly keyDirective = viewChild.required<NgbTypeahead>('keyDirective');
+  private readonly keyOptions = signal<string[]>([]);
+  private readonly _loadKeyOptions = effect(() => {
+    const code = this.eventKey()?.trim();
+    if (!code) {
+      this.keyOptions.set([]);
+      return;
+    }
+
+    this.keyService.getKeys({ code })
+      .pipe(map(r => r.data.map(d => d.code)))
+      .subscribe(codes => this.keyOptions.set(codes));
+  });
+
   public readonly statusForm = new FormControl('', { validators: Validators.required, nonNullable: true });
   public readonly reference = viewChild.required<HTMLDivElement>('reference');
+  private createTypeaheadStream(
+    { nativeElement: el }: ElementRef<HTMLInputElement>,
+    dir: NgbTypeahead,
+    text$: Observable<string>,
+    callback: (v: string) => string[]
+  ) {
+    const focus$ = fromEvent(el, 'focus').pipe(map(() => el.value));
+    const click$ = fromEvent(el, 'click').pipe(filter(() => !dir.isPopupOpen()), map(() => el.value));
+    return text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      mergeWith(focus$, click$),
+      map(callback),
+      takeUntilDestroyed(this.destroyRef),
+    );
+  }
+  public readonly searchKeys = (text$: Observable<string>) =>
+    this.createTypeaheadStream(
+      this.keyInput(),
+      this.keyDirective(),
+      text$,
+      () => this.keyOptions().slice(0, 10)
+    );
 
   public close(reason?: string): void {
     if (reason) {

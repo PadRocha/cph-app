@@ -1,15 +1,30 @@
 <form [formGroup]="searchForm" role="search" class="d-grid sticky-top gap-3 py-3">
-  <input
-    formControlName="search"
-    id="search"
-    name="search"
-    type="search"
-    class="form-control form-control-sm"
-    placeholder="Clave y/o descripción"
-    autocomplete="off"
-    autofocus
-    aria-label="Buscar por clave y/o descripción"
-    aria-autocomplete="none"/>
+  <div class="input-group input-group-sm">
+    <button 
+      (click)="toggleRecorder()" 
+      [class.active]="listening" 
+      class="btn btn-dark" 
+      type="button" 
+      id="recorder"
+      name="recorder">
+      @if (!listening) {
+        <span class="ico-record"></span>
+      } @else {
+        <span class="ico-stream"></span>
+      }
+    </button>
+    <input
+      formControlName="search"
+      id="search"
+      name="search"
+      type="search"
+      class="form-control"
+      placeholder="Clave y/o descripción"
+      autocomplete="off"
+      autofocus
+      aria-label="Buscar por clave y/o descripción"
+      aria-autocomplete="none"/>
+  </div>
   <div class="d-inline-flex justify-content-between">
     <div class="d-none d-md-inline-flex flex-wrap ps-2 gap-2">
       <span>Σ [{{ success }}]</span>

@@ -1,15 +1,15 @@
-import { Component, inject, OnInit } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { RouterModule, RouterOutlet } from "@angular/router";
 
 import { TitleBarComponent } from "@components";
 import { ToasterComponent } from "./components/toaster/toaster.component";
 import { ScrollToTopComponent } from "./components/scroll-to-top/scroll-to-top.component";
-import { ThemeDirective } from "@shared/directives";
+import { ScrollTrackerDirective, ThemeDirective } from "@shared/directives";
 import { NavigationService, UserService } from "@core/services";
 
 @Component({
   selector: "app-root",
-  imports: [RouterOutlet, RouterModule, TitleBarComponent, ToasterComponent, ScrollToTopComponent],
+  imports: [RouterOutlet, RouterModule, TitleBarComponent, ToasterComponent, ScrollToTopComponent, ScrollTrackerDirective],
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
   hostDirectives: [ThemeDirective],

@@ -35,7 +35,7 @@ export class HomeComponent implements OnInit {
       ['/home'],
       { queryParams: { search, status }, queryParamsHandling: 'merge', replaceUrl: true }
     );
-    this.loadData();
+    // this.loadData();
   });
 
   ngOnInit(): void {

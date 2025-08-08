@@ -5,6 +5,7 @@ import { Search, status } from '@home/models';
 import { DecimalPipe } from '@angular/common';
 import { StatusButtonDirective } from '@home/directives';
 import { ItemService } from '@home/services';
+import { SpeechService } from '@core/services/speech-recognition/speech.service';
 
 type SearchControls = {
   [K in keyof Search]: FormControl<Search[K]>;
@@ -18,7 +19,7 @@ type SearchControls = {
 })
 export class ItemSearchComponent implements OnInit {
   private readonly itemService = inject(ItemService);
-
+  private readonly speechService = inject(SpeechService);
   public readonly statusList: status[] = [1, 2, 3, 4, 5];
   
   public searchForm = new FormGroup<SearchControls>({
@@ -29,12 +30,24 @@ export class ItemSearchComponent implements OnInit {
     const search = this.itemService.searchParams;
     this.searchForm.patchValue(search, { emitEvent: false });
   });
+  public transcriptChange = effect(() => {
+    const text = this.speechService.transcript();
+    if (text && this.listening) {
+      this.searchForm.patchValue({ search: text });
+    }
+  });
+  public get listening() {
+    return this.speechService.isListening();
+  }
+  public toggleRecorder() {
+    this.speechService.toggle();
+    const input = this.searchForm.controls.search;
+    this.listening ? input.disable() : input.enable();
+  }
 
   ngOnInit(): void {
-    // Sincronizamos el formulario con el valor actual del signal
     const search = this.itemService.searchParams;
     this.searchForm.patchValue(search, { emitEvent: false });
-    // Cada vez que el formulario cambie, actualizamos el signal
     this.searchForm.valueChanges
       .pipe(
         debounceTime(500),

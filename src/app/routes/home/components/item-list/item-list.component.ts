@@ -1,9 +1,9 @@
 import { animate, query, stagger, style, transition, trigger } from '@angular/animations';
-import { Component, DestroyRef, effect, ElementRef, inject, OnDestroy, viewChild } from '@angular/core';
+import { Component, effect, inject, OnDestroy } from '@angular/core';
 import { ItemModel } from '@home/models';
 import { ItemService } from '@home/services';
 import { ItemComponent } from '../item/item.component';
-import { first } from 'rxjs';
+import { ScrollService } from '@shared/services';
 
 @Component({
   selector: 'item-list',
@@ -28,33 +28,27 @@ import { first } from 'rxjs';
 })
 export class ItemListComponent implements OnDestroy {
   private readonly itemService = inject(ItemService);
+  private readonly scrollService = inject(ScrollService);
 
-  private readonly sentinel = viewChild.required<ElementRef<HTMLDivElement>>("sentinel");
-  private readonly observer = new IntersectionObserver(
-    ([{ isIntersecting, target }]) => {
-      if (!isIntersecting || this.loading || !this.hasNext) return
-      this.observer.unobserve(target);
+  private readonly _load = effect(()=> {
+    if (this.scrollService.isBottom()) {
+      if (this.loading || !this.hasNext) return;
       this.itemService.loading = true;
       this.itemService.more
-        .pipe(first())
+        .pipe()
         .subscribe({
           next: () => { },
           error: console.error
         })
         .add(() => {
           this.itemService.loading = false;
-          this.observer.observe(target);
-        });
-    },
-    { rootMargin: '0px', threshold: 0 }
-  );
-  readonly _effectSentinel = effect(() => {
-    const { nativeElement } = this.sentinel();
-    this.observer.observe(nativeElement);
+          this.scrollService.next = false;
+        });      
+    }
   });
 
   ngOnDestroy(): void {
-    this.observer.disconnect();
+    // this.observer.disconnect();
   }
 
   public get items(): ItemModel[] {
@@ -67,5 +61,9 @@ export class ItemListComponent implements OnDestroy {
 
   public get hasNext(): boolean {
     return this.itemService.hasNext;
+  }
+
+  public endScroll(): void {
+    console.log('End of scroll reached');
   }
 }
