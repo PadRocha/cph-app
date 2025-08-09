@@ -1,14 +1,5 @@
-import { isPlatformBrowser } from "@angular/common";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import {
-  inject,
-  Inject,
-  Injectable,
-  InjectionToken,
-  PLATFORM_ID,
-  signal,
-  WritableSignal,
-} from "@angular/core";
+import { inject, Injectable, signal, } from "@angular/core";
 import { Router } from "@angular/router";
 import { environment } from "@environment";
 import { Observable } from "rxjs";
@@ -56,21 +47,18 @@ export class AuthService {
   protected readonly url = environment.httpUrl;
   protected readonly http = inject(HttpClient);
   protected readonly router = inject(Router);
-  protected readonly platformId = inject(PLATFORM_ID);
-  private tokenSignal = signal<string|null>(null);
+  private tokenSignal = signal<string | null>(null);
   private storage!: Storage;
 
   constructor(
   ) {
-    if (isPlatformBrowser(this.platformId)) {
-      this.storage = sessionStorage;
-      const tokenStr = this.storage.getItem("token");
-      if (tokenStr) {
-        const { expiry, value } = JSON.parse(tokenStr);
-        const now = new Date().getTime();
-        // Si no hay expiración o la expiración es futura, se mantiene el token
-        if (!expiry || now <= expiry) this.tokenSignal.set(value);
-      }
+    this.storage = sessionStorage;
+    const tokenStr = this.storage.getItem("token");
+    if (tokenStr) {
+      const { expiry, value } = JSON.parse(tokenStr);
+      const now = new Date().getTime();
+      // Si no hay expiración o la expiración es futura, se mantiene el token
+      if (!expiry || now <= expiry) this.tokenSignal.set(value);
     }
   }
 
@@ -81,11 +69,9 @@ export class AuthService {
    * @param expiry - Si se debe asignar una expiración (por defecto true, 24h).
    */
   public setToken(value: string, expiry = true): void {
-    if (isPlatformBrowser(this.platformId)) {
-      const now = new Date();
-      const item = { value, expiry: expiry ? now.getTime() + 86_400_000 : false };
-      this.storage.setItem("token", JSON.stringify(item));
-    }
+    const now = new Date();
+    const item = { value, expiry: expiry ? now.getTime() + 86_400_000 : false };
+    this.storage.setItem("token", JSON.stringify(item));
     this.tokenSignal.set(value);
   }
 
@@ -107,7 +93,7 @@ export class AuthService {
    * @param goto - Ruta a la que redirigir tras el logout (por defecto "/login").
    */
   public logout(goto: string = "/login"): void {
-    if (isPlatformBrowser(this.platformId)) sessionStorage.removeItem("token");
+    sessionStorage.removeItem("token");
     this.tokenSignal.set(null);
     this.router.navigate([goto]);
   }

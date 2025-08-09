@@ -1,9 +1,10 @@
 import { animate, query, stagger, style, transition, trigger } from '@angular/animations';
-import { Component, effect, inject, OnDestroy } from '@angular/core';
-import { ItemModel } from '@home/models';
+import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Fuzzy, ItemModel } from '@home/models';
 import { ItemService } from '@home/services';
 import { ItemComponent } from '../item/item.component';
 import { ScrollService } from '@shared/services';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'item-list',
@@ -26,33 +27,54 @@ import { ScrollService } from '@shared/services';
     ])
   ]
 })
-export class ItemListComponent implements OnDestroy {
+export class ItemListComponent {
   private readonly itemService = inject(ItemService);
   private readonly scrollService = inject(ScrollService);
+  public readonly isFuzzySearch = signal(false);
+  public fuzzyData: Fuzzy = { items: [], keys: [] };
 
-  private readonly _load = effect(()=> {
-    if (this.scrollService.isBottom()) {
-      if (this.loading || !this.hasNext) return;
-      this.itemService.loading = true;
-      this.itemService.more
-        .pipe()
-        .subscribe({
-          next: () => { },
-          error: console.error
-        })
-        .add(() => {
-          this.itemService.loading = false;
-          this.scrollService.next = false;
-        });      
+  private readonly _ = effect(() => {
+    if (this.itemService.loading) {
+      this.isFuzzySearch.set(false);
+      this.fuzzyData = { items: [], keys: [] };
     }
   });
-
-  ngOnDestroy(): void {
-    // this.observer.disconnect();
-  }
+  private readonly _fuzzy = effect(() => {
+    const noItems = this.itemService.noItems;
+    const loading = this.itemService.loading;
+    if (!noItems || loading) return;
+    this.itemService.fuzzy
+      .pipe(take(1))
+      .subscribe({
+        next: ({ data }) => {
+          this.fuzzyData = data ?? { items: [], keys: [] };
+          const hasAny = (this.fuzzyData.items.length ?? 0) + (this.fuzzyData.keys.length ?? 0) > 0;
+          this.isFuzzySearch.set(hasAny);
+        },
+        error: () => {
+          this.fuzzyData = { items: [], keys: [] };
+          this.isFuzzySearch.set(false);
+        }
+      });
+  });
+  private readonly _load = effect(() => {
+    if (!this.scrollService.isBottom()) return;
+    if (this.loading || !this.hasNext) return;
+    this.itemService.loading = true;
+    this.itemService.more
+      .subscribe({ next: () => { }, error: console.error })
+      .add(() => {
+        this.itemService.loading = false;
+        this.scrollService.next = false;
+      });
+  });
 
   public get items(): ItemModel[] {
     return this.itemService.all;
+  }
+
+  public get empty(): boolean {
+    return this.itemService.noItems;
   }
 
   public get loading(): boolean {
@@ -62,8 +84,6 @@ export class ItemListComponent implements OnDestroy {
   public get hasNext(): boolean {
     return this.itemService.hasNext;
   }
-
-  public endScroll(): void {
-    console.log('End of scroll reached');
-  }
+  
+  public readonly noData = computed(() => !this.itemService.loading && this.itemService.noItems && !this.isFuzzySearch());
 }

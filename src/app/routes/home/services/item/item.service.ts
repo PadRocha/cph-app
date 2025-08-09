@@ -1,9 +1,9 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { computed, inject, Injectable, Signal, signal, WritableSignal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '@environment';
 import { DocPaginate, Paginate } from '@shared/models';
-import { combineLatest, forkJoin, lastValueFrom, map, Observable, take, tap } from 'rxjs';
-import { Archive, Delete, Info, Item, ItemModel, LeanItem, Search, status } from '@home/models';
+import { lastValueFrom, map, Observable, tap } from 'rxjs';
+import { Archive, Delete, Fuzzy, Info, Item, ItemModel, LeanItem, Search, status } from '@home/models';
 
 /**
  * Estado inicial para la información de los items.
@@ -382,6 +382,16 @@ export class ItemService {
     return this.list.pipe(
       tap(({ data }) => this.docs.update(docs => docs.concat(data)))
     );
+  }
+
+  /**
+   * Busca items basándose en los parámetros de búsqueda actuales.
+   *
+   * @returns Un observable que emite un arreglo de strings.
+   */
+  public get fuzzy(): Observable<{ data: Fuzzy }> {
+    const params = this.params();
+    return this.http.get<{ data: Fuzzy }>(`${this.url}/item/fuzzy`, { params: { ...params } })
   }
 
   /**

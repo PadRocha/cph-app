@@ -1,0 +1,31 @@
+<aside class="offcanvas-body overflow-visible pt-0">
+  <form class="sticky-top bg-dark py-3" [formGroup]="searchForm">
+    <input
+      class="form-control mb-1"
+      type="search"
+      formControlName="code"
+      maxlength="6"
+      autocomplete="off"
+      spellcheck="false"
+      placeholder="Línea"
+    />
+    <span>Total: {{ totalDocs() }}</span>
+  </form>
+  <ul>
+    <li (click)="onAll()">Todas</li>
+    @for (key of docs(); track $index) {
+			<li (click)="onSelected(key)">
+				{{ key.code }}
+				<span>{{ key.desc | capitalize }}</span>
+			</li>
+    }
+		@if (isLoading()) {
+			<li class="text-center">
+				<img src="wait.gif" alt="Wait Key" height="100" />
+			</li>
+    }
+		@if (notFound()) {
+    	<li class="error">No existe la Clave</li>
+    }
+  </ul>
+</aside>

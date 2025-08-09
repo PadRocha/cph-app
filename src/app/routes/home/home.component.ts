@@ -1,8 +1,8 @@
 import { Component, effect, HostListener, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbOffcanvas, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { distinctUntilChanged } from 'rxjs';
-import { ItemListComponent, ItemSearchComponent } from './components';
+import { AsideKeysComponent, ItemListComponent, ItemSearchComponent } from './components';
 import { Search, status } from './models';
 import { ItemService } from './services';
 
@@ -28,6 +28,7 @@ export class HomeComponent implements OnInit {
   private readonly itemService = inject(ItemService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly offcanvas = inject(NgbOffcanvas);
 
   private readonly _searchChange = effect(() => {
     const { search, status } = this.itemService.searchParams;
@@ -35,7 +36,6 @@ export class HomeComponent implements OnInit {
       ['/home'],
       { queryParams: { search, status }, queryParamsHandling: 'merge', replaceUrl: true }
     );
-    // this.loadData();
   });
 
   ngOnInit(): void {
@@ -78,19 +78,20 @@ export class HomeComponent implements OnInit {
       .add(() => this.itemService.loading = false);
   }
 
-  private loadMore(): void {
-    this.itemService.loading = true;
-    this.itemService.more
-      .subscribe({
-        next: () => { /* Los nuevos ítems se agregan en el servicio */ },
-        error: () => { /* Manejo de error si fuera necesario */ }
-      })
-      .add(() => this.itemService.loading = false);
-  }
-
-  @HostListener("scroll", ["$event"])
-  onScroll(event: Event & { target: Document }) {
-    console.log(event);
-
+  @HostListener("window:keydown.control.k", ["$event"])
+  openKeys(event: Event): void {
+    if (!event?.preventDefault) return;
+    event.preventDefault();
+    if (this.offcanvas.hasOpenOffcanvas()) return this.offcanvas.dismiss();
+    const offcanvas = this.offcanvas.open(AsideKeysComponent, {
+      position: "end",
+      panelClass: "text-bg-dark aside-width",
+    });
+    offcanvas.closed.subscribe({
+      next: ({ value }: { value: string }) => {
+        const curr = this.itemService.searchParams;
+        this.itemService.searchParams = { ...curr, search: value };
+      },
+    });
   }
 }

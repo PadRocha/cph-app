@@ -93,6 +93,11 @@ interface Delete {
   deletedStatus: Info["status"];
 }
 
+export interface Fuzzy {
+  items: string[];
+  keys: string[];
+}
+
 /**
  * Modelo para gestionar un item y sus imágenes asociadas.
  */

@@ -32,9 +32,7 @@ export class ItemSearchComponent implements OnInit {
   });
   public transcriptChange = effect(() => {
     const text = this.speechService.transcript();
-    if (text && this.listening) {
-      this.searchForm.patchValue({ search: text });
-    }
+    if (text && this.listening) this.searchForm.patchValue({ search: text });
   });
   public get listening() {
     return this.speechService.isListening();

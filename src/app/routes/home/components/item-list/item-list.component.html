@@ -1,30 +1,73 @@
-<section [@listAnim] class="grid position-relative">
-  <!-- 1) Items: se animan al entrar y salir -->
-  @for (item of items; track $index) {
-    <item [item]="item"></item>
-  } @empty {
-    @if (!loading) {
-      <div class="empty-state text-center p-4">
-        <p>Oh, parece que no hay nada por aquí...</p>
-      </div>
-    }
+<section class="position-relative">
+  @if (!isFuzzySearch()){
+    <div [@listAnim] class="grid">
+      @for (item of items; track $index) {
+        <item [item]="item"></item>
+      }
+      @if (loading) {
+        @for (fake of [1, 2, 3, 4, 5]; track $index) {
+          <article class="item-card p-2 loading" aria-hidden="true">
+            <header class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="skeleton skeleton-text w-50 m-0"></h5>
+              <span class="skeleton skeleton-button"></span>
+            </header>
+            <div class="img-placeholder skeleton skeleton-rect mb-2"></div>
+            <div class="input-group mb-2 d-flex flex-wrap gap-1">
+              <span class="skeleton skeleton-select"></span>
+              <span class="skeleton skeleton-select"></span>
+              <span class="skeleton skeleton-select"></span>
+            </div>
+            <p class="skeleton skeleton-text w-75 mb-0"></p>
+          </article>
+        }
+      }
+    </div>
+  } @else {
+    <div class="suggestions" aria-live="polite">
+      <h4 class="m-0 mb-3">Sugerencias</h4>
+      @if (fuzzyData.items.length) {
+        <section class="codes-group">
+          <header class="codes-header">Items</header>
+          <ul class="codes-list">
+            @for (code of fuzzyData.items; track $index) {
+              <li>
+                <div class="code-card">
+                  <code class="code-text">{{ code }}</code>
+                  <div class="code-actions">
+                    <button type="button" class="btn btn-sm btn-outline-primary btn-tight">Buscar</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary btn-tight">Copiar</button>
+                  </div>
+                </div>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+      @if (fuzzyData.keys.length) {
+        <section class="codes-group">
+          <header class="codes-header">Keys</header>
+          <ul class="codes-list">
+            @for (code of fuzzyData.keys; track $index) {
+              <li>
+                <div class="code-card">
+                  <code class="code-text">{{ code }}</code>
+                  <div class="code-actions">
+                    <button type="button" class="btn btn-sm btn-outline-primary btn-tight">Buscar</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary btn-tight">Copiar</button>
+                  </div>
+                </div>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    </div>
   }
-  <!-- 2) Skeleton: se anima al entrar y al salir -->
-  @if (loading) {
-    @for (fake of [1, 2, 3, 4, 5]; track $index) {
-      <article class="item-card p-2 loading" aria-hidden="true">
-        <header class="d-flex justify-content-between align-items-center mb-2">
-          <h5 class="skeleton skeleton-text w-50 m-0"></h5>
-          <span class="skeleton skeleton-button"></span>
-        </header>
-        <div class="img-placeholder skeleton skeleton-rect mb-2"></div>
-        <div class="input-group mb-2 d-flex flex-wrap gap-1">
-          <span class="skeleton skeleton-select"></span>
-          <span class="skeleton skeleton-select"></span>
-          <span class="skeleton skeleton-select"></span>
-        </div>
-        <p class="skeleton skeleton-text w-75 mb-0"></p>
-      </article>
-    }
+  @if (noData()) {
+    <div class="empty-state text-center p-4" aria-live="polite">
+      <div class="empty-anim" aria-hidden="true"></div>
+      <p class="mb-0 mt-2">No se encontraron coincidencias</p>
+      <small class="text-muted">Prueba con otra clave o revisa la ortografía</small>
+    </div>
   }
 </section>

@@ -19,6 +19,12 @@
         "button-name": "off"
       }
     ],
-    "axe/forms": "off"
+    "axe/forms": "off",
+    "axe/structure": [
+      "default",
+      {
+        "list": "off"
+      }
+    ]
   }
 }

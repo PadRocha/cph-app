@@ -1,0 +1,39 @@
+@import 'local_variables';
+@import 'local_mixins';
+
+:host {
+  overflow-y: scroll !important;
+  @include scroll;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    @include interactive($aside-background);
+    text-align: center;
+    font-size: 25px;
+    padding: 5px 10px;
+    cursor: pointer;
+
+    span {
+      display: none;
+      font-size: 15px;
+      background-color: $aside-background;
+      padding: 5px;
+    }
+
+    &:hover span,
+    &:active span {
+      display: block;
+    }
+
+    &.error {
+      @include interactive($aside-error);
+      display: block;
+      cursor: pointer;
+    }
+  }
+}

@@ -199,7 +199,7 @@ export class ImageEditorComponent implements OnDestroy {
     this.unlistenDragDrop = await listen<{ paths: string[] }>(TauriEvent.DRAG_DROP, async (event) => {
       if (Array.isArray(event.payload?.paths) && event.payload.paths.length > 0) {
         const [filePath] = event.payload.paths;
-        const bytes = await readFile(filePath);
+        const bytes = await readFile(filePath) as BlobPart;
         const ext = await extname(filePath);
         if (!['jpg', 'jpeg', 'png'].includes(ext.toLowerCase())) return;
         const mimeTypes: Record<string, string> = {

@@ -46,17 +46,18 @@
 // Utilities
 @import "bootstrap/scss/utilities/api";
 
-*:has(> [class^='ico-']) {
-    display: flex;
-    align-items: center !important;
+*:has(> [class^="ico-"]) {
+  display: flex;
+  align-items: center !important;
 }
 
 *[copy] {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .aside-width {
-    width: 260px !important;
+  margin-top: $title-bar-height;
+  width: 260px !important;
 }
 
 .blurred-backdrop {
@@ -67,10 +68,10 @@
 }
 
 .typeahead-auto-width {
-  display: inline-block !important;         /* inline-level box */  
-  min-width: 0 !important;                   /* anula el min-width de Bootstrap */  
-  max-width: none !important;                /* elimina límite superior */  
-  white-space: nowrap;                       /* evita saltos de línea */  
+  display: inline-block !important; /* inline-level box */
+  min-width: 0 !important; /* anula el min-width de Bootstrap */
+  max-width: none !important; /* elimina límite superior */
+  white-space: nowrap; /* evita saltos de línea */
   /* Sizing intrínseco moderno (alternativo a width: max-content) */
   inline-size: max-content !important;
 }
