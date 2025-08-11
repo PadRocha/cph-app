@@ -1,0 +1,32 @@
+@import "local_variables";
+@import "local_mixins";
+
+.loading {
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.hint {
+  font-size: 0.95rem;
+}
+.preview {
+  max-height: 320px;
+  overflow: auto;
+}
+.desc {
+  max-width: 520px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+@include dark-mode {
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    background-color: $secundary;
+    color: $text-color-dark;
+  }
+}

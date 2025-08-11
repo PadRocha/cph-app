@@ -25,6 +25,7 @@
       {
         "list": "off"
       }
-    ]
+    ],
+    "detect-css-reflows/composite": "off"
   }
 }

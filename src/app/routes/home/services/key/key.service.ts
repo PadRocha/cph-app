@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '@environment';
 import { DocPaginate } from '@shared/models';
+import { Observable } from 'rxjs';
 
 interface Key {
   code: string;
@@ -21,7 +22,7 @@ export class KeyService {
   private readonly http = inject(HttpClient);
   private readonly url = environment.httpUrl;
 
-  getKeys({ code, page = 1 }: KeySearch = {}) {
+  public getKeys({ code, page = 1 }: KeySearch = {}): Observable<DocPaginate<Key>> {
     let params = new HttpParams()
       .set('page', String(page));
 

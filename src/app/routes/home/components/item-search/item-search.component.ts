@@ -5,7 +5,9 @@ import { Search, status } from '@home/models';
 import { DecimalPipe } from '@angular/common';
 import { StatusButtonDirective } from '@home/directives';
 import { ItemService } from '@home/services';
-import { SpeechService } from '@core/services/speech-recognition/speech.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ModalHelpComponent } from '@shared/components';
+import { SpeechService } from '@core/services';
 
 type SearchControls = {
   [K in keyof Search]: FormControl<Search[K]>;
@@ -19,7 +21,8 @@ type SearchControls = {
 })
 export class ItemSearchComponent implements OnInit {
   private readonly itemService = inject(ItemService);
-  private readonly speechService = inject(SpeechService);
+  private readonly speech = inject(SpeechService);
+  private readonly modal = inject(NgbModal);
   public readonly statusList: status[] = [1, 2, 3, 4, 5];
   
   public searchForm = new FormGroup<SearchControls>({
@@ -31,14 +34,14 @@ export class ItemSearchComponent implements OnInit {
     this.searchForm.patchValue(search, { emitEvent: false });
   });
   public transcriptChange = effect(() => {
-    const text = this.speechService.transcript();
+    const text = this.speech.transcript();
     if (text && this.listening) this.searchForm.patchValue({ search: text });
   });
   public get listening() {
-    return this.speechService.isListening();
+    return this.speech.isListening();
   }
   public toggleRecorder() {
-    this.speechService.toggle();
+    this.speech.toggle();
     const input = this.searchForm.controls.search;
     this.listening ? input.disable() : input.enable();
   }
@@ -74,5 +77,18 @@ export class ItemSearchComponent implements OnInit {
 
   public get activeStatus() {
     return this.searchForm.get('status')?.value ?? -1;
+  }
+
+  public openHelp(): void {
+    this.modal.open(ModalHelpComponent, {
+      animation: true,
+      centered: true,
+      size: 'md',
+      scrollable: true,
+      ariaLabelledBy: 'helpTitle',
+      ariaDescribedBy: 'helpBody',
+      keyboard: false,
+      backdropClass: "blurred-backdrop",
+    });
   }
 }

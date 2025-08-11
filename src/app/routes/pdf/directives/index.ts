@@ -1,0 +1,1 @@
+export { LazyImgDirective } from './lazy-img/lazy-img.directive';

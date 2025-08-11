@@ -4,5 +4,6 @@ export { StorageService } from './storage/storage.service';
 export { UserService } from './user/user.service';
 export { ConfirmService } from './confirm/confirm.service';
 export { ToastService } from './toast/toast.service';
+export { SpeechService } from './speech-recognition/speech.service';
 
 export type { Historian } from './navigation/navigation.service';

@@ -63,7 +63,7 @@ export class AsideKeysComponent {
   /** Formulario de búsqueda y paginación */
   public searchForm = new FormGroup<SearchControls>({
     page: new FormControl(1, {
-      validators,
+      validators: [Validators.min(1), Validators.required],
       nonNullable: true
     }),
     code: new FormControl('', {

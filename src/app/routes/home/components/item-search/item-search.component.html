@@ -3,8 +3,9 @@
     <button 
       (click)="toggleRecorder()" 
       [class.active]="listening" 
-      class="btn btn-dark" 
+      class="btn btn-dark"
       type="button" 
+      title="Grabadora"
       id="recorder"
       name="recorder">
       @if (!listening) {
@@ -18,12 +19,17 @@
       id="search"
       name="search"
       type="search"
+      title="Buscar"
       class="form-control"
       placeholder="Clave y/o descripción"
       autocomplete="off"
       autofocus
       aria-label="Buscar por clave y/o descripción"
-      aria-autocomplete="none"/>
+      aria-autocomplete="none"
+    />
+    <button (click)="openHelp()" class="btn btn-dark" type="button" title="Ayuda" aria-label="Ayuda">
+      <span class="ico-help"></span>
+    </button>
   </div>
   <div class="d-inline-flex justify-content-between">
     <div class="d-none d-md-inline-flex flex-wrap ps-2 gap-2">

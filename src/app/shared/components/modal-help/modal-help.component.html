@@ -1,0 +1,79 @@
+<div class="modal-header py-2">
+  <h5 class="modal-title" id="helpTitle">Guía rápida del buscador</h5>
+  <button type="button" class="btn-close" aria-label="Cerrar" (click)="close()"></button>
+</div>
+<div class="modal-body" id="helpBody" [@fadeIn]>
+  <p class="lead mb-2">
+    Escribe instrucciones y texto libre para filtrar resultados en tiempo real
+  </p>
+  <section class="mb-3">
+    <h6 class="section-title">Campos y alias</h6>
+    <p class="mb-1">
+      Campos: <code>keys</code>, <code>items</code>, <code>lines</code>,
+      <code>brands</code>. Alias:
+      <i>clave(s), artículo(s), producto(s), línea(s), marca(s)</i>.
+    </p>
+  </section>
+  <section class="mb-3">
+    <h6 class="section-title">Instrucción directa</h6>
+    <p class="mb-1">
+      Solo para <code>keys</code> e <code>items</code> y en
+      <strong>MAYÚSCULAS</strong>.
+    </p>
+    <ul class="example">
+      <li><code>ACCPVH</code> (KEY: <code>[A-Z0-9]&#123;5,6&#125;</code>)</li>
+      <li>
+        <code>ACCPVH0001</code> o <code>ACCRC 0001</code> (ITEM:
+        <code>([A-Z0-9]&#123;6&#125;|[A-Z0-9]&#123;5&#125;\s)[A-Z0-9]&#123;4&#125;</code>)
+      </li>
+    </ul>
+  </section>
+  <section class="mb-3">
+    <h6 class="section-title">Con prefijo <small>(campo:valor)</small></h6>
+    <p class="mb-1">Exacta o regex para los cuatro campos.</p>
+    <ul class="example">
+      <li><code>line:ACC</code>, <code>brand:PVH</code></li>
+      <li>
+        <code>line:^A</code>, <code>brand:H$</code>, <code>key:^A|^B</code>,
+        <code>item:^A|H$</code>
+      </li>
+    </ul>
+  </section>
+  <section class="mb-3">
+    <h6 class="section-title">Items por sufijo numérico</h6>
+    <p class="mb-1">
+      Exclusivo para <code>items</code>. El sufijo son los 4 últimos dígitos
+      (numérico). Las clases <code>[]</code> van sobre la <em>clave</em>.
+    </p>
+    <ul class="example">
+      <li><code>item:[ACCPVH]&gt;50</code></li>
+      <li><code>items:[GRA]&lt;10</code></li>
+      <li><code>item:[^G]&lt;=50</code>, <code>item:[H$]&gt;=10</code></li>
+      <li><code>item:[Gra]10&lt;&gt;50</code> (rango inclusivo)</li>
+      <li>
+        <code>item:&lt;50</code>, <code>item:&gt;=10</code>,
+        <code>item:5&lt;&gt;8</code>
+      </li>
+    </ul>
+  </section>
+  <section class="mb-3">
+    <h6 class="section-title">Literales con comillas</h6>
+    <p class="mb-1">Conserva espacios o símbolos.</p>
+    <ul class="example">
+      <li><code>items:"ACCRC 0001"</code>, <code>brand:"^A"</code></li>
+      <li><code>items:"[GRA]&gt;50"</code></li>
+    </ul>
+  </section>
+  <section>
+    <h6 class="section-title">Mezcla con búsqueda libre</h6>
+    <p class="mb-1">
+      Lo no reconocido como instrucción se busca en descripción.
+    </p>
+    <ul class="example">
+      <li><code>Grapa Chevy brand:PVH</code></li>
+      <li><code>line:ACC accesorio</code></li>
+      <li><code>Grapa items:&lt;50 Chevy</code></li>
+      <li><code>brand:PVH chevy corsa items:&lt;50 año 2015</code></li>
+    </ul>
+  </section>
+</div>

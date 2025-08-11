@@ -1,1 +1,191 @@
-<p>pdf works!</p>
+<form [formGroup]="searchForm"  class="d-grid sticky-top gap-3 py-3" role="search">
+  <div class="input-group input-group-sm">
+    <button
+      class="btn btn-dark"
+      id="recorder"
+      name="recorder"
+      type="button"
+      title="Grabadora"
+      (click)="toggleRecorder()"
+      [class.active]="listening">
+      @if (!listening) {
+        <span class="ico-record"></span>
+      } @else {
+        <span class="ico-stream"></span>
+      }
+    </button>
+    <input
+      class="form-control"
+      id="search"
+      name="search"
+      type="search"
+      title="Buscar"
+      aria-autocomplete="none"
+      aria-label="Buscar por clave y/o descripción"
+      formControlName="search"
+      placeholder="Clave y/o descripción"
+      autocomplete="off"
+      autofocus
+    />
+    <button
+      [class.active]="filter"
+      [attr.aria-label]="filter ? 'Filtrar: solo con imagen': 'Filtrar: incluir nulos (sin imagen)'"
+      (click)="toggleStatus()"
+      class="btn btn-dark"
+      type="button"
+      title="Filtrar por imagen">
+      <span class="ico-filter"></span>
+    </button>
+    <button
+      class="btn btn-dark"
+      type="button"
+      title="Ayuda"
+      aria-label="Ayuda"
+      (click)="openHelp()">
+      <span class="ico-help"></span>
+    </button>
+  </div>
+</form>
+<section class="position-relative">
+  @if (phase() === 'results') {
+    <div [@listAnim] class="grid">
+      @for (item of docs(); track $index) {
+        <div class="item" [id]="item._id">
+          <div class="img-placeholder mb-2">
+            <img lazy-img
+              [item]="item"
+              src="default.png"
+              sizes="
+                (min-width: 1400px) 640px,
+                (min-width: 1200px) 480px,
+                (min-width: 992px) 360px,
+                (min-width: 768px) 320px,
+                240px"
+              loading="lazy"
+              draggable="false"
+              alt="Imagen representativa"
+              crossorigin="anonymous" 
+            />
+          </div>
+          <header class="d-flex justify-content-center align-items-center pb-2 mb-2">
+            <h5>{{ item.code }}</h5>
+          </header>
+          <p class="mb-0">{{ item.desc }}</p>
+        </div>
+      }
+      @if (isLoading()) {
+        @for (fake of [1, 2, 3, 4, 5]; track $index) {
+          <article class="item-card p-2 loading" aria-hidden="true">
+            <div class="img-placeholder skeleton skeleton-rect mb-2"></div>
+            <header
+              class="d-flex justify-content-center align-items-center mb-2">
+              <h5 class="skeleton skeleton-text w-50 m-0"></h5>
+            </header>
+            <p class="skeleton skeleton-text w-75 mb-0"></p>
+          </article>
+        }
+      }
+    </div>
+  } @else if (phase() === 'fuzzy') {
+    <div class="suggestions" aria-live="polite">
+      <h4 class="m-0 mb-3">Sugerencias</h4>
+      @if (fuzzyData.items.length) {
+        <section class="codes-group">
+          <header class="codes-header">Items</header>
+          <ul class="codes-list">
+            @for (code of fuzzyData.items; track $index) {
+              <li>
+                <div class="code-card">
+                  <code class="code-text">{{ code }}</code>
+                  <div class="code-actions">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-primary btn-tight"
+                      (click)="searchSuggestion(code)">
+                      Buscar
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-secondary btn-tight"
+                      (click)="copySuggestion(code)">
+                      Copiar
+                    </button>
+                  </div>
+                </div>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+      @if (fuzzyData.keys.length) {
+        <section class="codes-group">
+          <header class="codes-header">Keys</header>
+          <ul class="codes-list">
+            @for (code of fuzzyData.keys; track $index) {
+              <li>
+                <div class="code-card">
+                  <code class="code-text">{{ code }}</code>
+                  <div class="code-actions">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-primary btn-tight"
+                      (click)="searchSuggestion(code)">
+                      Buscar
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-secondary btn-tight"
+                      (click)="copySuggestion(code)">
+                      Copiar
+                    </button>
+                  </div>
+                </div>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    </div>
+  } @else {
+    <div class="empty-state text-center p-4" aria-live="polite">
+      <div class="empty-anim" aria-hidden="true"></div>
+      <p class="mb-0 mt-2">No se encontraron coincidencias</p>
+      <small class="text-muted">
+        Prueba con otra clave o revisa la ortografía
+      </small>
+    </div>
+  }
+</section>
+<div
+  class="control-center"
+  [class.open]="opened"
+  (keydown.escape)="opened = false">
+  <button
+    class="option-btn"
+    type="button"
+    title="Opciones"
+    aria-haspopup="true"
+    aria-label="Más opciones"
+    [attr.aria-expanded]="opened"
+    (click)="opened = !opened">
+    <span class="ico-plus" [class.rotate]="opened"></span>
+  </button>
+  <div class="right-sidebar" role="toolbar" aria-label="Exportar">
+    <button
+      class="action-btn"
+      type="button"
+      title="Exportar Excel"
+      aria-label="Exportar a Excel"
+      (click)="onExcel()">
+      <span class="ico-xls"></span>
+    </button>
+    <button
+      class="action-btn"
+      type="button"
+      title="Exportar PDF"
+      aria-label="Exportar a PDF"
+      (click)="onPdf()">
+      <span class="ico-doc"></span>
+    </button>
+  </div>
+</div>

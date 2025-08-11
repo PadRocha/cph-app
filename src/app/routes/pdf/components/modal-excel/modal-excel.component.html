@@ -1,0 +1,67 @@
+<div class="modal-header py-2">
+  <h5 class="modal-title">Exportar datos a Excel</h5>
+  <button type="button" class="btn-close" aria-label="Cerrar" (click)="close()"></button>
+</div>
+<div class="modal-body">
+  @if (loading()) {
+    <div class="loading" aria-live="polite">
+      <div class="excel-skeleton" aria-hidden="true">
+        <div class="skeleton-shimmer"></div>
+        <div class="spinner-border main-spinner" role="status" aria-label="Preparando exportación…">
+          <span class="visually-hidden">Cargando…</span>
+        </div>
+        <div class="skeleton-header"></div>
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row short"></div>
+      </div>
+      <div class="hint">{{ tip() }}</div>
+      <button type="button" class="btn btn-sm btn-outline-secondary mt-2" (click)="close()">
+        Cancelar
+      </button>
+    </div>
+  } @else if (error()) {
+    <div class="alert alert-danger d-flex justify-content-between align-items-center">
+      <span>{{ error() }}</span>
+      <button class="btn btn-sm btn-outline-secondary" (click)="retry()">Reintentar</button>
+    </div>
+  } @else {
+    <p class="mb-2">
+      Vista previa de las primeras {{ preview().length }} filas
+      (total: {{ rows().length }})
+    </p>
+    <div class="table-responsive preview">
+      <table class="table table-sm table-striped align-middle">
+        <thead>
+          <tr>
+            <th>line</th>
+            <th>brand</th>
+            <th>key</th>
+            <th>code</th>
+            <th>desc</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of preview(); track $index) {
+            <tr>
+              <td>{{ r.line }}</td>
+              <td>{{ r.brand }}</td>
+              <td>{{ r.key }}</td>
+              <td>{{ r.code }}</td>
+              <td class="desc">{{ r.desc }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <small class="text-body-secondary">
+      Para verificar más resultados ajusta tu búsqueda antes de exportar
+    </small>
+  }
+</div>
+<div class="modal-footer py-2">
+  @if (!loading() && !error() && rows().length) {
+    <button type="button" class="btn btn-primary" (click)="getExcel()">Exportar .xlsx</button>
+  }
+  <button type="button" class="btn btn-outline-secondary" (click)="close()">Cerrar</button>
+</div>

@@ -1,0 +1,72 @@
+@import "local_variables";
+@import "local_mixins";
+
+.modal-header {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.modal-title {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+// Cuerpo del modal
+.modal-body {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  line-height: 1.45;
+}
+
+.section-title {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+// Lista de ejemplos
+.example {
+  padding-left: 1.25rem;
+  margin-bottom: 0;
+
+  li {
+    margin-bottom: 0.25rem;
+    code {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: .25rem;
+      padding: 0.1rem 0.3rem;
+      font-size: 0.85rem;
+    }
+  }
+}
+
+// Ajuste de <code> general
+code {
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+// Texto introductorio
+.lead {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+// Responsive ajustes extra pequeños
+@media (max-width: 400px) {
+  .modal-body {
+    font-size: 0.9rem;
+  }
+  code {
+    font-size: 0.8rem;
+  }
+}
+
+@include dark-mode {
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    background-color: $secundary;
+    color: $text-color-dark;
+  }
+}
