@@ -11,7 +11,6 @@ interface Key {
 interface ILine {
   readonly code: string;
   readonly desc: string;
-
 }
 
 interface Line extends ILine {
@@ -28,19 +27,26 @@ interface Brand extends IBrand {
 }
 
 interface StatusInfo {
-  /** Cantidad de imágenes defectuosas. */
   readonly defective: number;
-  /** Cantidad de imágenes encontradas. */
   readonly found: number;
-  /** Cantidad de imágenes fotografiadas. */
   readonly photographed: number;
-  /** Cantidad de imágenes preparadas. */
   readonly prepared: number;
-  /** Cantidad de imágenes editadas. */
   readonly edited: number;
-  /** Cantidad de imágenes guardadas. */
   readonly saved: number;
 }
 
-export type { Brand, IBrand, IKey, ILine, Key, Line, StatusInfo };
+interface IUser {
+  // (sin cambios)
+}
 
+/** ← mantengo tu User tal cual (roles: string[]) */
+interface User {
+  identifier: string;
+  nickname: string;
+  roles?: string[];
+}
+
+/** NUEVO: alias de roles tipados para el front (no rompe a User) */
+type AuthRole = 'READ' | 'WRITE' | 'EDIT' | 'GRANT' | 'ADMIN';
+
+export type { Brand, IBrand, IKey, ILine, IUser, Key, Line, StatusInfo, User, AuthRole };

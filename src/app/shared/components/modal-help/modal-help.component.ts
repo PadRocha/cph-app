@@ -1,6 +1,6 @@
 import { trigger, transition, style, animate } from '@angular/animations';
 import { Component, inject } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { ThemeDirective } from '@shared/directives';
 
 @Component({
@@ -16,7 +16,7 @@ import { ThemeDirective } from '@shared/directives';
       ])
     ])
   ],
-  hostDirectives: [ThemeDirective],
+  hostDirectives: [ThemeDirective, NgbTooltip],
 })
 export class ModalHelpComponent {
   private readonly active = inject(NgbActiveModal);

@@ -1,1 +1,164 @@
-<p>config-users works!</p>
+<div class="d-flex flex-column flex-lg-row-reverse flex-lg-row gap-3">
+  <div
+    ngbNav
+    #side="ngbNav"
+    [activeId]="subId()"
+    (activeIdChange)="subId.set($event)"
+    [animation]="true"
+    class="nav nav-pills flex-column"
+    orientation="vertical">
+    <ng-container ngbNavItem="register">
+      <button ngbNavLink>Registrar</button>
+      <ng-template ngbNavContent>
+        <form [formGroup]="formRegister" (ngSubmit)="onRegister()">
+          <div class="form-floating mb-1">
+            <input [class.is-invalid]="isInvalid(formRegister.controls.nickname)" formControlName="nickname" class="form-control" id="r-nick" type="text" placeholder="Nickname" />
+            <label for="r-nick">Nickname</label>
+          </div>
+          <div class="form-floating mb-1">
+            <input [class.is-invalid]="isInvalid(formRegister.controls.password)" formControlName="password" class="form-control" id="r-pass" type="password" placeholder="Contraseña" />
+            <label for="r-pass">Contraseña</label>
+          </div>
+          <div class="mb-3">
+            <div class="form-label">Roles</div>
+            <div class="d-flex flex-wrap gap-2">
+              @for (r of allRoles; track r) {
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    [checked]="isCheckedRegister(r)"
+                    (change)="toggleRegisterRole(r)"
+                    [disabled]="isDisabledRegisterRole(r)"
+                    [id]="'rr-' + r" />
+                  <label class="form-check-label" [for]="'rr-' + r">{{ r }}</label>
+                </div>
+              }
+            </div>
+          </div>
+          <div class="d-grid">
+            <button class="btn btn-primary" type="submit" [disabled]="!canRegister()">Guardar</button>
+          </div>
+        </form>
+      </ng-template>
+    </ng-container>
+    <ng-container ngbNavItem="update">
+      <button ngbNavLink>Actualizar</button>
+      <ng-template ngbNavContent>
+        <div class="row g-3 align-items-start">
+          <form [formGroup]="formOriginal" class="col-12 col-md-6" autocomplete="off" novalidate>
+            <div class="form-floating">
+              <input formControlName="nickname" class="form-control" id="orig-nick" type="text" placeholder="Nickname" readonly />
+              <label for="orig-nick">Nickname original</label>
+            </div>
+          </form>
+          <form [formGroup]="formUpdate" (ngSubmit)="onUpdate()" class="col-12 col-md-6" autocomplete="off" novalidate>
+            <div class="form-floating mb-3">
+              <input [class.is-invalid]="isInvalid(formUpdate.controls.newNickname)" formControlName="newNickname" class="form-control" id="u-nick" type="text" placeholder="Nuevo nickname" />
+              <label for="u-nick">Nuevo nickname</label>
+            </div>
+            <div class="d-grid">
+              <button class="btn btn-warning" type="submit" [disabled]="!canUpdate()">Actualizar</button>
+            </div>
+          </form>
+        </div>
+      </ng-template>
+    </ng-container>
+    <ng-container ngbNavItem="roles">
+      <button ngbNavLink>Roles</button>
+      <ng-template ngbNavContent>
+        <form [formGroup]="formRoles" (ngSubmit)="onRoles()">
+          <div class="mb-2">
+            <label class="form-label" for="op">Operación</label>
+            <select id="op" class="form-select" formControlName="op">
+              <option value="set">set</option>
+              <option value="add">add</option>
+              <option value="remove">remove</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <div class="form-label">Roles destino</div>
+            <div class="d-flex flex-wrap gap-2">
+              @for (r of allRoles; track r) {
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    [checked]="isCheckedRoles(r)"
+                    (change)="toggleRolesRole(r)"
+                    [disabled]="isDisabledRole(r)"
+                    [id]="'ur-' + r"
+                  />
+                  <label class="form-check-label" [for]="'ur-' + r">{{ r }}</label>
+                </div>
+              }
+            </div>
+          </div>
+          <div class="d-grid">
+            <button class="btn btn-secondary" type="submit" [disabled]="!canRoles()">Aplicar</button>
+          </div>
+        </form>
+      </ng-template>
+    </ng-container>
+    <ng-container ngbNavItem="delete">
+      <button ngbNavLink>Eliminar</button>
+      <ng-template ngbNavContent>
+        <div class="mb-3">
+          <div class="text-body-secondary small">Roles: {{ selectedRolesLine() }}</div>
+        </div>
+        <div class="d-grid">
+          <button class="btn btn-danger" type="button" (click)="onDelete()" [disabled]="!canDeleteBtn()">Eliminar</button>
+        </div>
+      </ng-template>
+    </ng-container>
+    <ng-container ngbNavItem="password">
+      <button ngbNavLink>Contraseña</button>
+      <ng-template ngbNavContent>
+        <div class="d-flex flex-column gap-3">
+          <form [formGroup]="formOwn" (ngSubmit)="onChangeOwnPassword()">
+            <div class="form-floating mb-1">
+              <input [class.is-invalid]="isInvalid(formOwn.controls.currentPassword)" formControlName="currentPassword" class="form-control" id="own-cur" type="password" placeholder="Contraseña actual" />
+              <label for="own-cur">Contraseña actual</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input [class.is-invalid]="isInvalid(formOwn.controls.newPassword)" formControlName="newPassword" class="form-control" id="own-new" type="password" placeholder="Nueva contraseña" />
+              <label for="own-new">Nueva contraseña</label>
+            </div>
+            <div class="d-grid">
+              <button class="btn btn-primary" type="submit" [disabled]="!canOwnPw()">Cambiar propia</button>
+            </div>
+          </form>
+          <form [formGroup]="formForce" (ngSubmit)="onForcePassword()">
+            <div class="form-floating mb-3">
+              <input [class.is-invalid]="isInvalid(formForce.controls.newPassword)" formControlName="newPassword" class="form-control" id="force-pass" type="password" placeholder="Nueva contraseña (admin)" />
+              <label for="force-pass">Nueva contraseña (admin)</label>
+            </div>
+            <div class="d-grid">
+              <button class="btn btn-danger" type="submit" [disabled]="!canForcePw()">Forzar cambio</button>
+            </div>
+          </form>
+        </div>
+      </ng-template>
+    </ng-container>
+  </div>
+  <div class="vr d-none d-lg-block"></div>
+  <div class="d-flex flex-column flex-fill">
+    @if (subId() !== 'register') {
+      <div class="form-floating mb-3">
+        <input
+          [ngbTypeahead]="searchUsers"
+          [selectOnExact]="true"
+          [formControl]="parameter"
+          class="form-control"
+          id="parameter"
+          type="text"
+          placeholder="Nickname de usuario" />
+        <label for="parameter">Buscar usuario por nickname</label>
+      </div>
+      <div class="small mb-2">
+        Usuario seleccionado: <strong>{{ selectedNick() }}</strong>
+      </div>
+    }
+    <div [ngbNavOutlet]="side"></div>
+  </div>
+</div>
