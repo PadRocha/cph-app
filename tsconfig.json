@@ -37,20 +37,20 @@
       "@shared/*": [
         "src/app/shared/*"
       ],
-      "@dashboard/*": [
-        "src/app/pages/dashboard/*"
-      ],
       "@environment": [
         "src/environments/environment.ts"
       ],
       "@home/*": [
         "src/app/routes/home/*"
       ],
-      "@login/*": [
-        "src/app/routes/login/*"
+      "@auth/*": [
+        "src/app/routes/auth/*"
       ],
       "@pdf/*": [
         "src/app/routes/pdf/*"
+      ],
+      "@settings/*": [
+        "src/app/routes/settings/*"
       ],
     },
     "skipLibCheck": true,

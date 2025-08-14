@@ -1,0 +1,255 @@
+<div class="d-flex flex-column flex-lg-row-reverse flex-lg-row gap-3">
+  <div
+    ngbNav
+    #side="ngbNav"
+    [activeId]="subId()"
+    (activeIdChange)="subId.set($event)"
+    class="nav nav-pills flex-column"
+    orientation="vertical">
+    <ng-container ngbNavItem="create">
+      <button ngbNavLink>Crear</button>
+      <ng-template ngbNavContent>
+        <form [formGroup]="form" (ngSubmit)="onCreate()">
+          <div class="form-floating mb-1">
+            <input
+              [ngbTypeahead]="searchLines"
+              [selectOnExact]="true"
+              [resultTemplate]="rtLine"
+              formControlName="line"
+              class="form-control"
+              id="line"
+              type="text"
+              placeholder="Línea (3)"
+              maxlength="3"
+            />
+            <label for="line">Línea (3)</label>
+          </div>
+          @if (lineDesc()) {
+            <div class="form-text text-body-secondary mb-3">
+              {{ lineDesc() }}
+            </div>
+          }
+          <div class="form-floating mb-1">
+            <input
+              [ngbTypeahead]="searchBrands"
+              [selectOnExact]="true"
+              [resultTemplate]="rtBrand"
+              formControlName="brand"
+              class="form-control"
+              id="brand"
+              type="text"
+              placeholder="Marca (2–3)"
+              maxlength="3"
+            />
+            <label for="brand">Marca (2–3)</label>
+          </div>
+          @if (brandDesc()) {
+            <div class="form-text text-body-secondary mb-3">
+              {{ brandDesc() }}
+            </div>
+          }
+          <div class="d-grid">
+            <button class="btn btn-primary" type="submit" [disabled]="!canCreate()">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </ng-template>
+    </ng-container>
+    <ng-container ngbNavItem="update">
+      <button ngbNavLink>Actualizar</button>
+      <ng-template ngbNavContent>
+        <div class="row g-3 align-items-start">
+          <!-- Original (solo lectura) -->
+          <form [formGroup]="formOriginal" class="col-12 col-md-6" autocomplete="off" novalidate>
+            <div class="form-floating mb-1">
+              <input
+                formControlName="line"
+                class="form-control"
+                id="orig-line"
+                type="text"
+                placeholder="Línea original (3)"
+                readonly
+              />
+              <label for="orig-line">Línea original (3)</label>
+            </div>
+            @if (origLineDesc()) {
+              <div class="form-text text-body-secondary mb-3">
+                {{ origLineDesc() }}
+              </div>
+            }
+            <div class="form-floating">
+              <input
+                formControlName="brand"
+                class="form-control"
+                id="orig-brand"
+                type="text"
+                placeholder="Marca original (2–3)"
+                readonly
+              />
+              <label for="orig-brand">Marca original (2–3)</label>
+            </div>
+            @if (origBrandDesc()) {
+              <div class="form-text text-body-secondary">
+                {{ origBrandDesc() }}
+              </div>
+            }
+          </form>
+          <form [formGroup]="form" (ngSubmit)="onUpdate()" class="col-12 col-md-6" autocomplete="off" novalidate>
+            <div class="form-floating mb-1">
+              <input
+                [ngbTypeahead]="searchLines"
+                [selectOnExact]="true"
+                [resultTemplate]="rtLine"
+                formControlName="line"
+                class="form-control"
+                id="u-line"
+                type="text"
+                placeholder="Nueva línea (3)"
+                maxlength="3"
+              />
+              <label for="u-line">Nueva línea (3)</label>
+            </div>
+            @if (lineDesc()) {
+              <div class="form-text text-body-secondary mb-3">
+                {{ lineDesc() }}
+              </div>
+            }
+            <div class="form-floating mb-3">
+              <input
+                [ngbTypeahead]="searchBrands"
+                [selectOnExact]="true"
+                [resultTemplate]="rtBrand"
+                formControlName="brand"
+                class="form-control"
+                id="u-brand"
+                type="text"
+                placeholder="Nueva marca (2–3)"
+                maxlength="3"
+              />
+              <label for="u-brand">Nueva marca (2–3)</label>
+            </div>
+            @if (brandDesc()) {
+              <div class="form-text text-body-secondary mb-3">
+                {{ brandDesc() }}
+              </div>
+            }
+            <div class="d-grid">
+              <button class="btn btn-warning" type="submit" [disabled]="!canUpdate()">
+                Actualizar
+              </button>
+            </div>
+          </form>
+        </div>
+      </ng-template>
+    </ng-container>
+    <ng-container ngbNavItem="delete">
+      <button ngbNavLink>Eliminar</button>
+      <ng-template ngbNavContent>
+        <div class="form-floating mb-1">
+          <input
+            class="form-control"
+            id="del-line"
+            type="text"
+            placeholder="Línea"
+            [value]="origLineUpper()"
+            readonly
+          />
+          <label for="del-line">Línea</label>
+        </div>
+        @if (origLineDesc()) {
+          <div class="form-text text-body-secondary mb-3">
+            {{ origLineDesc() }}
+          </div>
+        }
+        <div class="form-floating mb-1">
+          <input
+            class="form-control"
+            id="del-brand"
+            type="text"
+            placeholder="Marca"
+            [value]="origBrandUpper()"
+            readonly
+          />
+          <label for="del-brand">Marca</label>
+        </div>
+        @if (origBrandDesc()) {
+          <div class="form-text text-body-secondary mb-3">
+            {{ origBrandDesc() }}
+          </div>
+        }
+        <div class="form-check form-switch mb-3">
+          <input class="form-check-input" id="forceDel" type="checkbox" [formControl]="forceDelete" />
+          <label class="form-check-label" for="forceDel">
+            Forzar eliminación de archivos relacionados
+          </label>
+        </div>
+        <div class="d-grid">
+          <button class="btn btn-danger" type="button" (click)="onDelete()" [disabled]="!canDeleteBtn()">
+            Eliminar
+          </button>
+        </div>
+      </ng-template>
+    </ng-container>
+    <ng-container ngbNavItem="reset">
+      <button ngbNavLink>Resetear</button>
+      <ng-template ngbNavContent>
+        <div class="form-floating mb-3">
+          <select class="form-select" id="resetStatus" [formControl]="resetStatus">
+            <option [ngValue]="0">0 — defective</option>
+            <option [ngValue]="1">1 — found</option>
+            <option [ngValue]="2">2 — photographed</option>
+            <option [ngValue]="3">3 — prepared</option>
+            <option [ngValue]="4">4 — edited</option>
+          </select>
+          <label for="resetStatus">Estado destino</label>
+        </div>
+        <div class="d-grid">
+          <button class="btn btn-secondary" type="button" (click)="onReset()" [disabled]="!canResetBtn()">
+            Resetear
+          </button>
+        </div>
+      </ng-template>
+    </ng-container>
+    <ng-template #rtLine let-r="result">
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">{{ r }}</span>
+        <small class="text-body-secondary ms-2 text-end">{{ descOfLine(r) }}</small>
+      </div>
+    </ng-template>
+    <ng-template #rtBrand let-r="result">
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">{{ r }}</span>
+        <small class="text-body-secondary ms-2 text-end">{{ descOfBrand(r) }}</small>
+      </div>
+    </ng-template>
+  </div>
+  <div class="vr d-none d-lg-block"></div>
+  <div class="d-flex flex-column flex-fill">
+    @if (subId() !== 'create') {
+      <div class="form-floating mb-3">
+        <input
+          [ngbTypeahead]="searchKeys"
+          [selectOnExact]="true"
+          [formControl]="parameter"
+          class="form-control"
+          id="parameter"
+          type="text"
+          placeholder="Código de clave"
+          maxlength="6"
+          [resultTemplate]="rtKey"
+        />
+        <label for="parameter">Código de clave</label>
+      </div>
+      <div class="small mb-2">
+        Clave seleccionada: <strong>{{ selectedCode() }}</strong>
+      </div>
+      <ng-template #rtKey let-r="result">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="fw-semibold">{{ r }}</span>
+        </div>
+      </ng-template>
+    }
+    <div [ngbNavOutlet]="side"></div>
+  </div>
+</div>

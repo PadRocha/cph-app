@@ -1,50 +1,48 @@
-<form [formGroup]="searchForm"  class="d-grid sticky-top gap-3 py-3" role="search">
-  <div class="input-group input-group-sm">
-    <button
-      class="btn btn-dark"
-      id="recorder"
-      name="recorder"
-      type="button"
-      title="Grabadora"
-      (click)="toggleRecorder()"
-      [class.active]="listening">
-      @if (!listening) {
-        <span class="ico-record"></span>
-      } @else {
-        <span class="ico-stream"></span>
-      }
-    </button>
-    <input
-      class="form-control"
-      id="search"
-      name="search"
-      type="search"
-      title="Buscar"
-      aria-autocomplete="none"
-      aria-label="Buscar por clave y/o descripción"
-      formControlName="search"
-      placeholder="Clave y/o descripción"
-      autocomplete="off"
-      autofocus
-    />
-    <button
-      [class.active]="filter"
-      [attr.aria-label]="filter ? 'Filtrar: solo con imagen': 'Filtrar: incluir nulos (sin imagen)'"
-      (click)="toggleStatus()"
-      class="btn btn-dark"
-      type="button"
-      title="Filtrar por imagen">
-      <span class="ico-filter"></span>
-    </button>
-    <button
-      class="btn btn-dark"
-      type="button"
-      title="Ayuda"
-      aria-label="Ayuda"
-      (click)="openHelp()">
-      <span class="ico-help"></span>
-    </button>
-  </div>
+<form [formGroup]="searchForm"  class="sticky-top my-3 input-group input-group-sm" role="search">
+  <button
+    class="btn btn-dark"
+    id="recorder"
+    name="recorder"
+    type="button"
+    title="Grabadora"
+    (click)="toggleRecorder()"
+    [class.active]="listening">
+    @if (!listening) {
+      <span class="ico-record"></span>
+    } @else {
+      <span class="ico-stream"></span>
+    }
+  </button>
+  <input
+    class="form-control"
+    id="search"
+    name="search"
+    type="search"
+    title="Buscar"
+    aria-autocomplete="none"
+    aria-label="Buscar por clave y/o descripción"
+    formControlName="search"
+    placeholder="Clave y/o descripción"
+    autocomplete="off"
+    autofocus
+  />
+  <button
+    [class.active]="filter"
+    [attr.aria-label]="filter ? 'Filtrar: solo con imagen': 'Filtrar: incluir nulos (sin imagen)'"
+    (click)="toggleStatus()"
+    class="btn btn-dark"
+    type="button"
+    title="Filtrar por imagen">
+    <span class="ico-filter"></span>
+  </button>
+  <button
+    class="btn btn-dark"
+    type="button"
+    title="Ayuda"
+    aria-label="Ayuda"
+    (click)="openHelp()">
+    <span class="ico-help"></span>
+  </button>
 </form>
 <section class="position-relative">
   @if (phase() === 'results') {

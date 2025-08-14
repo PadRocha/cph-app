@@ -79,7 +79,6 @@ export class ModalItemComponent {
   });
 
   public readonly statusForm = new FormControl('', { validators: Validators.required, nonNullable: true });
-  public readonly reference = viewChild.required<HTMLDivElement>('reference');
   private createTypeaheadStream(
     { nativeElement: el }: ElementRef<HTMLInputElement>,
     dir: NgbTypeahead,

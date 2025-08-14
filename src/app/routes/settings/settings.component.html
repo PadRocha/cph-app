@@ -1,1 +1,33 @@
-<p>settings works!</p>
+<ul ngbNav #nav="ngbNav" [activeId]="activeId()" class="nav-tabs sticky-top my-3">
+  <li [ngbNavItem]="1">
+    <button ngbNavLink>Productos</button>
+    <ng-template ngbNavContent>
+        <config-items></config-items>
+    </ng-template>
+  </li>
+  <li [ngbNavItem]="2">
+    <button ngbNavLink>Claves</button>
+    <ng-template ngbNavContent>
+        <config-keys></config-keys>
+    </ng-template>
+  </li>
+  <li [ngbNavItem]="3">
+    <button ngbNavLink>Líneas</button>
+    <ng-template ngbNavContent>
+        <config-lines></config-lines>
+    </ng-template>
+  </li>
+  <li [ngbNavItem]="4">
+    <button ngbNavLink>Marcas</button>
+    <ng-template ngbNavContent>
+        <config-brands></config-brands>
+    </ng-template>
+  </li>
+  <li [ngbNavItem]="5">
+    <button ngbNavLink>Usuarios</button>
+    <ng-template ngbNavContent>
+        <config-users></config-users>
+    </ng-template>
+  </li>
+</ul>
+<div [ngbNavOutlet]="nav"></div>

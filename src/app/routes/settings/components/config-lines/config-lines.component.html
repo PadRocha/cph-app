@@ -1,0 +1,162 @@
+<div class="d-flex flex-column flex-lg-row-reverse flex-lg-row gap-3">
+  <div
+    ngbNav
+    #side="ngbNav"
+    [activeId]="subId()"
+    (activeIdChange)="subId.set($event)"
+    class="nav nav-pills flex-column"
+    orientation="vertical">
+    <ng-container ngbNavItem="create">
+      <button ngbNavLink>Crear</button>
+      <ng-template ngbNavContent>
+        <form [formGroup]="form" (ngSubmit)="onCreate()">
+          <div class="form-floating mb-1">
+            <input
+              formControlName="code"
+              class="form-control"
+              id="code"
+              type="text"
+              placeholder="Código (3)"
+              maxlength="3"
+            />
+            <label for="code">Código (3)</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              formControlName="desc"
+              class="form-control"
+              id="desc"
+              type="text"
+              placeholder="Descripción"
+              maxlength="128"
+            />
+            <label for="desc">Descripción</label>
+          </div>
+          <div class="d-grid">
+            <button class="btn btn-primary" type="submit" [disabled]="!canCreate()">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </ng-template>
+    </ng-container>
+    <ng-container ngbNavItem="update">
+      <button ngbNavLink>Actualizar</button>
+      <ng-template ngbNavContent>
+        <div class="row g-3 align-items-start">
+          <!-- Original (solo lectura) -->
+          <form [formGroup]="formOriginal" class="col-12 col-md-6" autocomplete="off" novalidate>
+            <div class="form-floating mb-1">
+              <input
+                formControlName="code"
+                class="form-control"
+                id="orig-code"
+                type="text"
+                placeholder="Código original"
+                readonly
+              />
+              <label for="orig-code">Código original</label>
+            </div>
+            <div class="form-floating">
+              <input
+                formControlName="desc"
+                class="form-control"
+                id="orig-desc"
+                type="text"
+                placeholder="Descripción original"
+                readonly
+              />
+              <label for="orig-desc">Descripción original</label>
+            </div>
+          </form>
+          <!-- Editable (precargado al seleccionar la línea) -->
+          <form [formGroup]="form" (ngSubmit)="onUpdate()" class="col-12 col-md-6" autocomplete="off" novalidate>
+            <div class="form-floating mb-1">
+              <input
+                formControlName="code"
+                class="form-control"
+                id="u-code"
+                type="text"
+                placeholder="Nuevo código (3)"
+                maxlength="3"
+              />
+              <label for="u-code">Nuevo código (3)</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input
+                formControlName="desc"
+                class="form-control"
+                id="u-desc"
+                type="text"
+                placeholder="Nueva descripción"
+                maxlength="128"
+              />
+              <label for="u-desc">Nueva descripción</label>
+            </div>
+            <div class="d-grid">
+              <button class="btn btn-warning" type="submit" [disabled]="!canUpdate()">
+                Actualizar
+              </button>
+            </div>
+          </form>
+        </div>
+      </ng-template>
+    </ng-container>
+    <ng-container ngbNavItem="delete">
+      <button ngbNavLink>Eliminar</button>
+      <ng-template ngbNavContent>
+        <div class="form-floating mb-3">
+          <input
+            class="form-control"
+            id="del-desc"
+            type="text"
+            placeholder="Descripción"
+            [value]="selectedDesc()"
+            readonly
+          />
+          <label for="del-desc">Descripción</label>
+        </div>
+        <div class="form-check form-switch mb-3">
+          <input class="form-check-input" id="forceDel" type="checkbox" [formControl]="forceDelete" />
+          <label class="form-check-label" for="forceDel">
+            Forzar eliminación de elementos relacionados
+          </label>
+        </div>
+        <div class="d-grid">
+          <button class="btn btn-danger" type="button" (click)="onDelete()" [disabled]="!canDeleteBtn()">
+            Eliminar
+          </button>
+        </div>
+      </ng-template>
+    </ng-container>
+  </div>
+  <div class="vr d-none d-lg-block"></div>
+  <div class="d-flex flex-column flex-fill">
+    @if (subId() !== 'create') {
+      <div class="form-floating mb-3">
+        <input
+          [ngbTypeahead]="searchLines"
+          [selectOnExact]="true"
+          [formControl]="parameter"
+          class="form-control"
+          id="parameter"
+          type="text"
+          placeholder="Código de línea"
+          maxlength="3"
+          [resultTemplate]="rtParam"
+        />
+        <label for="parameter">Código de línea</label>
+      </div>
+      <div class="small mb-2">
+        Línea seleccionada: <strong>{{ selectedCode() }}</strong>
+      </div>
+      <ng-template #rtParam let-r="result">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="fw-semibold">{{ r }}</span>
+          <small class="text-body-secondary ms-2 text-end">{{ descOfLine(r) }}</small>
+        </div>
+      </ng-template>
+    }
+    <div [ngbNavOutlet]="side"></div>
+  </div>
+</div>
